@@ -2,7 +2,16 @@
 section.unit .secnav .jb{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px}
 @media (max-width:760px){section.unit .secnav .jb{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}}
 .p140-go{display:block;width:100%;margin:14px 0 4px;padding:12px 14px;font:inherit;font-size:19px;font-weight:700;color:#fff;background:#c8102e;border:0;border-radius:12px;cursor:pointer;text-align:center}
-</style><script defer src="https://cloud.umami.is/script.js" data-website-id="0c59c8ac-f594-41fb-ac04-392482ab3e25"></script>
+</style><script>/* Z-Math public counter (abacus): one visit per browser session, +1 per minute of active use */
+(function(){ var NS="https://abacus.jasoncameron.dev/hit/kzogovic.github.io/";
+ function hit(k){ try{ fetch(NS+k).catch(function(){}); }catch(e){} }
+ try{ if(!sessionStorage.getItem("zmVisit")){ sessionStorage.setItem("zmVisit","1"); hit("zmath-visits"); } }catch(e){ hit("zmath-visits"); }
+ var acc=0,last=Date.now(),act=Date.now();
+ ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,function(){act=Date.now();},{passive:true}); });
+ setInterval(function(){ var n=Date.now(); if(document.visibilityState==="visible"&&n-act<120000) acc+=(n-last)/1000; last=n;
+   if(acc>=60){ acc-=60; setTimeout(function(){hit("zmath-minutes");},Math.random()*8000); } },10000);
+})();</script>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="0c59c8ac-f594-41fb-ac04-392482ab3e25"></script>
 <script>/* Z-Math time counter: counts only time the page is open, visible and in use. No names, no cookies. */
 (function(){ var BOOK='Z-Algebra 2', STEP=300, acc=0, last=Date.now(), active=Date.now();
  function used(){ active=Date.now(); } ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,used,{passive:true}); });
