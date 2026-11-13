@@ -219,17 +219,38 @@ function flowHTML(id,F){ FLOWS[id]=F;
  ${fv()}${fn(F.end)}
 </div>
 <div class="mf-d" aria-live="polite"></div>`; }
-function mfDetail(m){
+function mfDetail(m,flow,k){
   return `<div class="mf-dc" style="--c:${m.c}"><div class="mf-dk">${m.grp}</div><h4>${m.name}</h4><p class="mf-when"><b>When:</b> ${m.when}</p><p class="mf-rule">${m.rule}</p>${m.why?`<p class="mf-why"><b>Why this method:</b> ${m.why}</p>`:""}
    <div class="mf-exs">${m.ex.map(([q,st],i)=>`<div class="mf-ex"><div class="fx-k">Example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(s=>`<li>${s}</li>`).join("")}</ol></div>`).join("")}</div>
    ${m.tip?`<p class="mf-tip"><b>⚠ Watch out:</b> ${m.tip}</p>`:""}
-   ${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
+   <button type="button" class="fx-go" data-mgen="1">↻ New examples</button>${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
 function bindFlow(root){ root.querySelectorAll(".mf").forEach(mf=>{ if(mf.dataset.bound) return; mf.dataset.bound=1; const d=mf.nextElementSibling, F=FLOWS[mf.dataset.flow]; if(!F) return;
-  const pickK=(k,scroll)=>{ mf.querySelectorAll(".mf-n").forEach(b=>b.classList.toggle("on",b.dataset.fm===k)); d.innerHTML=mfDetail(F.M[k]); if(scroll) d.scrollIntoView({behavior:"smooth",block:"nearest"}); };
+  const pickK=(k,scroll)=>{ mf.querySelectorAll(".mf-n").forEach(b=>b.classList.toggle("on",b.dataset.fm===k)); d.dataset.k=k; d.innerHTML=mfDetail(F.M[k],mf.dataset.flow,k); if(scroll) d.scrollIntoView({behavior:"smooth",block:"nearest"}); };
   mf.querySelectorAll(".mf-n").forEach(b=>b.onclick=()=>pickK(b.dataset.fm,true)); pickK(F.top[0],false);
-  d.addEventListener("click",e=>{ const o=e.target.closest("[data-mopen]"); if(o){ location.hash=o.dataset.mopen; return; }
+  d.addEventListener("click",e=>{ if(e.target.closest("[data-mgen]")){ const ex=zFresh(F.M[d.dataset.k],mf.dataset.flow,d.dataset.k); if(ex) d.querySelector(".mf-exs").innerHTML=ex; return; } const o=e.target.closest("[data-mopen]"); if(o){ location.hash=o.dataset.mopen; return; }
     const j=e.target.closest("[data-mjump]"); if(!j) return; const sec=mf.closest("section.unit"), node=sec&&sec.querySelector(`.pm-node[data-pk="${j.dataset.mjump.replace(/^sub-[^-]+-/,"")}"]`);
     if(node) node.click(); const t=document.getElementById(j.dataset.mjump); if(!t) return; if(t.tagName==="DETAILS") t.open=true; setTimeout(()=>window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-130,behavior:"smooth"}),40); }); }); }
+
+const zTok=s=>new Set(String(s||"").replace(/<[^>]+>/g," ").toLowerCase().split(/[^a-z0-9χ²]+/).filter(w=>w.length>2&&!/^(the|and|for|with|from|that|this|then|when|each|into|than|only|both|have|uses|use|find|your|what|which|value|values|are|you|one|two)$/.test(w)).map(w=>w.replace(/(ies|es|s|ing|ed)$/,"")));
+const SCC=['P1I','P1T','P2I','P2T','GOF','HOM','IND','M1I','M1T','MPT','MPI','M2I','M2T','SLT','SLI'];
+const ZW={p1:'P1',p2:'P2',gof:'GOF',hom:'HOM',ind:'IND',m1:'M1',mp:'MP',m2:'M2',sl:'SL',u8cat:'GOF|HOM|IND',u9out:'SLT',u9ci:'SLI',est:'.',ctx:'.',u7zt:'M'};
+const ZT={z:'z-scores',u1emp:'z-scores',tr:'Transformations',lsrl:'LSRL',u2r:'LSRL',rv:'Random variables',comb:'Combining RVs',bin:'Binomial',geo:'Geometric',phat:'Standard errors',xbar:'Sampling distributions',u5dp:'Standard errors|Pooling',u5dm:'Sampling distributions',u5what:'Standard errors|Sampling distributions',u5norm:'Sampling distributions',u8exp:'Expected counts|Degrees of freedom',chk:'Conditions|Conclusions|Test statistics',u6err:'Conclusions',u6ci:'Margin of error',inter:'Conclusions',res:'LSRL'};
+const ZD={srs:'SRS',str:'Stratified',clu:'Cluster',sys:'Systematic',crd:'Completely',blk:'Block',mpd:'Matched',obs:'.',bias:'Convenience|Voluntary',scope:'.',u5bias:'Convenience|Voluntary'};
+const mkDn=re=>()=>{ const L=DS.filter(d=>new RegExp(re,"i").test(d[0])); const [a,ex]=pick(L.length?L:DS); const others=shuffle(DS.filter(d=>d[0]!==a).map(d=>d[0])).slice(0,3); return PS("Which design?",pick(ex)+" Which method is this?",a,others,[`<b>${a}</b>`]); };
+function zPool(k,flow){ if(/^uf-unit-[1245]$/.test(flow||"")&&/^(inter|ctx|chk|res|u1ctx)$/.test(k)) return null; const all=[...G.ap.calc,...G.ap.form,mkC,mkCon]; all.forEach(g=>{ if(g._t===undefined){ const p=gen(g); g._t=p?p.t:""; } });
+  if(ZW[k]){ const re=new RegExp("^("+ZW[k]+")"); return SC.filter((g,i)=>re.test(SCC[i])).map(mkW); }
+  if(ZT[k]){ const re=new RegExp("^("+ZT[k]+")$"); return all.filter(g=>re.test(g._t)); }
+  if(ZD[k]) return [mkDn(ZD[k])];
+  const u=(flow||"").replace(/^uf-/,""); const PU=window.PRACTICE&&PRACTICE._U[u]; return PU?null:[...G.ap.which]; }
+const pTok=s=>new Set(String(s||"").replace(/<[^>]+>/g," ").toLowerCase().split(/[^a-z]+/).filter(w=>w.length>3).map(w=>w.replace(/(ies|es|s|ing|ed)$/,"")));
+function zUnit(m,flow){ const u=(flow||"").replace(/^uf-/,""), PU=PRACTICE._U[u]; const T=pTok(m.name+" "+m.hint+" "+m.rule);
+  const L=[...(PU.mcq||[]).map(g=>["m",g]),...(PU.tasks||[]).map(g=>["t",g])].map(([kd,g])=>{ let p; try{p=g();}catch(e){} return p?[kd,p]:null; }).filter(Boolean);
+  const sc=L.map(([kd,p])=>{ let n=0; pTok(kd==="m"?p.q:p.t).forEach(w=>{ if(T.has(w)) n++; }); return n+Math.random()*.9; });
+  return L.map((x,i)=>[sc[i],x]).sort((a,b)=>b[0]-a[0]).slice(0,4).sort(()=>Math.random()-.5).slice(0,2).map(([_,[kd,p]])=>kd==="m"?{t:"Practice",q:p.q,a:p.ch[p.ai],s:[p.ex]}:{t:"Free response",q:p.t,a:"see the solution",s:[p.s]}); }
+function zFresh(m,flow,k){ if(!m) return null; let out=[]; const pool=zPool(k,flow);
+  if(pool&&pool.length){ const seen=new Set(); let t=0; while(out.length<2&&t++<40){ const p=gen(pick(pool)); if(!p||seen.has(p.q)) continue; seen.add(p.q); out.push(p); } }
+  else if(window.PRACTICE) out=zUnit(m,flow);
+  return out.map((p,i)=>`<div class="mf-ex"><div class="fx-k">New example ${i+1} · ${p.t}</div><p class="mf-eq">${p.q}</p>${p.a==="see the solution"?"":`<p><b>Answer:</b> ${p.a}</p>`}${p.s&&p.s.length?`<ol>${p.s.map(x=>`<li>${x}</li>`).join("")}</ol>`:""}</div>`).join(""); }
 /* ===================== engine ===================== */
 const has=(u,kind)=>!!(G[u]&&G[u][kind]&&G[u][kind].length);
 function parseAns(s){ s=String(s||"").trim().toLowerCase().replace(/[−–—]/g,"-").replace(/,/g,"").replace(/\s+/g,"").replace(/%$/,"").replace(/^\$/,"");

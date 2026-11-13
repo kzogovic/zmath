@@ -34,17 +34,27 @@ function flowHTML(id,F){ FLOWS[id]=F;
  ${fv()}${fn(F.end)}
 </div>
 <div class="mf-d" aria-live="polite"></div>`; }
-function mfDetail(m){
+function mfDetail(m,flow,k){
   return `<div class="mf-dc" style="--c:${m.c}"><div class="mf-dk">${m.grp}</div><h4>${m.name}</h4><p class="mf-when"><b>When:</b> ${m.when}</p><p class="mf-rule">${m.rule}</p>${m.why?`<p class="mf-why"><b>Why this method:</b> ${m.why}</p>`:""}
    <div class="mf-exs">${m.ex.map(([q,st],i)=>`<div class="mf-ex"><div class="fx-k">Example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(s=>`<li>${s}</li>`).join("")}</ol></div>`).join("")}</div>
    ${m.tip?`<p class="mf-tip"><b>⚠ Watch out:</b> ${m.tip}</p>`:""}
-   ${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
+   ${zHas(flow)?`<button type="button" class="fx-go" data-mgen="1">↻ New examples</button>`:""}${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
 function bindFlow(root){ root.querySelectorAll(".mf").forEach(mf=>{ if(mf.dataset.bound) return; mf.dataset.bound=1; const d=mf.nextElementSibling, F=FLOWS[mf.dataset.flow]; if(!F) return;
-  const pickK=(k,scroll)=>{ mf.querySelectorAll(".mf-n").forEach(b=>b.classList.toggle("on",b.dataset.fm===k)); d.innerHTML=mfDetail(F.M[k]); if(scroll) d.scrollIntoView({behavior:"smooth",block:"nearest"}); };
+  const pickK=(k,scroll)=>{ mf.querySelectorAll(".mf-n").forEach(b=>b.classList.toggle("on",b.dataset.fm===k)); d.dataset.k=k; d.innerHTML=mfDetail(F.M[k],mf.dataset.flow,k); if(scroll) d.scrollIntoView({behavior:"smooth",block:"nearest"}); };
   mf.querySelectorAll(".mf-n").forEach(b=>b.onclick=()=>pickK(b.dataset.fm,true)); pickK(F.top[0],false);
-  d.addEventListener("click",e=>{ const o=e.target.closest("[data-mopen]"); if(o){ location.hash=o.dataset.mopen; return; }
+  d.addEventListener("click",e=>{ if(e.target.closest("[data-mgen]")){ const ex=zFresh(mf.dataset.flow,F.M[d.dataset.k]); if(ex) d.querySelector(".mf-exs").innerHTML=ex; return; } const o=e.target.closest("[data-mopen]"); if(o){ location.hash=o.dataset.mopen; return; }
     const j=e.target.closest("[data-mjump]"); if(!j) return; const sec=mf.closest("section.unit"), node=sec&&sec.querySelector(`.pm-node[data-pk="${j.dataset.mjump.replace(/^sub-[^-]+-/,"")}"]`);
     if(node) node.click(); const t=document.getElementById(j.dataset.mjump); if(!t) return; if(t.tagName==="DETAILS") t.open=true; setTimeout(()=>window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-130,behavior:"smooth"}),40); }); }); }
+
+const zU=flow=>String(flow||"").replace(/^f-/,"");
+const zHas=flow=>{ const u=zU(flow); return !!(typeof G!=="undefined"&&G[u]&&(G[u].sat.length||G[u].chal.length)); };
+const zTok=s=>new Set(String(s||"").replace(/<[^>]+>/g," ").toLowerCase().split(/[^a-z]+/).filter(w=>w.length>3&&!/^(with|from|that|this|then|when|each|into|than|only|both|have|uses|use|find|your|what|which|value|values)$/.test(w)).map(w=>w.replace(/(ies|es|s|ing|ed)$/,"")));
+function zPick(u,kind,m){ const L=G[u][kind]; if(!L.length) return null; topicsOf(u,kind); const T=zTok(m.name+" "+m.hint+" "+(m.when||""));
+  const sc=L.map(g=>{ let n=0; zTok(g._t).forEach(w=>{ if(T.has(w)) n++; }); return n; }); const best=Math.max(...sc); const pool=best>0?L.filter((g,i)=>sc[i]===best):L;
+  return gen(pick(pool)); }
+function zFresh(flow,m){ const u=zU(flow); if(!zHas(flow)||!m) return null; const out=[]; const a=zPick(u,"sat",m), b=zPick(u,"sat",m), c=zPick(u,"chal",m);
+  if(a) out.push(["New example",a]); if(c) out.push(["Harder example",c]); else if(b&&b.q!==(a&&a.q)) out.push(["New example",b]);
+  return out.map(([lab,p])=>`<div class="mf-ex"><div class="fx-k">${lab} · ${p.t}</div><p class="mf-eq">${p.q}</p><p><b>Answer:</b> ${p.a}</p>${solHtml(p)}</div>`).join(""); }
 /* ===================== engine ===================== */
 const has=(u,kind)=>!!(G[u]&&G[u][kind]&&G[u][kind].length);
 function parseAns(s){ s=String(s||"").trim().toLowerCase().replace(/[−–—]/g,"-").replace(/,/g,"").replace(/\s+/g,"").replace(/%$/,"").replace(/^\$/,"");

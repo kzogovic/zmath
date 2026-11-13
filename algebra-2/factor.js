@@ -138,6 +138,78 @@ const FGEN={
  chk:()=>{ const g=rnd(2,6), q=rnd(1,8);
    return [poly([g,0,-g*q*q,0]),[`GCF: ${g}x(${poly([1,0,-q*q])}). Not done yet!`,`x<sup>2</sup> − ${q*q} = (x − ${q})(x + ${q}).`,`<b>${g}x(x − ${q})(x + ${q})</b>`]]; }
 };
+
+/* ---------- fresh examples for every other Algebra 2 flowchart ---------- */
+const mtxH=(M)=>mat(M.map(r=>r.map(v=>typeof v==="number"?num(v):v)));
+function sys2(kind){ for(let t=0;t<200;t++){ const x=nz(-6,6), y=rnd(-6,6); let a=nz(-5,5), b=nz(-5,5), c=nz(-5,5), d=nz(-5,5);
+   if(kind==="sub"){ a=1; } const D=a*d-b*c; if(!D) continue; const e=a*x+b*y, f=c*x+d*y;
+   const eq=(p,q,r)=>`${poly([p,0]).replace(/x$/,"x")} ${q<0?"−":"+"} ${Math.abs(q)===1?"":Math.abs(q)}y = ${num(r)}`;
+   const q=`${eq(a,b,e)}<br>${eq(c,d,f)}`; let st;
+   if(kind==="sub") st=[`Solve the first equation for x: x = ${num(e)} ${b<0?"+":"−"} ${Math.abs(b)===1?"":Math.abs(b)}y.`,`Substitute into the second and solve: y = ${num(y)}.`,`Back-substitute: x = ${num(x)}.`];
+   else if(kind==="cr2") st=[`D = (${num(a)})(${num(d)}) − (${num(b)})(${num(c)}) = ${num(D)}.`,`D<sub>x</sub> = (${num(e)})(${num(d)}) − (${num(b)})(${num(f)}) = ${num(e*d-b*f)}, D<sub>y</sub> = (${num(a)})(${num(f)}) − (${num(e)})(${num(c)}) = ${num(a*f-e*c)}.`,`x = D<sub>x</sub>/D = ${num(x)}, y = D<sub>y</sub>/D = ${num(y)}.`];
+   else if(kind==="inv") st=[`A = ${mtxH([[a,b],[c,d]])}, det A = ${num(D)}.`,`A<sup>−1</sup> = (1/${num(D)})${mtxH([[d,-b],[-c,a]])}.`,`[x ; y] = A<sup>−1</sup>·${mtxH([[e],[f]])} = ${mtxH([[x],[y]])}.`];
+   else if(kind==="graph") st=[`Write both lines in slope-intercept form and graph them.`,`They cross at one point; read it off the graph.`,`Check it in both equations.`];
+   else st=[`Multiply so one variable has opposite coefficients, then add the equations.`,`Solve the remaining one-variable equation: ${kind==="elim"?"y":"y"} = ${num(y)}.`,`Substitute back: x = ${num(x)}.`];
+   return [q,[...st,`<b>(${num(x)}, ${num(y)})</b>`]]; } }
+const LGEN={
+ ind:(()=>{ const P=[
+  ()=>{const n0=1;return ["Prove 1 + 2 + … + n = n(n+1)/2 for all n ≥ 1.",["Base case n = 1: left 1, right 1(2)/2 = 1. ✓","Hypothesis: assume 1 + … + k = k(k+1)/2.","Step: add k+1: k(k+1)/2 + (k+1) = (k+1)(k+2)/2.","<b>That is the formula for n = k+1, so it holds for all n ≥ 1.</b>"]]},
+  ()=>{const a=pick([3,4,5,6,7,8,9]),b=a-1;return [`Prove ${a}<sup>n</sup> − 1 is divisible by ${b} for all n ≥ 1.`,[`Base case n = 1: ${a} − 1 = ${b}. ✓`,`Hypothesis: ${a}<sup>k</sup> − 1 = ${b}m for some integer m.`,`Step: ${a}<sup>k+1</sup> − 1 = ${a}·${a}<sup>k</sup> − 1 = ${a}(${b}m + 1) − 1 = ${b}(${a}m + 1).`,`<b>Divisible by ${b}, so it holds for all n ≥ 1.</b>`]]},
+  ()=>{const r=pick([2,3,4,5]);return [`Prove 1 + ${r} + ${r}² + … + ${r}<sup>n−1</sup> = (${r}<sup>n</sup> − 1)/${r-1} for n ≥ 1.`,[`Base case n = 1: left 1, right (${r} − 1)/${r-1} = 1. ✓`,`Hypothesis: the sum up to ${r}<sup>k−1</sup> is (${r}<sup>k</sup> − 1)/${r-1}.`,`Step: add ${r}<sup>k</sup>: (${r}<sup>k</sup> − 1 + ${r-1}·${r}<sup>k</sup>)/${r-1} = (${r}<sup>k+1</sup> − 1)/${r-1}.`,`<b>The formula holds for n = k+1, so for all n ≥ 1.</b>`]]},
+  ()=>{const c=pick([3,4,5]);return [`Prove 2<sup>n</sup> > ${c}n for all n ≥ ${c===3?4:c===4?5:5}.`,[`Base case: check the first n.`,`Hypothesis: 2<sup>k</sup> > ${c}k.`,`Step: 2<sup>k+1</sup> = 2·2<sup>k</sup> > ${2*c}k = ${c}k + ${c}k ≥ ${c}k + ${c} = ${c}(k+1), since k ≥ 1.`,`<b>So 2<sup>n</sup> > ${c}n for every n from the base case on.</b>`]]},
+  ()=>{const a=pick([2,3,5]),d=pick([1,2,3]);return [`a<sub>1</sub> = ${a}, a<sub>n+1</sub> = a<sub>n</sub> + ${d}. Prove a<sub>n</sub> = ${a} + ${d}(n − 1).`,[`Base case: a<sub>1</sub> = ${a} + 0 = ${a}. ✓`,`Hypothesis: a<sub>k</sub> = ${a} + ${d}(k − 1).`,`Step: a<sub>k+1</sub> = a<sub>k</sub> + ${d} = ${a} + ${d}k.`,`<b>Matches the formula at n = k+1, so it holds for all n.</b>`]]}];
+  const g=()=>pick(P)(); return {ibase:g,ihyp:g,isum:()=>pick([P[0],P[2]])(),idiv:P[1],iineq:P[3],irec:P[4],iconc:g}; })(),
+ sys:{p3:()=>{ const k=nz(-5,5); return [`For which value of a does the system x + y + z = 1, x + 2y + 3z = 2, 2x + 3y + az = ${num(k)} have no unique solution?`,[`Coefficient determinant: 1(2a − 9) − 1(a − 6) + 1(3 − 4) = a − 4.`,`No unique solution when the determinant is 0.`,`<b>a = 4</b> (then check: rows 1 + 2 give 2x + 3y + 4z = 3, so infinitely many solutions if ${num(k)} = 3, none otherwise: <b>${k===3?"infinitely many":"no solution"}</b>)`]]; },graph:()=>sys2("graph"),sub:()=>sys2("sub"),elim:()=>sys2("elim"),cr2:()=>sys2("cr2"),inv:()=>sys2("inv")},
+ mtx:{
+  madd:()=>{ const A=[[rnd(-6,6),rnd(-6,6)],[rnd(-6,6),rnd(-6,6)]], B=[[rnd(-6,6),rnd(-6,6)],[rnd(-6,6),rnd(-6,6)]], k=nz(-3,3);
+    return [`A = ${mtxH(A)}, B = ${mtxH(B)}. Find ${num(k)}A + B.`,[`Multiply every entry of A by ${num(k)}: ${mtxH(A.map(r=>r.map(v=>k*v)))}.`,`Add entry by entry.`,`<b>${mtxH(A.map((r,i)=>r.map((v,j)=>k*v+B[i][j])))}</b>`]]; },
+  mmul:()=>{ const A=[[rnd(-4,4),rnd(-4,4)],[rnd(-4,4),rnd(-4,4)]], B=[[rnd(-4,4),rnd(-4,4)],[rnd(-4,4),rnd(-4,4)]]; const C=A.map(r=>[0,1].map(j=>r[0]*B[0][j]+r[1]*B[1][j]));
+    return [`A = ${mtxH(A)}, B = ${mtxH(B)}. Find AB.`,[`Row 1 of A times each column of B: ${num(C[0][0])}, ${num(C[0][1])}.`,`Row 2 of A times each column of B: ${num(C[1][0])}, ${num(C[1][1])}.`,`<b>${mtxH(C)}</b>`]]; },
+  mdet:()=>{ if(Math.random()<.5){ const a=rnd(-6,6),b=rnd(-6,6),c=rnd(-6,6),d=rnd(-6,6); return [`Find det ${mtxH([[a,b],[c,d]])}.`,[`ad − bc = (${num(a)})(${num(d)}) − (${num(b)})(${num(c)})`,`<b>${num(a*d-b*c)}</b>`]]; }
+    const M=[0,1,2].map(()=>[0,1,2].map(()=>rnd(-4,4))); const [p,q,r]=M[0],[s2,t,u]=M[1],[v,w,z]=M[2]; const D=p*(t*z-u*w)-q*(s2*z-u*v)+r*(s2*w-t*v);
+    return [`Find det ${mtxH(M)}.`,[`Expand along row 1: ${num(p)}(${num(t*z-u*w)}) − (${num(q)})(${num(s2*z-u*v)}) + (${num(r)})(${num(s2*w-t*v)}).`,`<b>${num(D)}</b>`]]; },
+  minv:()=>{ let a,b,c,d,D; do{ a=rnd(-5,5);b=rnd(-5,5);c=rnd(-5,5);d=rnd(-5,5);D=a*d-b*c; }while(!D);
+    const fm=v=>frc(v,D); return [`Find the inverse of ${mtxH([[a,b],[c,d]])}.`,[`det = ${num(D)} ≠ 0, so the inverse exists.`,`Swap a and d, change the signs of b and c, divide by the determinant.`,mtxH([[fm(d),fm(-b)],[fm(-c),fm(a)]])]]; },
+  mtr:()=>{ const T=pick([[[[-1,0],[0,1]],"reflection in the y-axis"],[[[1,0],[0,-1]],"reflection in the x-axis"],[[[0,-1],[1,0]],"rotation 90° counterclockwise"],[[[0,1],[-1,0]],"rotation 90° clockwise"],[[[-1,0],[0,-1]],"rotation 180°"],[[[0,1],[1,0]],"reflection in y = x"]]); const x=nz(-6,6),y=nz(-6,6); const [M,nm]=T; const X2=M[0][0]*x+M[0][1]*y, Y2=M[1][0]*x+M[1][1]*y;
+    return [`Use the matrix ${mtxH(M)} to transform the point (${num(x)}, ${num(y)}). What transformation is it?`,[`Multiply the matrix by the column ${mtxH([[x],[y]])}.`,`Result: ${mtxH([[X2],[Y2]])}, so the image is (${num(X2)}, ${num(Y2)}).`,`<b>(${num(X2)}, ${num(Y2)}): ${nm}</b>`]]; },
+  mdim:()=>{ const m=rnd(1,4),n=rnd(1,4),p=rnd(1,4); return [`A is ${m} × ${n} and B is ${n} × ${p}. Is AB defined? What size is it? Is BA defined?`,[`AB: inner numbers ${n} = ${n} match, so AB is defined.`,`Size = outer numbers: ${m} × ${p}.`,`BA: ${p} vs ${m}: <b>${p===m?"also defined":"not defined"}</b>.`]]; }},
+ sta:{
+  scen:()=>{ const n=pick([5,6,7,8]), d=Array.from({length:n},()=>rnd(2,30)).sort((a,b)=>a-b), sum=d.reduce((a,b)=>a+b,0); const med=n%2?d[(n-1)/2]:(d[n/2-1]+d[n/2])/2;
+    return [`Data: ${d.join(", ")}. Find the mean and the median.`,[`Mean = ${sum}/${n} = ${N2(sum/n)}.`,`Ordered data, middle ${n%2?"value":"two values averaged"}: median = ${med}.`,`<b>mean ${N2(sum/n)}, median ${med}</b>`]]; },
+  sspr:()=>{ const d=Array.from({length:8},()=>rnd(1,40)).sort((a,b)=>a-b); const q1=(d[1]+d[2])/2, q3=(d[5]+d[6])/2;
+    return [`Data: ${d.join(", ")}. Find the range and the IQR.`,[`Range = ${d[7]} − ${d[0]} = ${d[7]-d[0]}.`,`Q1 = median of the lower half = ${q1}; Q3 = median of the upper half = ${q3}.`,`<b>range ${d[7]-d[0]}, IQR ${q3-q1}</b>`]]; },
+  spct:()=>{ const a=rnd(4,40)*5, p=pick([10,15,20,25,30,40,-10,-20,-25]); const b=a*(100+p)/100;
+    return [`A price changes from $${a} to $${N2(b)}. What is the percent change?`,[`Change = ${N2(b)} − ${a} = ${N2(b-a)}.`,`Divide by the original: ${N2(b-a)}/${a} = ${N2((b-a)/a)}.`,`<b>${p>0?"+":""}${p}%</b>`]]; },
+  sexp:()=>pick([["A researcher assigns 60 volunteers at random to a new diet or the usual diet. Experiment or observational study?",["The researcher assigns the treatment.","Random assignment lets you conclude cause and effect.","<b>Experiment</b>"]],["A survey asks 500 adults how much they sleep and how much coffee they drink. Experiment or observational study?",["Nothing is assigned; data are only recorded.","You can show association, not causation.","<b>Observational study</b>"]],["A school compares grades of students who chose to join tutoring with those who did not. Can it conclude tutoring causes higher grades?",["Students chose their own group, so there is no random assignment.","Motivation could be a confounding variable.","<b>No: observational study, association only</b>"]],["Plants are randomly given fertilizer A or B and growth is measured. What is the treatment and the response?",["Treatment = what is assigned.","Response = what is measured.","<b>Treatment: fertilizer type; response: growth</b>"]]]),
+  sdis:()=>{ const d=Array.from({length:9},()=>rnd(1,50)).sort((a,b)=>a-b); const q1=(d[1]+d[2])/2,q3=(d[6]+d[7])/2, iqr=q3-q1;
+    return [`Data: ${d.join(", ")}. Give the five-number summary for a box plot. Are there outliers?`,[`Min ${d[0]}, Q1 ${q1}, median ${d[4]}, Q3 ${q3}, max ${d[8]}.`,`IQR = ${iqr}; fences: ${q1} − 1.5(${iqr}) = ${num(q1-1.5*iqr)} and ${q3} + 1.5(${iqr}) = ${num(q3+1.5*iqr)}.`,`<b>${d.filter(v=>v<q1-1.5*iqr||v>q3+1.5*iqr).join(", ")||"No outliers"}</b>`]]; },
+  ssamp:()=>{ const n=pick([100,225,400,625,900,1600,2500]), p=rnd(30,70); const m=Math.round(1000/Math.sqrt(n))/10;
+    return [`A random sample of ${n} people finds ${p}% support a plan. Estimate the margin of error and give the interval.`,[`Margin of error ≈ 1/√n = 1/√${n} = 1/${Math.sqrt(n)} ≈ ${m}%.`,`Interval: ${p} − ${m} to ${p} + ${m}.`,`<b>about ${N2(p-m)}% to ${N2(p+m)}%</b>`]]; },
+  stwo:()=>{ const a=rnd(10,40),b=rnd(10,40),c=rnd(10,40),d=rnd(10,40); return [`Two-way table: Group A: ${a} yes, ${b} no. Group B: ${c} yes, ${d} no. Find P(yes | Group A) and P(Group A | yes).`,[`P(yes | A) = ${a}/${a+b}.`,`P(A | yes) = ${a}/${a+c}.`,`<b>${N2(a/(a+b))} and ${N2(a/(a+c))}</b>`]]; }}
+};
+const N2=v=>{ const r=Math.round(v*100)/100; return num(r); };
+const A2MAP={
+ quad:{std:["Solving by factoring","Quadratic formula"],disc:["Discriminant","Discriminant with a parameter"],sqr:["Completing the square"],gcf0:["Solving by factoring"],fac:["Solving by factoring"],cts:["Completing the square"],qf:["Quadratic formula"],chk:["Quadratic formula","Solving by factoring"]},
+ sys:{form:["Systems in three variables"],el3:["Systems in three variables"],gauss:["Systems in three variables"],cr3:["Systems in three variables"],nls:["Line–parabola systems","Line–circle systems"],nle:["Line–circle systems"],cls:["Systems in three variables"],p2:["Discriminant with a parameter"]},
+ zer:{cnt:["Finding all zeros","Zeros & multiplicity"],zp:["Zeros & multiplicity"],fz:["Factoring: quadratic form","Factoring by grouping"],giv:["Synthetic division","Factor theorem"],rrt:["Rational Root Theorem","Finding all zeros"],fin:["Finding all zeros"],apx:["Finding all zeros"]},
+ rat:{res:["Rational equations"],crs:["Rational equations"],lcd:["Rational equations"],ineq:["Rational inequalities"],rck:["Rational equations"]},
+ rad:{iso:["Radical equations"],sq1:["Radical equations"],sq2:["Radical equations"],cub:["Rational exponents"],rex:["Rational exponents"],xck:["Radical equations"]},
+ exp:{isx:["Exponential equations (logs)","Growth & decay models"],same:["Exponential equations (same base)"],tlog:["Exponential equations (logs)"],qfe:["Exponential equations (logs)"],one:["Log equations"],cond:["Log equations","Log properties"],dom:["Log equations"]},
+ cnt:{fcp:["Permutations & combinations"],perm:["Permutations & combinations"],rep:["Permutations & combinations"],comb:["Permutations & combinations"],idn:["Permutations & combinations"],prob:["Probability","Binomial probability"]},
+ seq:{ss:["Arithmetic sequences","Geometric sequences","Infinite geometric series"],ar:["Arithmetic sequences"],ge:["Geometric sequences"],rc:["Recursive formulas"],as:["Arithmetic sequences"],gs:["Geometric sequences"],is:["Infinite geometric series"],sg:["Sigma notation"],ck8:["Infinite geometric series"],ot:["Recursive formulas"]},
+ sta:{sprb:["Probability"],scond:["Probability"],ssct:["Slope","Line through two points"],sans:["Probability","Expected value"]},
+ mtx:{msys:["Systems in three variables"],mchk:["Systems in three variables"]}
+};
+function a2pool(flow,k){ const out=[]; const L=LGEN[flow]&&LGEN[flow][k]; if(L) out.push(()=>L());
+  const T=(A2MAP[flow]||{})[k]; if(T&&window.A2GEN){ for(const L2 of Object.values(A2GEN.GEN)) for(const g of L2) if(T.includes(g[0])) out.push(()=>{ const p=g[1](); return {q:p.q,a:p.a}; }); }
+  return out; }
+function freshEx(flow,k){ const F=FLOWS[flow], m=F&&F.M[k]; if(flow==="factor"&&m&&m.gen) return [m.gen(),m.gen()];
+  const pool=a2pool(flow,k); if(!pool.length) return null; const out=[], seen=new Set(); let t=0;
+  while(out.length<2&&t++<40){ try{ const r=pick(pool)(); const key=JSON.stringify(r).slice(0,300); if(seen.has(key)) continue; seen.add(key); out.push(r); }catch(e){} } return out.length?out:null; }
+const fmtA=s=>window.A2PRACTICE?A2PRACTICE.fmt(s):s;
+function exCard(r,i){ if(Array.isArray(r)){ const [q,st]=r; return `<div class="mf-ex"><div class="fx-k">New example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(x=>`<li>${x}</li>`).join("")}</ol></div>`; }
+  return `<div class="mf-ex"><div class="fx-k">New example ${i+1}</div><p class="mf-eq">${fmtA(r.q)}</p><div class="mf-sol">${fmtA(r.a)}</div></div>`; }
+const hasFresh=(flow,k)=>{ const F=FLOWS[flow], m=F&&F.M[k]; return !!((flow==="factor"&&m&&m.gen)||a2pool(flow,k).length); };
 const fv=()=>`<i class="mf-v" aria-hidden="true"></i>`;
 const FLOWS={};
 function flowHTML(id,F){ FLOWS[id]=F;
@@ -153,15 +225,15 @@ function flowHTML(id,F){ FLOWS[id]=F;
  ${fv()}${fn(F.end)}
 </div>
 <div class="mf-d" aria-live="polite"></div>`; }
-function mfDetail(m){
+function mfDetail(m,flow,k){
   return `<div class="mf-dc" style="--c:${m.c}"><div class="mf-dk">${m.grp}</div><h4>${m.name}</h4><p class="mf-when"><b>When:</b> ${m.when}</p><p class="mf-rule">${m.rule}</p>${m.why?`<p class="mf-why"><b>Why this method:</b> ${m.why}</p>`:""}
    <div class="mf-exs">${m.ex.map(([q,st],i)=>`<div class="mf-ex"><div class="fx-k">Example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(s=>`<li>${s}</li>`).join("")}</ol></div>`).join("")}</div>
    ${m.tip?`<p class="mf-tip"><b>⚠ Watch out:</b> ${m.tip}</p>`:""}
-   ${m.gen?`<button type="button" class="fx-go" data-mgen="1">↻ New examples</button>`:""}${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
+   ${hasFresh(flow,k)?`<button type="button" class="fx-go" data-mgen="1">↻ New examples</button>`:""}${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
 function bindFlow(root){ root.querySelectorAll(".mf").forEach(mf=>{ if(mf.dataset.bound) return; mf.dataset.bound=1; const d=mf.nextElementSibling, F=FLOWS[mf.dataset.flow]; if(!F) return;
-  const pickK=(k,scroll)=>{ mf.querySelectorAll(".mf-n").forEach(b=>b.classList.toggle("on",b.dataset.fm===k)); d.dataset.k=k; d.innerHTML=mfDetail(F.M[k]); if(scroll) d.scrollIntoView({behavior:"smooth",block:"nearest"}); };
+  const pickK=(k,scroll)=>{ mf.querySelectorAll(".mf-n").forEach(b=>b.classList.toggle("on",b.dataset.fm===k)); d.dataset.k=k; d.innerHTML=mfDetail(F.M[k],mf.dataset.flow,k); if(scroll) d.scrollIntoView({behavior:"smooth",block:"nearest"}); };
   mf.querySelectorAll(".mf-n").forEach(b=>b.onclick=()=>pickK(b.dataset.fm,true)); pickK(F.top[0],false);
-  d.addEventListener("click",e=>{ const g=e.target.closest("[data-mgen]"); if(g){ const m=F.M[d.dataset.k]; if(m&&m.gen){ const box=d.querySelector(".mf-exs"); box.innerHTML=[m.gen(),m.gen()].map(([q,st],i)=>`<div class="mf-ex"><div class="fx-k">New example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(x=>`<li>${x}</li>`).join("")}</ol></div>`).join(""); } return; } const o=e.target.closest("[data-mopen]"); if(o){ location.hash=o.dataset.mopen; return; }
+  d.addEventListener("click",e=>{ const g=e.target.closest("[data-mgen]"); if(g){ const ex=freshEx(mf.dataset.flow,d.dataset.k); if(ex){ d.querySelector(".mf-exs").innerHTML=ex.map(exCard).join(""); } return; } const o=e.target.closest("[data-mopen]"); if(o){ location.hash=o.dataset.mopen; return; }
     const j=e.target.closest("[data-mjump]"); if(!j) return; const sec=mf.closest("section.unit"), node=sec&&sec.querySelector(`.pm-node[data-pk="${j.dataset.mjump.replace(/^sub-[^-]+-/,"")}"]`);
     if(node) node.click(); const t=document.getElementById(j.dataset.mjump); if(!t) return; if(t.tagName==="DETAILS") t.open=true; setTimeout(()=>window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-130,behavior:"smooth"}),40); }); }); }
 Object.keys(FGEN).forEach(k=>{ if(FM[k]) FM[k].gen=FGEN[k]; });
@@ -966,7 +1038,7 @@ const st=document.createElement("style"); st.textContent=CSS+`
 `; document.head.appendChild(st);
 
 const NEX=CROSS_EX.length+RUF_EX.length, NPR=CROSS_P.length+RUF_P.length;
-window.A2FACT={
+window.A2FACT={_reg:()=>{[QFLOW,SYS,ZER,RAT,RAD,EXP,CNT,SEQ,STA,MTX,IND].forEach(f=>f());},_fresh:freshEx,_has:hasFresh,_flows:FLOWS,
   count:()=>NEX+NPR,
   tip:()=>`${NEX} solved examples · ${NPR} type-in problems`,
   subs:()=>[["start","Method Flowchart: Which Method When?","11 methods",START,"Method Flowchart"],
