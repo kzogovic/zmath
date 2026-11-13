@@ -41,6 +41,15 @@ a.course:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,trans
 footer{max-width:860px;margin:0 auto;padding:16px 16px 44px;color:#333;font-size:16px;text-align:center;border-top:3px double #111;font-style:italic}
 @media (max-width:640px){header{padding:34px 14px 16px}.ct b{font-size:19px}}
 </style>
+<script>/* Z-Math public counter (abacus): one visit per browser session, +1 per minute of active use */
+(function(){ var NS="https://abacus.jasoncameron.dev/hit/kzogovic.github.io/";
+ function hit(k){ try{ fetch(NS+k).catch(function(){}); }catch(e){} }
+ try{ if(!sessionStorage.getItem("zmVisit")){ sessionStorage.setItem("zmVisit","1"); hit("zmath-visits"); } }catch(e){ hit("zmath-visits"); }
+ var acc=0,last=Date.now(),act=Date.now();
+ ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,function(){act=Date.now();},{passive:true}); });
+ setInterval(function(){ var n=Date.now(); if(document.visibilityState==="visible"&&n-act<120000) acc+=(n-last)/1000; last=n;
+   if(acc>=60){ acc-=60; setTimeout(function(){hit("zmath-minutes");},Math.random()*8000); } },10000);
+})();</script>
 <script defer src="https://cloud.umami.is/script.js" data-website-id="0c59c8ac-f594-41fb-ac04-392482ab3e25"></script>
 <script>/* Z-Math time counter: counts only time the page is open, visible and in use. No names, no cookies. */
 (function(){ var BOOK='Z-Math hub', STEP=300, acc=0, last=Date.now(), active=Date.now();
@@ -56,6 +65,16 @@ footer{max-width:860px;margin:0 auto;padding:16px 16px 44px;color:#333;font-size
   <p class="kicker">Zogovic · Math &amp; Science</p>
   <h1><span class="z">Z</span>-Math</h1>
   <p>One place for every math and science course. Pick your course to open its book: method flowcharts, solved examples, and practice that's new every time.</p>
+<div class="zm-count" id="zmCount"><div><b id="zmV">…</b><span>visits</span></div><div><b id="zmT">…</b><span>of practice</span></div></div>
+<style>.zm-count{display:flex;justify-content:center;gap:14px;margin:18px auto 0;flex-wrap:wrap}.zm-count div{border:2px solid #111;background:#fff;padding:10px 18px;min-width:130px;text-align:center}.zm-count b{display:block;font-size:26px;font-variant-numeric:tabular-nums}.zm-count span{font-size:14px;color:#444;letter-spacing:.06em;text-transform:uppercase}</style>
+<script>(function(){ var G="https://abacus.jasoncameron.dev/get/kzogovic.github.io/";
+ function get(k){ return fetch(G+k).then(function(r){ return r.ok?r.json():{value:0}; }).then(function(j){ return j.value||0; }).catch(function(){ return null; }); }
+ function fmt(m){ if(m<60) return m+" min"; var h=Math.floor(m/60),r=m%60; return h.toLocaleString()+" h"+(r?" "+r+" min":""); }
+ function load(){ Promise.all([get("zmath-visits"),get("zmath-minutes")]).then(function(v){
+   if(v[0]!==null) document.getElementById("zmV").textContent=v[0].toLocaleString();
+   if(v[1]!==null) document.getElementById("zmT").textContent=fmt(v[1]); }); }
+ load(); setInterval(load,60000);
+})();</script>
 </div></header>
 <main>
   <h2>Math</h2>
