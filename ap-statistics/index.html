@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Z-AP Statistics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--muted:#555;--line:#111;--paper:#fff}
+*{box-sizing:border-box}
+html{background:#fff}
+body{margin:0;font-family:'EB Garamond',Georgia,'Times New Roman',serif;color:var(--ink);background:var(--paper);line-height:1.5;font-size:18px}
+header{padding:56px 24px 26px;text-align:center}
+header .wrap{max-width:900px;margin:0 auto;border-top:3px double var(--ink);border-bottom:3px double var(--ink);padding:26px 10px 22px}
+.kicker{text-transform:uppercase;letter-spacing:.3em;font-size:13px;margin:0 0 10px}
+h1{font-weight:800;font-size:clamp(34px,6vw,60px);margin:0 0 8px;letter-spacing:-.5px;line-height:1.05}
+header p{margin:0 auto;font-style:italic;color:#333;max-width:640px;font-size:19px}
+nav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--ink)}
+nav .wrap{max-width:1180px;margin:0 auto;padding:8px 16px;display:flex;flex-direction:column;gap:6px}
+.tgroup{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.tgroup .glabel{flex:0 0 150px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#555;font-weight:600}
+@media (max-width:700px){.tgroup .glabel{flex:1 0 100%}nav{position:static}}
+nav button{flex:0 0 auto;border:1px solid var(--ink);background:#fff;color:var(--ink);border-radius:0;padding:5px 13px;font:500 16px 'EB Garamond',Georgia,serif;cursor:pointer;white-space:nowrap}
+nav button:hover{background:#f1f1f1}
+nav button{border-left:5px solid var(--c,#111)}
+nav button[aria-current="true"]{background:var(--c,#111);border-color:var(--c,#111);color:#fff}
+nav button .n{opacity:.6;margin-left:5px;font-size:13px}
+main{max-width:1180px;margin:0 auto;padding:28px 16px 60px}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:26px}
+.toolbar input[type=search]{flex:1 1 260px;max-width:400px;padding:7px 2px;border:0;border-bottom:1.5px solid var(--ink);font:italic 18px 'EB Garamond',Georgia,serif;background:transparent;outline:none}
+.toggle{display:flex;gap:8px;align-items:center;font-size:16px;color:var(--muted);cursor:pointer;user-select:none}
+.toggle input{accent-color:#111}
+section.unit{margin-bottom:54px}
+section.unit h2{color:var(--c);font-weight:800;font-size:clamp(24px,3.4vw,32px);margin:0;line-height:1.15}
+section.unit .chapter{color:var(--c);font-weight:600;text-transform:uppercase;letter-spacing:.28em;font-size:12.5px;margin-bottom:4px}
+section.unit .sub{color:var(--muted);margin:6px 0 20px;font-style:italic;padding-bottom:12px;border-bottom:3px solid var(--c)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px}
+.card{background:#fff;border:1px solid var(--ink);border-top:6px solid var(--c,#111);display:flex;flex-direction:column;transition:box-shadow .15s}
+.card:hover{box-shadow:6px 6px 0 var(--c,#111)}
+.thumb{display:block;aspect-ratio:1/1;background:#f4f4f4;border:0;border-bottom:1px solid var(--ink);padding:0;cursor:zoom-in;width:100%;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;transform:scale(1.12);transform-origin:50% 4%}
+
+.body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.body h3{font-size:19px;margin:0;line-height:1.25;font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:1px 7px;border:1px solid var(--c,#111);color:var(--c,#111);background:var(--t,#fff);font-weight:600}
+.tag.beyond{border-style:dashed}
+.tag.orig{background:#111;color:#fff;border-color:#111}
+.note{font-size:15.5px;border-left:3px solid #c98a1b;background:#fff8e6;padding:2px 0 2px 10px;color:#222;line-height:1.4}
+.note summary{cursor:pointer;font-size:15px;font-weight:700;color:#8a4b00;list-style:none}.note summary::-webkit-details-marker{display:none}.note summary::after{content:" ▸"}.note[open] summary::after{content:" ▾"}.note[open] summary{margin-bottom:3px}
+body.hide-notes .note{display:none}
+.linkcard .thumb{display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;color:#111;background:repeating-linear-gradient(0deg,#fff 0 27px,#e6e6e6 27px 28px);font-size:24px;font-weight:600;text-align:center;padding:20px}
+.empty{color:var(--muted);font-style:italic}
+footer{max-width:900px;margin:0 auto;padding:18px 16px 50px;color:#333;font-size:16px;text-align:center;border-top:3px double var(--ink);font-style:italic}
+footer a{color:#111}
+#lb{position:fixed;inset:0;background:rgba(255,255,255,.97);display:none;z-index:20;flex-direction:column}
+#lb.open{display:flex}
+#lb .top{display:flex;justify-content:space-between;align-items:center;color:#111;padding:10px 16px;gap:12px;border-bottom:1px solid #111}
+#lb .top span{font-weight:600;font-size:20px}
+#lb .top button,#lb .nav{background:#fff;color:#111;border:1px solid #111;padding:6px 14px;font:500 17px 'EB Garamond',Georgia,serif;cursor:pointer}
+#lb .stage{flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:16px 12px}
+#lb .stage img{max-width:min(100%,1200px);height:auto;border:1px solid #111}
+#lb .nav{position:fixed;top:50%;transform:translateY(-50%);font-size:26px;padding:10px 16px}
+#lb .prev{left:10px} #lb .next{right:10px}
+@media (max-width:640px){#lb .nav{display:none}}
+@media (max-width:700px){
+.frq table,.frq tbody,.frq tr,.frq td{display:block;width:100%}
+.frq tr:first-child{display:none}
+.frq tr{border-top:1px solid #ccc;padding:6px 0}
+.frq td{border-top:0;padding:3px 12px}
+.frq td.l{white-space:normal}
+}
+html,body{overflow-x:clip}
+img{max-width:100%}
+
+#tip{position:fixed;z-index:30;max-width:320px;background:#111;color:#fff;padding:10px 14px;font:16px/1.35 'EB Garamond',Georgia,serif;pointer-events:none;opacity:0;transition:opacity .12s;box-shadow:4px 4px 0 rgba(0,0,0,.18)}
+#tip.on{opacity:1}
+#tip b{display:block;font-size:17px;margin-bottom:3px}
+#tip span{font-style:italic;color:#ddd}
+#tip small{display:block;margin-top:5px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#bbb}
+.frq{margin-top:22px;border:1px solid var(--c,#111);border-top:4px solid var(--c,#111)}
+.frq summary{cursor:pointer;padding:10px 14px;font-weight:600;font-size:19px;color:var(--c,#111);list-style:none}
+.frq summary::-webkit-details-marker{display:none}
+.frq summary::before{content:"▸ ";} .frq[open] summary::before{content:"▾ ";}
+.frq table{width:100%;border-collapse:collapse;font-size:16px}
+.frq th{background:var(--c,#111);color:#fff;text-align:left;padding:6px 10px;font-weight:600}
+.frq td{border-top:1px solid #ddd;padding:7px 10px;vertical-align:top}
+.frq td.yq{white-space:nowrap;font-weight:600}
+.frq td.yq .pe{font-weight:400;font-style:italic;font-size:13px;color:#8a4b00;white-space:normal;max-width:150px;line-height:1.2;margin-top:2px}
+.frq td.yq .ord{font-weight:400;font-size:14px;color:#555}
+.frq td.t b{display:block}
+.frq td.t span{font-style:italic;color:#444;font-size:15px}
+.frq td.l{white-space:nowrap}
+.frq a.btn{display:inline-block;margin:0 4px 4px 0;padding:1px 8px;border:1px solid var(--c,#111);color:var(--c,#111);text-decoration:none;font-size:14px}
+.frq a.btn:hover{background:var(--c,#111);color:#fff}
+.frq .note2{padding:8px 14px;font-size:14.5px;font-style:italic;color:#444;border-top:1px solid #ddd}
+.resgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:22px}
+.rescard{border:1px solid var(--ink);border-top:6px solid var(--c,#111);background:#fff;display:flex;flex-direction:column}
+.rescard h3{margin:0;padding:10px 14px 6px;font-size:21px;color:var(--c);border-bottom:1px solid #ddd}
+.rescard ul{list-style:none;margin:0;padding:0}
+.rescard li{padding:9px 14px;border-bottom:1px solid #eee;line-height:1.35}
+.rescard li:last-child{border-bottom:0}
+.rescard li a{color:#111;font-weight:600;font-size:18px;text-decoration:none;border-bottom:1px solid var(--c)}
+.rescard li a:hover{background:var(--t)}
+.rescard li a::after{content:" ↗";font-size:13px;color:var(--c)}
+.rescard li .by{font-style:italic;color:#444;font-size:15.5px}
+.rescard li p{margin:3px 0 0;font-size:15.5px;color:#222}
+.price{display:inline-block;margin-left:6px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:0 6px;border:1px solid #111;vertical-align:2px}
+.price.free{background:#111;color:#fff}
+
+/* unit button bar + panels */
+.ubar{display:flex;flex-wrap:wrap;gap:10px;margin:2px 0 16px}
+.ubtn{display:flex;align-items:center;gap:8px;border:1.5px solid var(--c,#111);background:#fff;color:var(--c,#111);padding:9px 16px;font:600 17px 'EB Garamond',Georgia,serif;cursor:pointer}
+.ubtn .n{font-size:13px;font-weight:600;background:var(--t,#f2f2f2);border:1px solid var(--c,#111);padding:0 7px;color:var(--c,#111)}
+.ubtn::after{content:"▸";font-size:13px}
+.ubtn:hover{background:var(--t,#f4f4f4)}
+.ubtn[aria-expanded="true"]{background:var(--c,#111);color:#fff}
+.ubtn[aria-expanded="true"] .n{background:#fff}
+.ubtn[aria-expanded="true"]::after{content:"▾"}
+.upanel{border:1px solid var(--c,#111);border-top:4px solid var(--c,#111);padding:14px;margin:0 0 10px;background:#fff}
+.upanel>.frq{margin-top:0;border:0}
+.upanel>.prac{margin:0}
+.ptitle{margin:0 0 10px;font-size:15px;font-style:italic;color:#444}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.pitem{display:flex;flex-direction:column;border:1px solid #bbb;border-left:5px solid var(--c,#111);background:#fff}
+.posterbtn{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:#fff;padding:8px 10px;cursor:pointer;font:600 17px/1.25 'EB Garamond',Georgia,serif;color:#111}
+.posterbtn:hover{background:var(--t,#f4f4f4)}
+.posterbtn img{width:58px;height:58px;object-fit:cover;object-position:top;border:1px solid #999;flex:0 0 58px;background:#f4f4f4}
+.posterbtn .pt{flex:1}
+.posterbtn .pt small{display:block;font-weight:400;font-style:italic;font-size:13.5px;color:var(--c,#555)}
+.srcl{margin:0 10px 8px;font-size:14px;font-style:italic;color:#555}.srcl a{color:#555}
+.pitem .note{margin:0 10px 8px;font-size:15px}
+#lbNote{margin:0;padding:8px 16px;border-bottom:1px solid #111;background:#fff8e6;font-size:16px;display:none}
+#lbNote.on{display:block}
+.callout{border:1px solid var(--c);border-left:6px solid var(--c);background:var(--t);padding:10px 14px;margin:0 0 22px;font-size:16.5px}
+</style>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="0c59c8ac-f594-41fb-ac04-392482ab3e25"></script>
+<script>/* Z-Math time counter: counts only time the page is open, visible and in use. No names, no cookies. */
+(function(){ var BOOK='Z-AP Statistics', STEP=300, acc=0, last=Date.now(), active=Date.now();
+ function used(){ active=Date.now(); } ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,used,{passive:true}); });
+ function send(n){ for(var i=0;i<n;i++){ try{ window.umami&&umami.track("5 minutes of use",{book:BOOK}); }catch(e){} } }
+ function tick(){ var now=Date.now(); if(document.visibilityState==="visible"&&now-active<120000) acc+=(now-last)/1000; last=now; if(acc>=STEP){ var n=Math.floor(acc/STEP); acc-=n*STEP; send(n); } }
+ setInterval(tick,15000);
+ document.addEventListener("visibilitychange",function(){ tick(); if(document.visibilityState==="hidden"&&acc>=STEP/2){ acc=0; send(1); } });
+})();</script>
+</head>
+<body>
+<div data-zmath-link style="max-width:1180px;margin:0 auto;padding:12px 16px 0"><a href="../" style="color:#111;font-weight:600;text-decoration:none;border:1.5px solid #111;border-radius:999px;padding:4px 14px;display:inline-block;font-size:16px">← Z-Math: all courses</a></div>
+<header><div class="wrap">
+  <p class="kicker">AP Statistics · Zogovic</p>
+  <h1>Z-AP Statistics</h1>
+  <p>Study posters and solved examples, arranged by unit (2019 Course and Exam Description, Units 1–9). Pick a unit, then use its buttons to open the posters, solved examples, practice sets and released FRQs.</p>
+</div></header>
+
+<nav><div class="wrap" id="tabs"></div></nav>
+
+<main>
+  <div class="toolbar">
+    <input type="search" id="q" placeholder="Search posters (e.g. chi-square, sampling, t-test)">
+    <label class="toggle"><input type="checkbox" id="notes" checked> Show correction notes</label>
+  </div>
+  <div class="heads" role="note" style="border:1px solid #c98a1b;border-left:6px solid #c98a1b;background:#fff8e6;padding:10px 14px;margin:0 0 24px;font-size:16.5px;line-height:1.45">
+    <b>⚠ Before you study:</b> some posters in this book come from other sources (such as the <a href="https://www.facebook.com/photo/?fbid=1161633173098573&amp;set=a.247164084545491">Statistics and Mathematics Tutor</a> Facebook page, Rakhi Kar and ChatWhole.com) and some <b>contain mistakes</b>. Each of those posters has an orange <b>⚠ Note</b> under it that explains the error and gives the correct answer, so <b>always read the note before you use that poster</b>. Posters marked <b>New solved example</b> were made for this book.
+  </div>
+  <div id="content"></div>
+</main>
+
+<footer>
+  <b style="font-style:normal">Created and maintained by Zogovic.</b><br>
+  Posters collected from the <a href="https://www.facebook.com/photo/?fbid=1161633173098573&set=a.247164084545491">Statistics and Mathematics Tutor</a> Facebook page and other creators credited under each poster; all poster content belongs to its creators. The “Note” boxes point out spots where a poster's numbers or wording don't match AP Statistics conventions. Try finding the mistake yourself before reading the note. Posters marked <b>New</b> were made for this collection to fill gaps in the units.
+</footer>
+
+<div id="tip" role="tooltip"></div>
+<div id="lb" role="dialog" aria-modal="true" aria-label="Poster viewer">
+  <div class="top"><span id="lbTitle"></span><button id="lbClose">Close ✕</button></div>
+  <div id="lbNote"></div>
+  <div class="stage"><img id="lbImg" alt=""></div>
+  <button class="nav prev" id="lbPrev" aria-label="Previous">‹</button>
+  <button class="nav next" id="lbNext" aria-label="Next">›</button>
+</div>
+
+<script src="practice.js"></script>
+<script>
+(function(){const c=document.getElementById("content");if(!c)return;new MutationObserver(()=>{const s=document.getElementById("sec-inf-folder");if(s&&!s.querySelector(".dlbar")){const d=document.createElement("div");d.className="dlbar";d.style.cssText="margin:4px 0 18px;padding:10px 14px;border:1.5px dashed #1d2b44;display:flex;gap:12px;align-items:center;flex-wrap:wrap";d.innerHTML='<button type="button" class="dlbtn" style="font:inherit;cursor:pointer;border:0;padding:6px 14px;background:#1d2b44;color:#fff;font-weight:600">⬇ Download the Units 5–7 poster pack (PDF, 11 pages)</button><span class="dlmsg" style="font-style:italic;color:#444">The 11 original solved-example posters for Units 5–7, one per letter-size page, ready to print.</span>';const b=d.querySelector(".dlbtn"),m=d.querySelector(".dlmsg");b.onclick=async()=>{try{const dl=window.claude&&window.claude.use?await window.claude.use("downloads"):null;if(!dl){m.textContent="Downloading isn't available in this view. Open the page in claude.ai to download.";return;}b.disabled=true;m.textContent="Preparing the PDF…";const blob=await (await fetch("dl/AP_Stats_Units_5-7_Posters.pdf")).blob();await dl.save({filename:"AP_Stats_Units_5-7_Posters.pdf",data:blob});m.textContent="Saved.";}catch(e){m.textContent=(e&&e.code==="declined")?"Download cancelled.":"The download didn't start. Please try again.";}finally{b.disabled=false;}};const sub=s.querySelector(".sub");(sub||s.firstChild).after(d);}}).observe(c,{childList:true,subtree:true});})();
+</script>
+<script src="resources.js"></script>
+<script src="unit4sets.js"></script>
+<script src="unitsets.js"></script>
+<script src="finder.js"></script>
+<script src="mathfix.js"></script>
+<script>
+const UNITS = [
+  {id:"finder", chapter:"Start here", short:"Which Test? Which Formula?", name:"Method Finder: Which Test? Which Formula? Which Design?", sub:"Flowcharts that show which inference procedure, which formula and which study design to use, and why. Conditions and formulas at a glance, plus practice that is new every time."},
+  {id:"unit-1", chapter:"Chapter I", short:"Unit 1", name:"Unit 1: Exploring One-Variable Data", sub:"Displays, summary statistics, the normal distribution"},
+  {id:"unit-2", chapter:"Chapter II", short:"Unit 2", name:"Unit 2: Exploring Two-Variable Data", sub:"Two-way tables, scatterplots, correlation, least-squares regression"},
+  {id:"unit-3", chapter:"Chapter III", short:"Unit 3", name:"Unit 3: Collecting Data", sub:"Sampling methods, bias, experiments, causation"},
+  {id:"unit-4", chapter:"Chapter IV", short:"Unit 4", name:"Unit 4: Probability, Random Variables & Probability Distributions", sub:"Probability rules, random variables, binomial and geometric distributions"},
+  {id:"unit-5", chapter:"Chapter V", short:"Unit 5", name:"Unit 5: Sampling Distributions", sub:"Sampling distributions of p̂ and x̄, the Central Limit Theorem"},
+  {id:"unit-6", chapter:"Chapter VI", short:"Unit 6", name:"Unit 6: Inference for Categorical Data: Proportions", sub:"Confidence intervals and significance tests for p and p₁ − p₂, Type I/II errors, power"},
+  {id:"unit-7", chapter:"Chapter VII", short:"Unit 7", name:"Unit 7: Inference for Quantitative Data: Means", sub:"t-intervals and t-tests for μ, paired data, μ₁ − μ₂"},
+  {id:"unit-8", chapter:"Chapter VIII", short:"Unit 8", name:"Unit 8: Inference for Categorical Data: Chi-Square", sub:"Goodness of fit, homogeneity, independence"},
+  {id:"unit-9", chapter:"Chapter IX", short:"Unit 9", name:"Unit 9: Inference for Quantitative Data: Slopes", sub:"Confidence intervals and tests for the slope of a regression model"},
+  {id:"inference", chapter:"Appendix A", short:"Inference Toolkit", name:"Inference Toolkit (Units 6–9)", sub:"Overview posters for hypothesis testing, p-values, and choosing the right procedure"},
+  {id:"inf-folder", chapter:"Folder", short:"Inference Folder (Units 5–7)", name:"Inference Folder: Units 5, 6 & 7 in One Place", sub:"Every poster for sampling distributions, inference for proportions, and inference for means, plus the Inference Toolkit"},
+  {id:"beyond", chapter:"Appendix B", short:"Beyond AP", name:"Beyond AP (Enrichment)", sub:"Bayes, Poisson and continuous distributions, counting, covariance, resampling, multiple and logistic regression, Bayesian inference, ANOVA and non-parametric tests. Not on the AP exam, but useful if you go on to college stats"},
+  {id:"practice", chapter:"Appendix D", short:"Practice", name:"Practice: Task Words, Multiple Choice, Tasks & Study Cards", sub:"Fresh questions every time — press “New set” or “New numbers” to redo with new values"},
+  {id:"books", chapter:"Appendix E", short:"Books", name:"Books & Reading", sub:"Textbooks, exam-prep books, free open textbooks, and statistics books worth reading for fun"},
+  {id:"apps", chapter:"Appendix F", short:"Apps & Sites", name:"Apps, Websites & Tools", sub:"Official College Board tools, free lessons and videos, applets for simulations, and real data sets"},
+  {id:"calc", chapter:"Appendix G", short:"Calculators", name:"Calculator Guides: Desmos, TI-84, NumWorks & Apps", sub:"Exactly which buttons to press, and what to write on the AP exam"},
+  {id:"frq", chapter:"Appendix C", short:"Released FRQs", name:"Released AP Free-Response Questions (1997–2026)", sub:"Every released FRQ sorted by unit, with the question, scoring guidelines and sample student responses"}
+];
+
+const POSTERS = [
+  // Unit 1
+  {img:"d00a026d.jpg", title:"Bar Chart vs Histogram", units:["unit-1"]},
+  {img:"f5334f07.jpg", title:"Bar Chart: Solved Example from Data", units:["unit-1"],
+    note:"Spot the error: the bars aren't drawn to scale. Math (30) is drawn below 30 and History (15) is drawn above 15, and Computer is missing from step 3."},
+  {img:"5070b453.jpg", title:"Relative Frequency Distribution: Solved Example", units:["unit-1"],
+    note:"The frequency table doesn't match the 50 listed values. Count them yourself: the value 1 appears 2 times (not 4), and 3 through 10 each appear 5 times."},
+  {img:"90f3218d.jpg", title:"Standard Normal Distribution: Solved Examples", units:["unit-1"]},
+  {img:"s_u1_boxplot.png", title:"Boxplots & the 1.5 × IQR Rule: Solved Example", units:["unit-1"], original:true},
+  {img:"s_u1_normal.png", title:"Normal Calculations: Solved Examples", units:["unit-1"], original:true},
+  {img:"s_u1_summary.png", title:"Mean, Median & Standard Deviation: Solved Example", units:["unit-1"], original:true},
+  {img:"s_u1_transform.png", title:"Transforming Data: Solved Examples", units:["unit-1"], original:true},
+  {img:"s_u1_compare.png", title:"Comparing Distributions: Solved Example", units:["unit-1"], original:true},
+  {img:"s_u1_normal_more.png", title:"Empirical Rule & z-Scores: Solved Examples", units:["unit-1"], original:true},
+  {img:"s_u1_normal_backwards.png", title:"Working Backwards: Finding μ or σ", units:["unit-1"], original:true},
+  // Unit 2
+  {img:"u1_describing.png", title:"Describing a Distribution (SOCS)", units:["unit-1"], original:true},
+  {img:"8a6bb016.jpg", title:"Correlation vs Causation vs Regression", units:["unit-2"]},
+  {img:"0b913407.jpg", title:"Causation vs Correlation: Key Differences", units:["unit-2","unit-3"]},
+  {img:"aa928096.jpg", title:"Simple Linear Regression: Solved Example", units:["unit-2"],
+    note:"Slope and intercept are correct, but R² is about 0.99, not 0.888. The residual sum Σe² shown is wrong."},
+  {img:"b826b278.jpg", title:"Regression Analysis: Complete Notes", units:["unit-2","unit-9"],
+    note:"Multiple and non-linear regression (sections 2, 7, 10) go beyond AP. AP uses ŷ = a + bx, and for Unit 9 the slope t-test uses df = n − 2."},
+  {img:"s_u2_twoway.png", title:"Two-Way Tables: Solved Example", units:["unit-2"], original:true},
+  {img:"s_u2_residuals.png", title:"Regression & Residuals: Solved Example", units:["unit-2"], original:true},
+  {img:"s_u2_r_byhand.png", title:"Correlation r: by Hand & in Words", units:["unit-2"], original:true},
+  {img:"s_u2_influential.png", title:"Outliers, High Leverage & Influential Points", units:["unit-2"], original:true},
+  // Unit 3
+  {img:"5adb0b7c.jpg", title:"Sampling Methods", units:["unit-3"]},
+  {img:"9c8bdf72.jpg", title:"Sampling Methods in Statistics", units:["unit-3"]},
+  {img:"ba743fea.jpg", title:"Stratified vs Cluster Sampling: Solved Example", units:["unit-3"]},
+  {img:"18e3e2bb.png", title:"Table of Random Digits", units:["unit-3"]},
+  {img:"s_u3_bias.png", title:"Spot the Bias: Solved Scenarios", units:["unit-3"], original:true},
+  {img:"s_u3_randomization.png", title:"Describing Random Assignment: Solved Example", units:["unit-3"], original:true},
+  // Unit 4
+  {img:"u3_experiments.png", title:"Designing Experiments", units:["unit-3"], original:true},
+  {img:"u4_probability_rules.png", title:"Probability Rules", units:["unit-4"], original:true},
+  {img:"u4_geometric.png", title:"Binomial vs Geometric", units:["unit-4"], original:true},
+  {img:"dd29ca87.jpg", title:"Binomial Distribution: Complete Notes", units:["unit-4"],
+    note:"Two fixes: \"calls received in a time period\" isn't binomial (there's no fixed n). And when p = 0.5, μ = n/2 and σ² = n/4, so they aren't equal. For the normal approximation, AP uses np ≥ 10 and n(1−p) ≥ 10."},
+  {img:"u4_negbin.png", title:"Binomial vs Negative Binomial", units:["unit-4"], original:true},
+  {img:"u4_hyper.png", title:"Geometric vs Hypergeometric", units:["unit-4"], original:true},
+  {img:"s_u4_tree.png", title:"Conditional Probability with a Tree: Solved Example", units:["unit-4"], original:true},
+  {img:"s_u4_rv.png", title:"Mean & SD of a Discrete Random Variable: Solved Example", units:["unit-4"], original:true},
+  {img:"s_u4_combining.png", title:"Transforming & Combining Random Variables: Solved Example", units:["unit-4"], original:true},
+  {img:"s_u4_simulation.png", title:"Estimating a Probability by Simulation (Random Digits)", units:["unit-4"], original:true},
+  // Unit 5
+  {img:"u5_sampling_distributions.png", title:"Sampling Distributions of p̂ and x̄", units:["unit-5"], original:true},
+  {img:"e8efad98.jpg", title:"Central Limit Theorem: Solved Example", units:["unit-5","unit-7"],
+    note:"Because σ is unknown, AP Stats uses t* (df = 35, t* ≈ 2.030) instead of z = 1.96. That gives about (165.94, 174.06)."},
+  {img:"s_u5_concepts.png", title:"Is This Result Surprising? Sampling Distribution Logic", units:["unit-5"], original:true},
+  {img:"s_u5_diff_props.png", title:"Sampling Distribution of p̂₁ − p̂₂: Solved Example", units:["unit-5"], original:true},
+  {img:"s_u5_diff_means.png", title:"Sampling Distribution of x̄₁ − x̄₂: Solved Example", units:["unit-5"], original:true},
+  // Unit 6
+  {img:"a8388e91.jpg", title:"Confidence Intervals", units:["unit-6","unit-7"],
+    note:"Section 4 calls the confidence level \"the probability that the interval contains the true parameter.\" That's a classic AP mistake. The correct interpretation is in section 9: it's the capture rate in repeated sampling."},
+  {img:"3b0fbdc5.jpg", title:"One Sample Proportion Test", units:["unit-6"],
+    note:"Example 2 is labeled right-tailed, but the question is whether the proportion is less than 95%, so the test should be left-tailed. With z = −1.95 < −1.645, we'd reject H₀."},
+  {img:"cd6e6bf4.jpg", title:"Two Sample Proportion Test", units:["unit-6"],
+    note:"Error hunt! Ex. 1: z ≈ 3.72, so we reject H₀. Ex. 2 and 3 are really one-sample tests. Ex. 2: z ≈ 2.10, so we reject H₀. Ex. 3: z ≈ −3.46."},
+  {img:"a6356e98.png", title:"Type I Error, Type II Error and Power", units:["unit-6"]},
+  {img:"67edbdb1.webp", title:"Type I/II Errors, α, β and Power (diagram)", units:["unit-6"],
+    note:"This diagram says \"accept null hypothesis.\" On the AP exam, always say \"fail to reject H₀.\""},
+  {img:"s_u6_one_prop_ci.png", title:"One-Proportion z-Interval: Solved Example", units:["unit-6"], original:true},
+  {img:"s_u6_two_prop_test.png", title:"Two-Proportion z-Test: Solved Example", units:["unit-6"], original:true},
+  {img:"s_u6_one_prop_test.png", title:"One-Proportion z-Test: Solved Example", units:["unit-6"], original:true},
+  {img:"s_u6_errors_context.png", title:"Type I & Type II Errors in Context", units:["unit-6"], original:true},
+  // Unit 7
+  {img:"a244f20d.jpg", title:"One Sample t Test: Solved Example", units:["unit-7"],
+    note:"Big error: ΣX = 976, not 954, so x̄ ≈ 81.33, s ≈ 7.24, t ≈ 3.03, p ≈ 0.011. We REJECT H₀, so the poster's conclusion is wrong."},
+  {img:"1a683cb1.jpg", title:"Hypothesis Testing: Solved Example (one-sample t)", units:["unit-7"]},
+  {img:"3b64a6df.jpg", title:"t-Test: One Sample Solved Example", units:["unit-7"],
+    note:"Some formulas are garbled: SE = s/√n and t = (x̄ − μ₀)/SE. Also, the p-value is NOT \"the probability of getting this mean\"; it's the probability of a result at least this extreme if H₀ is true."},
+  {img:"76db8a5c.jpg", title:"Paired t Test", units:["unit-7"],
+    note:"Small errors in s_d. Ex. 1: s_d ≈ 3.42, t ≈ 1.18. Ex. 2: s_d = 1.0, t = 9.0. The conclusions don't change."},
+  {img:"bfb956f7.jpg", title:"Paired t-Test: Solved Example", units:["unit-7"],
+    note:"The problem says 10 students but only 5 are used, and it asks whether scores improve (one-sided) but uses a two-sided critical value."},
+  {img:"80c44c0b.jpg", title:"ANOVA vs t-Test", units:["unit-7","beyond"],
+    note:"ANOVA is beyond AP. Also, t isn't a \"ratio of means\"; it's (difference in means) ÷ (standard error)."},
+  {img:"s_u7_two_sample_t.png", title:"Two-Sample t-Test: Solved Example", units:["unit-7"], original:true},
+  {img:"s_u7_t_interval.png", title:"One-Sample t-Interval for μ: Solved Example", units:["unit-7"], original:true},
+  // Unit 8
+  {img:"a2d1fcad.jpg", title:"Chi-Square Test: Goodness of Fit & Independence", units:["unit-8"],
+    note:"Check the arithmetic: the die example gives χ² = 1.0 (not 2.4), and the gender/sport example gives χ² ≈ 4.69 (not 4.36). Conclusions stay the same."},
+  {img:"b7c6cf2d.jpg", title:"Chi-Square Test: Solved Example (Independence)", units:["unit-8"]},
+  {img:"e8ed6ddc.jpg", title:"Chi-Square Test for Homogeneity: Solved Example", units:["unit-8"],
+    note:"Expected counts are wrong: E = (row total × column total) / 300, so every Preference A cell should be 33.33, not 15. The correct χ² ≈ 10.25 (df = 4), so we still reject H₀."},
+  {img:"9332d5f8.jpg", title:"Chi-Square Test: Complete Explanation", units:["unit-8"],
+    note:"Several formulas are garbled (\"Z\" should be E). The correct versions: GOF expected count = n·pᵢ; two-way table E = (row total × column total) / grand total; χ² = Σ(O − E)²/E. Cramér's V is beyond AP."},
+  {img:"s_u8_gof.png", title:"Chi-Square Goodness-of-Fit Test: Solved Example", units:["unit-8"], original:true},
+  {img:"s_u8_independence.png", title:"Chi-Square Test for Independence: Solved Example", units:["unit-8"], original:true},
+  // Unit 9
+  {img:"u9_slope.png", title:"Inference for the Slope β", units:["unit-9"], original:true},
+  // (Regression Analysis poster above is also listed here)
+  {img:"s_u9_slope_test.png", title:"t-Test for the Slope (one-sided): Solved Example", units:["unit-9"], original:true},
+  // Inference toolkit
+  {img:"8a3e7459.jpg", title:"How to Choose the Right Statistical Test", units:["inference"],
+    note:"Includes tests beyond AP (McNemar, Kruskal-Wallis, Fisher, F-test, ANOVA). In AP Stats we use t procedures for means whenever σ is unknown."},
+  {img:"355649e1.jpg", title:"Hypothesis Testing (full reference)", units:["inference"]},
+  {img:"1781fd9c.jpg", title:"Hypothesis Testing: Complete Notes", units:["inference"],
+    note:"The banner says \"accept or reject a claim.\" In AP we reject or fail to reject H₀; we never \"accept\" it."},
+  {img:"955abdf6.jpg", title:"Hypothesis Testing: Process & Example", units:["inference"],
+    note:"The n ≥ 30 rule for choosing z vs t isn't how AP works: use t for a mean whenever σ is unknown, regardless of n."},
+  {img:"c0dd4b00.jpg", title:"p-Value vs Significance Level", units:["inference","unit-6"]},
+  {img:"e635b602.jpg", title:"Types of P-Value in Statistics", units:["inference"]},
+  {img:"22090bfd.jpg", title:"Some Important Tests in Research", units:["inference","beyond"]},
+  {img:"s_u7_which_test.png", title:"Which Inference Procedure? (practice)", units:["inference"], original:true},
+  // Beyond AP
+  {img:"fb_discrete_dists.jpg", title:"Discrete Probability Distributions (formula table)", units:["unit-4","beyond"], src:"https://www.facebook.com/share/1K3Af4JoiU/?mibextid=wwXIfr", by:"Rakhi Kar", nl:"⚠ Note: read before using",
+    note:"The formulas are correct, but this is a screenshot, so app buttons cover part of the right column. Watch the notation: it uses q = 1 − p, and it gives TWO versions of the geometric and negative binomial. AP Stats uses the “number of trials” version: geometric mean 1/p, starting at x = 1. For the full right column, see the Probability Distributions Cheat Sheet in Beyond AP."},
+  {img:"fb_ztest.jpg", title:"Z-Test for a Population Mean (σ known)", units:["unit-7","inference"], by:"ChatWhole.com",
+    note:"Two errors: the table says ±1.645 is the 95% confidence level, but ±1.645 goes with 90% (0.05 in each tail); ±1.960 is 95%. Also, the 2.28% label is the whole tail beyond 2σ, not the area between 2σ and 3σ (that's 2.14%). AP Stats tip: σ is almost never known, so for means AP uses a t-test (Unit 7). The worked example is correct: z = 1.20, fail to reject H₀."},
+  {img:"729ad97f.jpg", title:"One-Way ANOVA & Kruskal-Wallis: Solved Examples", units:["beyond"]},
+  {img:"e6d225dc.jpg", title:"One-Way ANOVA vs Kruskal-Wallis", units:["beyond"]},
+  {img:"402ea794.jpg", title:"Parametric vs Non-Parametric Tests", units:["beyond"]},
+  {img:"wod_prob_map.jpg", title:"Probability Distributions: How They Connect", units:["beyond"], by:"The World of Data",
+    note:"Mostly correct, with three slips. (1) The Beta–Gamma arrow points the wrong way: if X₁ and X₂ are independent Gammas with the same λ, then X₁/(X₁ + X₂) is Beta, so the arrow should run Gamma → Beta. (2) Geometric ↔ Negative Binomial is labeled n = 1, but the Negative Binomial's parameter is r, so it should say r = 1. (3) The λ = 1 label on the Exponential–Weibull arrow is misleading: a Weibull with k = 1 is an Exponential for any scale λ. AP Stats only uses the Normal, Binomial, Geometric, t, and χ² from this map; the rest is enrichment."},
+  {img:"mltut_bayes9.jpg", title:"Bayesian Statistics: 9 Important Concepts", units:["beyond"], by:"MLTUT", nl:"⚠ Note: read before using",
+    note:"The formulas are all correct, including the Beta(2, 2) → Beta(8, 4) update. One drawing slip in box 8: the x-axis ticks jump 0.6, 0.7, 1.0, so the curves look shifted. Beta(2, 2) should peak exactly at 0.5, and Beta(8, 4) peaks at 0.7 (mean 0.67). AP tip: a Bayesian credible interval says “95% probability θ is in this interval.” An AP confidence interval does NOT mean that. It means 95% of intervals made this way capture the true parameter."},
+  {gallery:1, img:"bx_cheatsheet.png", title:"Probability Distributions Cheat Sheet", units:["beyond"], original:true},
+  {img:"bx_counting.png", title:"Counting: Permutations & Combinations", units:["beyond"], original:true},
+  {img:"bx_bayes.png", title:"Bayes' Theorem: Spam Filter Example", units:["beyond"], original:true},
+  {gallery:1, img:"bx_poisson.png", title:"The Poisson Distribution: Solved Example", units:["beyond"], original:true},
+  {gallery:1, img:"bx_continuous.png", title:"Uniform & Exponential Distributions", units:["beyond"], original:true},
+  {img:"bx_cov.png", title:"Covariance & Correlation of Random Variables", units:["beyond"], original:true},
+  {img:"bx_resampling.png", title:"Bootstrap & Permutation Tests", units:["beyond"], original:true},
+  {img:"bx_multreg.png", title:"Multiple Regression: Solved Example", units:["beyond"], original:true},
+  {img:"bx_logistic.png", title:"Logistic Regression: Solved Example", units:["beyond"], original:true},
+  {img:"bx_bayesian.png", title:"Bayesian Inference for a Proportion", units:["beyond"], original:true},
+  {gallery:1, img:"dg_bernoulli.png", title:"Bernoulli Distribution", units:["beyond"], original:true, kind:"discrete"},
+  {gallery:1, img:"dg_discuniform.png", title:"Discrete Uniform Distribution", units:["beyond"], original:true, kind:"discrete"},
+  {gallery:1, img:"dg_binomial.png", title:"Binomial Distribution", units:["beyond"], original:true, kind:"discrete"},
+  {gallery:1, img:"dg_geometric.png", title:"Geometric Distribution", units:["beyond"], original:true, kind:"discrete"},
+  {gallery:1, img:"dg_negbinomial.png", title:"Negative Binomial Distribution", units:["beyond"], original:true, kind:"discrete"},
+  {gallery:1, img:"dg_hypergeometric.png", title:"Hypergeometric Distribution", units:["beyond"], original:true, kind:"discrete"},
+  {gallery:1, img:"dg_multinomial.png", title:"Multinomial Distribution", units:["beyond"], original:true, kind:"discrete"},
+  {gallery:1, img:"dg_normal.png", title:"Normal Distribution", units:["beyond"], original:true, kind:"continuous"},
+  {gallery:1, img:"dg_laplace.png", title:"Laplace Distribution", units:["beyond"], original:true, kind:"continuous"},
+  {gallery:1, img:"dg_gamma.png", title:"Gamma Distribution", units:["beyond"], original:true, kind:"continuous"},
+  {gallery:1, img:"dg_beta.png", title:"Beta Distribution", units:["beyond"], original:true, kind:"continuous"},
+  {gallery:1, img:"dg_lognormal.png", title:"Lognormal Distribution", units:["beyond"], original:true, kind:"continuous"},
+  {gallery:1, img:"dg_weibull.png", title:"Weibull Distribution", units:["beyond"], original:true, kind:"continuous"},
+  {gallery:1, img:"dg_chisquare.png", title:"Chi-Square (χ²) Distribution", units:["beyond"], original:true, kind:"continuous"},
+  {gallery:1, img:"dg_t.png", title:"Student's t Distribution", units:["beyond"], original:true, kind:"continuous"},
+  {gallery:1, img:"dg_f.png", title:"F Distribution", units:["beyond"], original:true, kind:"continuous"},
+  {gallery:1, img:"dg_cauchy.png", title:"Cauchy Distribution", units:["beyond"], original:true, kind:"continuous"}
+];
+
+const GORDER = ["bx_cheatsheet", "dg_bernoulli", "dg_discuniform", "dg_binomial", "dg_geometric", "dg_negbinomial", "dg_hypergeometric", "bx_poisson", "dg_multinomial", "bx_continuous", "dg_normal", "dg_laplace", "dg_gamma", "dg_beta", "dg_lognormal", "dg_weibull", "dg_chisquare", "dg_t", "dg_f", "dg_cauchy"];
+const FRQ_ARCHIVE = "https://www.savemyexams.com/us/ap/statistics/college-board/past-papers/";
+const APC = "https://apcentral.collegeboard.org/courses/ap-statistics/exam/past-exam-questions";
+const FRQS = [{"y": 2026, "q": 1, "t": "Goat Weights", "top": "Five-number summary, comparing boxplots, shape from stemplot", "u": ["unit-1"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap26-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap26-sg-statistics.pdf"}, {"y": 2026, "q": 2, "t": "Coffee Grounds & Roses", "top": "Treatments, units, response; completely randomized design; statistical significance", "u": ["unit-3"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap26-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap26-sg-statistics.pdf"}, {"y": 2026, "q": 3, "t": "Team Song Times", "top": "Normal probability, binomial P(X ≥ 3), geometric mean & SD", "u": ["unit-4"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap26-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap26-sg-statistics.pdf", "o": {"unit-4": 7}}, {"y": 2026, "q": 4, "t": "Orange Fertilizers", "top": "Two-sample t-test for μ₁ − μ₂, scope of inference", "u": ["unit-7"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap26-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap26-sg-statistics.pdf"}, {"y": 2026, "q": 5, "t": "Pro Athletes' Ages & Sports", "top": "Two-way table probabilities, mosaic plot, independence, chi-square for a population", "u": ["unit-4", "unit-8"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap26-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap26-sg-statistics.pdf", "o": {"unit-4": 8}}, {"y": 2026, "q": 6, "t": "Hits & Runs (Investigative Task)", "top": "Scatterplot, LSRL prediction, influence, CI for mean response vs prediction interval", "u": ["unit-2", "unit-9"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap26-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap26-sg-statistics.pdf"}, {"y": 2025, "q": 1, "t": "Gas Mileage", "top": "Comparing boxplots, mean vs median, combining data sets", "u": ["unit-1"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap25-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap25-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap25-apc-statistics-q1.pdf", "o": {"unit-1": 7}}, {"y": 2025, "q": 2, "t": "Cabbage Aphids", "top": "Cluster vs stratified sampling, direction of bias, random selection", "u": ["unit-3"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap25-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap25-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap25-apc-statistics-q2.pdf", "o": {"unit-3": 4}}, {"y": 2025, "q": 3, "t": "Restaurant Playlist", "top": "Probability, binomial distribution, expected value, informal evidence", "u": ["unit-4"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap25-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap25-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap25-apc-statistics-q3.pdf", "o": {"unit-4": 6}}, {"y": 2025, "q": 4, "t": "Karen's App", "top": "One-proportion z-test", "u": ["unit-6"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap25-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap25-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap25-apc-statistics-q4.pdf", "o": {"unit-6": 4}}, {"y": 2025, "q": 5, "t": "Bedrooms in New Houses", "top": "Discrete RV mean, t-test hypotheses, Type I error, CI ↔ test", "u": ["unit-4", "unit-7"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap25-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap25-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap25-apc-statistics-q5.pdf", "o": {"unit-4": 9, "unit-7": 3}}, {"y": 2025, "q": 6, "t": "Reading Comprehension (Investigative Task)", "top": "Two-sample t-test, independent vs paired, Cohen's d effect size", "u": ["unit-7"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap25-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap25-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap25-apc-statistics-q6.pdf"}, {"y": 2024, "q": 1, "t": "Exercise Classes", "top": "Two-proportion z-test", "u": ["unit-6"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap24-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap24-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap24-apc-statistics-q1.pdf", "o": {"unit-6": 9}}, {"y": 2024, "q": 2, "t": "Bottle Fundraiser", "top": "Segmented bar graph, mosaic plot", "u": ["unit-2"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap24-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap24-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap24-apc-statistics-q2.pdf", "o": {"unit-2": 3}}, {"y": 2024, "q": 3, "t": "Miles per Gallon", "top": "Observational study vs experiment, random assignment, generalizing", "u": ["unit-3"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap24-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap24-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap24-apc-statistics-q3.pdf", "o": {"unit-3": 2}}, {"y": 2024, "q": 4, "t": "Red Crystals (Geodes)", "top": "Geometric distribution, probability distribution, expected value", "u": ["unit-4"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap24-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap24-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap24-apc-statistics-q4.pdf", "o": {"unit-4": 10}}, {"y": 2024, "q": 5, "t": "Baseball Cards", "top": "Probability from a table, chi-square test for independence", "u": ["unit-4", "unit-8"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap24-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap24-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap24-apc-statistics-q5.pdf", "o": {"unit-4": 11, "unit-8": 4}}, {"y": 2024, "q": 6, "t": "Whistle Prices (Investigative Task)", "top": "One-sample t-interval, conditions, skewness", "u": ["unit-7"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap24-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap24-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap24-apc-statistics-q6.pdf"}, {"y": 2023, "q": 1, "t": "Alaskan Streams", "top": "Describing a distribution, constructing and using boxplots", "u": ["unit-1"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap23-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap23-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap23-apc-statistics-q1.pdf", "o": {"unit-1": 8}}, {"y": 2023, "q": 2, "t": "Fiber Driveways", "top": "Experimental units, treatments, response, randomization", "u": ["unit-3"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap23-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap23-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap23-apc-statistics-q2.pdf", "o": {"unit-3": 5}}, {"y": 2023, "q": 3, "t": "Bath Fizzies", "top": "Probability, conditional probability, expected value", "u": ["unit-4"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap23-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap23-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap23-apc-statistics-q3.pdf", "o": {"unit-4": 2}}, {"y": 2023, "q": 4, "t": "Omega-3 Supplement", "top": "Matched-pairs t-test", "u": ["unit-7"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap23-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap23-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap23-apc-statistics-q4.pdf", "o": {"unit-7": 5}}, {"y": 2023, "q": 5, "t": "Tule Elk", "top": "Scatterplot, prediction, residual, slope test", "u": ["unit-2", "unit-9"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap23-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap23-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap23-apc-statistics-q5.pdf"}, {"y": 2023, "q": 6, "t": "Gold Necklaces (Investigative Task)", "top": "Normal probability, sampling distribution of x̄, range statistic", "u": ["unit-5"], "qu": "https://apcentral.collegeboard.org/media/pdf/ap23-frq-statistics.pdf", "sg": "https://apcentral.collegeboard.org/media/pdf/ap23-sg-statistics.pdf", "sa": "https://apcentral.collegeboard.org/media/pdf/ap23-apc-statistics-q6.pdf"}, {"y": 2022, "q": 1, "t": "Bullfrogs", "top": "Scatterplot, slope, r², largest residual", "u": ["unit-2"], "o": {"unit-2": 1}}, {"y": 2022, "q": 2, "t": "Acne Treatments", "top": "Experiment components, matched pairs, random assignment within pairs", "u": ["unit-3"], "o": {"unit-3": 3}}, {"y": 2022, "q": 3, "t": "Shampoo Bottles", "top": "Normal probability, binomial random variable", "u": ["unit-4"], "o": {"unit-4": 12}}, {"y": 2022, "q": 4, "t": "Video Streaming", "top": "One-proportion z-interval, evaluating a claim", "u": ["unit-6"], "o": {"unit-6": 1}}, {"y": 2022, "q": 5, "t": "Dark vs White Chocolate", "top": "Medians from dotplots, simulation-based inference", "u": ["unit-7"], "o": {"unit-7": 34}}, {"y": 2022, "q": 6, "t": "Allergy Clinics (Investigative Task)", "top": "Relative frequencies, mosaic plots, Simpson's paradox, observational study", "u": ["unit-2", "unit-3"]}, {"y": 2021, "q": 1, "t": "Hospital Length of Stay", "top": "Five-number summary, outliers, outlier rules", "u": ["unit-1"], "o": {"unit-1": 1}}, {"y": 2021, "q": 2, "t": "Walking & Cholesterol", "top": "Response bias, random sampling, cause and effect", "u": ["unit-3"], "o": {"unit-3": 6}}, {"y": 2021, "q": 3, "t": "Gift Card Lottery", "top": "Binomial distribution, expected value, informal inference", "u": ["unit-4"], "o": {"unit-4": 13}}, {"y": 2021, "q": 4, "t": "$10 Off Next Purchase", "top": "One-proportion z-test, Type I/II errors", "u": ["unit-6"], "o": {"unit-6": 6}}, {"y": 2021, "q": 5, "t": "Soda in Baltimore", "top": "Two-way tables, segmented bars, chi-square homogeneity", "u": ["unit-8"], "o": {"unit-8": 1}}, {"y": 2021, "q": 6, "t": "Baseball Attendance (Investigative Task)", "top": "Comparing boxplots, scatterplots, confounding", "u": ["unit-1", "unit-2", "unit-3"], "o": {"unit-3": 7}}, {"y": 2019, "q": 1, "t": "Dorm Rooms", "top": "Histogram shape, outliers, boxplot vs histogram", "u": ["unit-1"], "o": {"unit-1": 9}}, {"y": 2019, "q": 2, "t": "Fungus Mixtures", "top": "Experiment components, control group, random assignment", "u": ["unit-3"], "o": {"unit-3": 8}}, {"y": 2019, "q": 3, "t": "Taking Medicine", "top": "Two-way table probabilities, independence, binomial", "u": ["unit-4"], "o": {"unit-4": 14}}, {"y": 2019, "q": 4, "t": "Tumbleweeds", "top": "Two-proportion z-test (one-sided)", "u": ["unit-6"], "o": {"unit-6": 10}}, {"y": 2019, "q": 5, "t": "Smartphone Batteries", "top": "Normal percentiles and areas, expected value", "u": ["unit-1", "unit-4"], "o": {"unit-4": 5}}, {"y": 2019, "q": 6, "t": "Emma's Apartments (Investigative Task)", "top": "Scope of inference, sampling distribution of the median", "u": ["unit-5", "unit-7"]}, {"y": 2018, "q": 1, "t": "Waiting in Line", "top": "Interpreting intercept and r², outlier", "u": ["unit-2"], "o": {"unit-2": 2}}, {"y": 2018, "q": 2, "t": "Do You Recycle?", "top": "Sample size for a proportion interval, bias, randomized response", "u": ["unit-3", "unit-6"], "o": {"unit-6": 15}}, {"y": 2018, "q": 3, "t": "Multiple Births & Lefties", "top": "Multiplication rule, conditional probability, binomial", "u": ["unit-4"], "o": {"unit-4": 15}}, {"y": 2018, "q": 4, "t": "ACL Surgery", "top": "Scope of inference, two-sample t-test", "u": ["unit-7"], "o": {"unit-7": 8}}, {"y": 2018, "q": 5, "t": "Teachers' Experience", "top": "Medians from histograms, combined mean", "u": ["unit-1"], "o": {"unit-1": 10}}, {"y": 2018, "q": 6, "t": "Blood Pressure (Investigative Task)", "top": "Type II error, power, effect of sample size", "u": ["unit-6", "unit-7"]}, {"y": 2017, "q": 1, "t": "Gray Wolves", "top": "Scatterplot, slope, residuals", "u": ["unit-2"], "o": {"unit-2": 4}}, {"y": 2017, "q": 2, "t": "Water Cups", "top": "One-proportion z-interval, converting to a total", "u": ["unit-6"], "o": {"unit-6": 2}}, {"y": 2017, "q": 3, "t": "Melons", "top": "Normal probability, multiplication rule, conditional probability", "u": ["unit-4"], "o": {"unit-4": 3}}, {"y": 2017, "q": 4, "t": "Pottery Chemicals", "top": "Comparing boxplots, classifying", "u": ["unit-1"], "o": {"unit-1": 11}}, {"y": 2017, "q": 5, "t": "Schizophrenia", "top": "Chi-square test for independence", "u": ["unit-8"], "o": {"unit-8": 2}}, {"y": 2017, "q": 6, "t": "Coins vs Chips (Investigative Task)", "top": "Random assignment arrangements, choosing a method", "u": ["unit-3", "unit-4"]}, {"y": 2016, "f": "", "q": 1, "t": "Robin's Tips", "top": "Describing a distribution; effect of changing a value on mean and median", "u": ["unit-1"], "o": {"unit-1": 3}}, {"y": 2016, "f": "", "q": 2, "t": "Choco-Zuties", "top": "Chi-square test for homogeneity; follow-up analysis", "u": ["unit-8"], "o": {"unit-8": 3}}, {"y": 2016, "f": "", "q": 3, "t": "Smoking and Alzheimer's", "top": "Explanatory/response variables, experiment vs observational study, confounding", "u": ["unit-3"], "o": {"unit-3": 9}}, {"y": 2016, "f": "", "q": 4, "t": "Rocket Igniters", "top": "Multiplication rule, geometric probability, informal p-value and conclusion", "u": ["unit-4"]}, {"y": 2016, "f": "", "q": 5, "t": "Environment vs Jobs", "top": "One-proportion z-interval, large counts condition, why a two-proportion interval doesn't apply", "u": ["unit-6"], "o": {"unit-6": 12}}, {"y": 2016, "f": "", "q": 6, "t": "Semesters and Salary", "top": "Describing scatterplots, interpreting slope from output, medians, third variable", "u": ["unit-2"], "o": {"unit-2": 5}}, {"y": 2015, "f": "", "q": 1, "t": "Accountant Salaries", "top": "Comparing boxplots, making decisions using boxplots", "u": ["unit-1"], "o": {"unit-1": 12}}, {"y": 2015, "f": "", "q": 2, "t": "Random Discounts", "top": "Using confidence intervals to make decisions, margin of error and sample size", "u": ["unit-6"], "o": {"unit-6": 14}}, {"y": 2015, "f": "", "q": 3, "t": "ATMs", "top": "Discrete probability distributions, expected value, conditional probability", "u": ["unit-4"], "o": {"unit-4": 16}}, {"y": 2015, "f": "", "q": 4, "t": "Aspirin and Colon Cancer", "top": "Two-sample z-test for a difference in proportions (experiment)", "u": ["unit-6"], "o": {"unit-6": 11}}, {"y": 2015, "f": "", "q": 5, "t": "Body Shapes", "top": "Describing scatterplots, classifying individuals, making a prediction", "u": ["unit-2"]}, {"y": 2015, "f": "", "q": 6, "t": "Tortillas", "top": "Choosing a sampling method, comparing variability of sample means", "u": ["unit-5"], "o": {"unit-5": 5}}, {"y": 2014, "f": "", "q": 1, "t": "Extracurricular Activities", "top": "Conditional relative frequency and association, chi-square", "u": ["unit-8"], "o": {"unit-8": 9}}, {"y": 2014, "f": "", "q": 2, "t": "Selecting a Convention Site", "top": "General multiplication rule, informal inference, simulation design", "u": ["unit-4"], "o": {"unit-4": 17}}, {"y": 2014, "f": "", "q": 3, "t": "School Attendance", "top": "Normal probability, sampling distribution of x̄, probability rules", "u": ["unit-5"], "o": {"unit-5": 2}}, {"y": 2014, "f": "", "q": 4, "t": "Alumni Income Survey", "top": "Mean vs median, sampling methods and bias", "u": ["unit-3"], "o": {"unit-3": 10}}, {"y": 2014, "f": "", "q": 5, "t": "Gender and Car Prices", "top": "Paired t-test", "u": ["unit-7"], "o": {"unit-7": 6}}, {"y": 2014, "f": "", "q": 6, "t": "Fuel Consumption Rates", "top": "Calculating/interpreting residuals, comparing associations, multiple regression", "u": ["unit-2"]}, {"y": 2013, "f": "", "q": 1, "t": "Lead in Crows", "top": "Stemplots, one-sample t-interval", "u": ["unit-7"], "o": {"unit-7": 1}}, {"y": 2013, "f": "", "q": 2, "t": "Appearance of a University", "top": "Convenience samples, selecting an SRS, stratified sampling", "u": ["unit-3"], "o": {"unit-3": 11}}, {"y": 2013, "f": "", "q": 3, "t": "Eggs", "top": "Normal calculation, sum of random variables", "u": ["unit-4"], "o": {"unit-4": 18}}, {"y": 2013, "f": "", "q": 4, "t": "Fruits and Vegetables", "top": "Chi-square test for independence", "u": ["unit-8"], "o": {"unit-8": 5}}, {"y": 2013, "f": "", "q": 5, "t": "Meditation and Blood Pressure", "top": "Scope of inference, two-proportion z-test conditions, logic of inference", "u": ["unit-6"], "o": {"unit-6": 28}}, {"y": 2013, "f": "", "q": 6, "t": "Typhoons", "top": "Comparing distributions, trends in timeplots, moving averages", "u": ["unit-2"]}, {"y": 2012, "f": "", "q": 1, "t": "Sewing Machines", "top": "Describing scatterplots, influential points", "u": ["unit-2"]}, {"y": 2012, "f": "", "q": 2, "t": "Spin the Pointer", "top": "Discrete probability distributions, expected value, normal calculations", "u": ["unit-4"], "o": {"unit-4": 19}}, {"y": 2012, "f": "", "q": 3, "t": "Household Size", "top": "Comparing histograms, conditions for a two-sample t-interval", "u": ["unit-7"], "o": {"unit-7": 25}}, {"y": 2012, "f": "", "q": 4, "t": "Television Commercials", "top": "Two-sample z-test (or interval) for proportions", "u": ["unit-6"], "o": {"unit-6": 29}}, {"y": 2012, "f": "", "q": 5, "t": "Physical Fitness", "top": "Type II errors, conclusion for a one-proportion z-test, using volunteers", "u": ["unit-6"], "o": {"unit-6": 25}}, {"y": 2012, "f": "", "q": 6, "t": "Soft Drinks", "top": "Selecting an SRS, SE of the mean for SRS vs stratified random sample", "u": ["unit-5"], "o": {"unit-5": 6}}, {"y": 2011, "f": "", "q": 1, "t": "Speed and Strength", "top": "Assessing normality; calculating, interpreting and comparing z-scores", "u": ["unit-1"], "o": {"unit-1": 14}}, {"y": 2011, "f": "", "q": 2, "t": "Politics and Gender", "top": "Conditional probability, independence, segmented bar charts", "u": ["unit-4"], "o": {"unit-4": 20}}, {"y": 2011, "f": "", "q": 3, "t": "New Carpet in Apartments", "top": "Cluster sampling vs stratified sampling", "u": ["unit-3"], "o": {"unit-3": 13}}, {"y": 2011, "f": "", "q": 4, "t": "Cholesterol Drug", "top": "Two-sample t-test", "u": ["unit-7"], "o": {"unit-7": 9}}, {"y": 2011, "f": "", "q": 5, "t": "Windmills", "top": "Regression output, interpreting slope, meaning of r², test for slope", "u": ["unit-2", "unit-9"], "o": {"unit-2": 9}}, {"y": 2011, "f": "", "q": 6, "t": "US History Multiple Choice", "top": "Confidence interval for p, tree diagrams", "u": ["unit-6"], "o": {"unit-6": 20}}, {"y": 2011, "f": "B", "q": 1, "t": "Pupil-Teacher Ratio", "top": "Estimating median from histogram, comparing histograms, mean vs median", "u": ["unit-1"], "o": {"unit-1": 13}}, {"y": 2011, "f": "B", "q": 2, "t": "Fear of Heights", "top": "Experiment vs observational study, scope of inference, purpose of random assignment", "u": ["unit-3"], "o": {"unit-3": 12}}, {"y": 2011, "f": "B", "q": 3, "t": "Flight Upgrades", "top": "Geometric probability, binomial probability, cumulative binomial", "u": ["unit-4"]}, {"y": 2011, "f": "B", "q": 4, "t": "Flu Vaccine", "top": "Confidence interval for p, determining sample size", "u": ["unit-6"], "o": {"unit-6": 13}}, {"y": 2011, "f": "B", "q": 5, "t": "Part-Time Jobs", "top": "Chi-square test for independence, Type I and II errors", "u": ["unit-8"], "o": {"unit-8": 8}}, {"y": 2011, "f": "B", "q": 6, "t": "Grass Buffer Strips", "top": "Interpreting slope, extrapolation, distribution of x̄, optimal design for estimating slope", "u": ["unit-9"]}, {"y": 2010, "f": "", "q": 1, "t": "Garlic Oil", "top": "Treatments, units, response variable; scatterplots and linearity", "u": ["unit-3"]}, {"y": 2010, "f": "", "q": 2, "t": "Rock-and-Roll Survey", "top": "Sampling distribution of the sample mean", "u": ["unit-5"], "o": {"unit-5": 4}}, {"y": 2010, "f": "", "q": 3, "t": "Humane Society", "top": "Interpreting confidence level, assessing a claim with a CI, finding sample size", "u": ["unit-6"], "o": {"unit-6": 3}}, {"y": 2010, "f": "", "q": 4, "t": "New Car Customers", "top": "Mean and SD of a binomial, binomial probability, stratified sampling", "u": ["unit-4"], "o": {"unit-4": 22}}, {"y": 2010, "f": "", "q": 5, "t": "Tropical Fish", "top": "Two-sample t-test", "u": ["unit-7"], "o": {"unit-7": 23}}, {"y": 2010, "f": "", "q": 6, "t": "Hurricanes", "top": "Graphing and comparing distributions, evaluating and using a new test statistic", "u": ["unit-8"]}, {"y": 2010, "f": "B", "q": 1, "t": "Polluted Rivers", "top": "Comparing boxplots, constructing a stemplot, stemplot vs boxplot", "u": ["unit-1"], "o": {"unit-1": 5}}, {"y": 2010, "f": "B", "q": 2, "t": "Cafeteria Food Survey", "top": "Simple random sampling and stratified random sampling", "u": ["unit-3"]}, {"y": 2010, "f": "B", "q": 3, "t": "Multiple-Choice Guessing", "top": "Binomial distribution, binomial probabilities", "u": ["unit-4"], "o": {"unit-4": 21}}, {"y": 2010, "f": "B", "q": 4, "t": "Digital Music Players", "top": "One-sample CI for a proportion, sampling without replacement", "u": ["unit-6"], "o": {"unit-6": 18}}, {"y": 2010, "f": "B", "q": 5, "t": "Sources of News", "top": "Two-way tables, conditional probability, independence, chi-square tests", "u": ["unit-8"], "o": {"unit-8": 10}}, {"y": 2010, "f": "B", "q": 6, "t": "House Prices with Pools", "top": "Slope, residuals, estimating effect of a pool, difference of slopes", "u": ["unit-9"]}, {"y": 2009, "f": "", "q": 1, "t": "Gender and Work", "top": "Exploring categorical data, association, chi-square", "u": ["unit-8"], "o": {"unit-8": 11}}, {"y": 2009, "f": "", "q": 2, "t": "Stopping Distance", "top": "Inverse normal, binomial, sampling distribution of x̄", "u": ["unit-5"], "o": {"unit-5": 10}}, {"y": 2009, "f": "", "q": 3, "t": "Frog Dissection", "top": "Random assignment vs non-random assignment", "u": ["unit-3"]}, {"y": 2009, "f": "", "q": 4, "t": "Ambulance Response", "top": "CI for a difference of two means, significant difference?", "u": ["unit-7"], "o": {"unit-7": 7}}, {"y": 2009, "f": "", "q": 5, "t": "CPR/CC Survival", "top": "Difference of two proportions, p-value, conclusion, error and consequence", "u": ["unit-6"], "o": {"unit-6": 30}}, {"y": 2009, "f": "", "q": 6, "t": "Measuring Skewness", "top": "Hypotheses, measuring skewness, sampling distribution", "u": ["unit-7"], "o": {"unit-7": 35}}, {"y": 2009, "f": "B", "q": 1, "t": "Gasoline Taxes", "top": "Boxplots, median/IQR, linear transformation of data", "u": ["unit-1"], "o": {"unit-1": 15}}, {"y": 2009, "f": "B", "q": 2, "t": "ELISA Testing", "top": "Conditional probability, probability rules", "u": ["unit-4"], "o": {"unit-4": 23}}, {"y": 2009, "f": "B", "q": 3, "t": "CPR vs Cardiac Compression", "top": "Difference of two proportions, hypothesis test", "u": ["unit-6"], "o": {"unit-6": 32}}, {"y": 2009, "f": "B", "q": 4, "t": "Birds and Pesticides", "top": "Random assignment in blocks, increasing power", "u": ["unit-3", "unit-6"], "o": {"unit-6": 27}}, {"y": 2009, "f": "B", "q": 5, "t": "Bottle-Filling Machine", "top": "Test for a mean, test for SD with simulation", "u": ["unit-7"], "o": {"unit-7": 36}}, {"y": 2009, "f": "B", "q": 6, "t": "Relative Risk", "top": "Double blind, two-proportion z-interval, relative risk", "u": ["unit-6"], "o": {"unit-6": 34}}, {"y": 2008, "f": "", "q": 1, "t": "Sugar in Cereal", "top": "Comparing boxplots, rescaling data, mean/median and shape", "u": ["unit-1"], "o": {"unit-1": 16}}, {"y": 2008, "f": "", "q": 2, "t": "School Board Survey", "top": "Nonresponse bias", "u": ["unit-3"]}, {"y": 2008, "f": "", "q": 3, "t": "Josephine's Game", "top": "Expected value, probability rules and distributions", "u": ["unit-4"], "o": {"unit-4": 25}}, {"y": 2008, "f": "", "q": 4, "t": "Underwater Devices", "top": "Scatterplots, describing association, mean and SE of an average of proportions", "u": ["unit-6"], "o": {"unit-6": 38}}, {"y": 2008, "f": "", "q": 5, "t": "Moose", "top": "Chi-square goodness of fit, largest contribution", "u": ["unit-8"]}, {"y": 2008, "f": "", "q": 6, "t": "Magnet Schools", "top": "Two-sample t-test, LSRL from output, testing slopes, additional information", "u": ["unit-9"]}, {"y": 2008, "f": "B", "q": 1, "t": "Student-Teacher Ratios", "top": "Comparing dotplots, logic of hypothesis tests", "u": ["unit-7"], "o": {"unit-7": 33}}, {"y": 2008, "f": "B", "q": 2, "t": "Estimators", "top": "Properties of estimators: bias and variability", "u": ["unit-5"], "o": {"unit-5": 1}}, {"y": 2008, "f": "B", "q": 3, "t": "Stopping Distance", "top": "Sample size calculations, CI for a mean", "u": ["unit-7"], "o": {"unit-7": 12}}, {"y": 2008, "f": "B", "q": 4, "t": "Soothing Music", "top": "Experimental design, Type I and II errors and consequences", "u": ["unit-6"], "o": {"unit-6": 26}}, {"y": 2008, "f": "B", "q": 5, "t": "Snake Gulch Railroad", "top": "Combining normal random variables, normal calculations", "u": ["unit-4"], "o": {"unit-4": 24}}, {"y": 2008, "f": "B", "q": 6, "t": "Morton's Neuroma", "top": "Scatterplots, matched-pairs test, classification", "u": ["unit-7"], "o": {"unit-7": 22}}, {"y": 2007, "f": "", "q": 1, "t": "Strawberry Disease", "top": "Interpreting SD, comparing center, using CIs", "u": ["unit-7"], "o": {"unit-7": 31}}, {"y": 2007, "f": "", "q": 2, "t": "Dog Joint & Hip Health", "top": "Control groups, random assignment, blocking", "u": ["unit-3"]}, {"y": 2007, "f": "", "q": 3, "t": "Big Town Fisheries", "top": "Sampling distribution of x̄, normal distribution, CLT", "u": ["unit-5"], "o": {"unit-5": 3}}, {"y": 2007, "f": "", "q": 4, "t": "E. coli in Beef", "top": "Matched-pairs t-test", "u": ["unit-7"], "o": {"unit-7": 17}}, {"y": 2007, "f": "", "q": 5, "t": "Distracted Drivers", "top": "Experiment/observational study, hypotheses, two-sample z-test conditions, p-value", "u": ["unit-6"], "o": {"unit-6": 31}}, {"y": 2007, "f": "", "q": 6, "t": "The Dimly Lit Room", "top": "Slope, no-intercept models, test for slope = 1, multiple regression ideas", "u": ["unit-9"]}, {"y": 2007, "f": "B", "q": 1, "t": "Economics Test Scores", "top": "Stemplots, describing distributions", "u": ["unit-1"], "o": {"unit-1": 6}}, {"y": 2007, "f": "B", "q": 2, "t": "Number of Pets", "top": "Probability distributions, binomial, sampling distribution of x̄", "u": ["unit-5"], "o": {"unit-5": 8}}, {"y": 2007, "f": "B", "q": 3, "t": "Heat Gain of Windows", "top": "Block design, randomization", "u": ["unit-3"]}, {"y": 2007, "f": "B", "q": 4, "t": "Father/Daughter Heights", "top": "LSRL, residuals, influential points", "u": ["unit-2"]}, {"y": 2007, "f": "B", "q": 5, "t": "Cholesterol Drug", "top": "Two-sample t-test", "u": ["unit-7"], "o": {"unit-7": 28}}, {"y": 2007, "f": "B", "q": 6, "t": "Bird Extinction", "top": "Two-sample z-test, t-interval for slope, comparing methods", "u": ["unit-9"]}, {"y": 2006, "f": "", "q": 1, "t": "Catapults", "top": "Comparing distributions, variability, center", "u": ["unit-1"], "o": {"unit-1": 18}}, {"y": 2006, "f": "", "q": 2, "t": "Soap Suds", "top": "Regression output, interpreting s and SE(slope)", "u": ["unit-9"]}, {"y": 2006, "f": "", "q": 3, "t": "Depth Measurements", "top": "Normal, binomial, sampling distribution of x̄", "u": ["unit-5"], "o": {"unit-5": 9}}, {"y": 2006, "f": "", "q": 4, "t": "Ambulance vs Helicopter", "top": "Two-sample t-interval for a difference of means, significant difference?", "u": ["unit-7"], "o": {"unit-7": 24}}, {"y": 2006, "f": "", "q": 5, "t": "Tiger Shrimp", "top": "Treatments, randomization, limiting variability, generalizability", "u": ["unit-3"]}, {"y": 2006, "f": "", "q": 6, "t": "Testing for Variability", "top": "Hypotheses, chi-square, simulation, power", "u": ["unit-8"]}, {"y": 2006, "f": "B", "q": 1, "t": "Monthly Sales", "top": "Cumulative frequency plots", "u": ["unit-1"], "o": {"unit-1": 17}}, {"y": 2006, "f": "B", "q": 2, "t": "Defectives, Day vs Night", "top": "Two-sample CI for a difference in proportions, significant difference?", "u": ["unit-6"], "o": {"unit-6": 8}}, {"y": 2006, "f": "B", "q": 3, "t": "Golf Balls", "top": "Normal, binomial, inverse normal", "u": ["unit-4"]}, {"y": 2006, "f": "B", "q": 4, "t": "Dexterity", "top": "Matched-pairs t-test", "u": ["unit-7"], "o": {"unit-7": 18}}, {"y": 2006, "f": "B", "q": 5, "t": "Tractors", "top": "Response, treatments, units, randomization, replication, confounding", "u": ["unit-3"], "o": {"unit-3": 1}}, {"y": 2006, "f": "B", "q": 6, "t": "Juice Comparison", "top": "One-sample z-test for a proportion, binomial, significance level", "u": ["unit-6"], "o": {"unit-6": 23}}, {"y": 2005, "f": "", "q": 1, "t": "Urban vs Rural Caloric Intake", "top": "Comparing stemplots, generalizability, sampling variability", "u": ["unit-3"]}, {"y": 2005, "f": "", "q": 2, "t": "Mean vs Median", "top": "Expected value / median relationship, sampling variability", "u": ["unit-4"], "o": {"unit-4": 26}}, {"y": 2005, "f": "", "q": 3, "t": "Railcars & Fuel Consumption", "top": "Residual plots, interpreting slope, r², extrapolation", "u": ["unit-2"], "o": {"unit-2": 6}}, {"y": 2005, "f": "", "q": 4, "t": "Cereal Coupons", "top": "One-sample z-test for a proportion", "u": ["unit-6"], "o": {"unit-6": 5}}, {"y": 2005, "f": "", "q": 5, "t": "High School Diploma Survey", "top": "Sources of bias, sample size calculation, stratified samples", "u": ["unit-6"], "o": {"unit-6": 21}}, {"y": 2005, "f": "", "q": 6, "t": "Lead Exposure", "top": "Two-sample t-interval, interaction plot, relationships", "u": ["unit-7"], "o": {"unit-7": 30}}, {"y": 2005, "f": "B", "q": 1, "t": "Test Scores", "top": "Shape, center and spread of a distribution", "u": ["unit-1"], "o": {"unit-1": 19}}, {"y": 2005, "f": "B", "q": 2, "t": "Child and Adult Tickets", "top": "Mean and SD of a random variable, combining random variables", "u": ["unit-4"]}, {"y": 2005, "f": "B", "q": 3, "t": "Mosquitoes", "top": "Randomization, completely randomized vs matched-pairs design, which test?", "u": ["unit-7"], "o": {"unit-7": 10}}, {"y": 2005, "f": "B", "q": 4, "t": "Growth of Plants", "top": "Matched-pairs t-interval, significant difference?", "u": ["unit-7"], "o": {"unit-7": 19}}, {"y": 2005, "f": "B", "q": 5, "t": "Walking Speed", "top": "Regression output, interpreting slope and intercept, CI for slope", "u": ["unit-9"]}, {"y": 2005, "f": "B", "q": 6, "t": "Milk Containers", "top": "One-sample t-test, normal, probability rules, simulation", "u": ["unit-7"], "o": {"unit-7": 13}}, {"y": 2004, "f": "", "q": 1, "t": "Gasoline Additives", "top": "Boxplots, outliers, properties of boxplots, shape/center", "u": ["unit-1"], "o": {"unit-1": 20}}, {"y": 2004, "f": "", "q": 2, "t": "Shampoo", "top": "Blocking, random assignment within blocks", "u": ["unit-3"]}, {"y": 2004, "f": "", "q": 3, "t": "Brontosaurs", "top": "Binomial, probability, interpreting probability, generalizability", "u": ["unit-4"], "o": {"unit-4": 27}}, {"y": 2004, "f": "", "q": 4, "t": "Antibiotics", "top": "Probability rules, expected value", "u": ["unit-4"], "o": {"unit-4": 28}}, {"y": 2004, "f": "", "q": 5, "t": "Hospital Satisfaction", "top": "Chi-square test of independence, generalizability", "u": ["unit-8"], "o": {"unit-8": 6}}, {"y": 2004, "f": "", "q": 6, "t": "Cholesterol Drug", "top": "One-sample t-test, interval disagreement, one-sided CI", "u": ["unit-7"], "o": {"unit-7": 4}}, {"y": 2004, "f": "B", "q": 1, "t": "Moon Craters", "top": "Interpreting scatterplot, r², transforming data, residual plot", "u": ["unit-2"]}, {"y": 2004, "f": "B", "q": 2, "t": "Dining Hall Survey", "top": "Selection bias and response bias", "u": ["unit-3"]}, {"y": 2004, "f": "B", "q": 3, "t": "Bauxite Cars", "top": "Normal distribution and sampling distribution of x̄", "u": ["unit-5"], "o": {"unit-5": 7}}, {"y": 2004, "f": "B", "q": 4, "t": "Time Spent Online", "top": "Two-sample t-interval, matched pairs", "u": ["unit-7"], "o": {"unit-7": 11}}, {"y": 2004, "f": "B", "q": 5, "t": "Mandible Lengths", "top": "Boxplots, conditions for a t-interval, two-sample t-test", "u": ["unit-7"], "o": {"unit-7": 26}}, {"y": 2004, "f": "B", "q": 6, "t": "Banded Birds", "top": "Two-sample z-test, recapture technique, random sampling", "u": ["unit-6"], "o": {"unit-6": 36}}, {"y": 2003, "f": "", "q": 1, "t": "Accuracy of Watches", "top": "Boxplots, variability, choosing hypotheses", "u": ["unit-7"], "o": {"unit-7": 14}}, {"y": 2003, "f": "", "q": 2, "t": "Class-Action Lawsuit", "top": "Type I and II errors and consequences", "u": ["unit-6"], "o": {"unit-6": 7}}, {"y": 2003, "f": "", "q": 3, "t": "Neck Sizes", "top": "Normal, binomial", "u": ["unit-4"], "o": {"unit-4": 30}}, {"y": 2003, "f": "", "q": 4, "t": "Yoga vs Tai Chi", "top": "Random assignment, control groups, generalizability", "u": ["unit-3"], "o": {"unit-3": 14}}, {"y": 2003, "f": "", "q": 5, "t": "Gender/Response", "top": "Chi-square test of independence", "u": ["unit-8"], "o": {"unit-8": 7}}, {"y": 2003, "f": "", "q": 6, "t": "Coaches Survey", "top": "Confidence intervals for proportions, applications", "u": ["unit-6"], "o": {"unit-6": 19}}, {"y": 2003, "f": "B", "q": 1, "t": "Work/Study Relationship", "top": "Influential points", "u": ["unit-2"], "o": {"unit-2": 14}}, {"y": 2003, "f": "B", "q": 2, "t": "Age and Income", "top": "Conditional probability, independence", "u": ["unit-4"], "o": {"unit-4": 29}}, {"y": 2003, "f": "B", "q": 3, "t": "Vitamin C and Colds", "top": "Experiment vs observational study, two-sample z-test for proportions", "u": ["unit-6"], "o": {"unit-6": 33}}, {"y": 2003, "f": "B", "q": 4, "t": "Coffee Filters", "top": "Random assignment, control groups, which test, reducing variability", "u": ["unit-7"], "o": {"unit-7": 32}}, {"y": 2003, "f": "B", "q": 5, "t": "Skunk Game", "top": "Probability rules, expected value, chi-square goodness of fit", "u": ["unit-8"]}, {"y": 2003, "f": "B", "q": 6, "t": "HMO Confidence Intervals", "top": "CI for one proportion, interpreting confidence level, sample size", "u": ["unit-6"], "o": {"unit-6": 16}}, {"y": 2002, "f": "", "q": 1, "t": "Newton/Einstein", "top": "Interval estimates, precision", "u": ["unit-7"], "o": {"unit-7": 15}}, {"y": 2002, "f": "", "q": 2, "t": "Waterproofing Boots", "top": "Matched-pairs experiment, double blind", "u": ["unit-3"], "o": {"unit-3": 16}}, {"y": 2002, "f": "", "q": 3, "t": "Relay Team", "top": "Normal distribution, combining random variables", "u": ["unit-4"]}, {"y": 2002, "f": "", "q": 4, "t": "Commercial Airlines", "top": "Regression output, correlation, influential points", "u": ["unit-2"], "o": {"unit-2": 8}}, {"y": 2002, "f": "", "q": 5, "t": "Early Birds/Night Owls", "top": "Hypotheses, two-sample t-test", "u": ["unit-7"], "o": {"unit-7": 27}}, {"y": 2002, "f": "", "q": 6, "t": "S or F? F or S?", "top": "One-proportion z-interval, confidence level, two-sample z-test, pooling", "u": ["unit-6"], "o": {"unit-6": 37}}, {"y": 2002, "f": "B", "q": 1, "t": "Swine & Ammonia", "top": "Scatterplot, interpreting r and r²", "u": ["unit-2"], "o": {"unit-2": 7}}, {"y": 2002, "f": "B", "q": 2, "t": "Airline Overbooking", "top": "Probability, expected value, conditional probability", "u": ["unit-4"], "o": {"unit-4": 1}}, {"y": 2002, "f": "B", "q": 3, "t": "Magnets and Pain Relief", "top": "Design of experiments, blocking", "u": ["unit-3"], "o": {"unit-3": 15}}, {"y": 2002, "f": "B", "q": 4, "t": "Social Security", "top": "One-sample z-interval for a proportion", "u": ["unit-6"], "o": {"unit-6": 17}}, {"y": 2002, "f": "B", "q": 5, "t": "Obstacle Course Times", "top": "Making graphs and comparing distributions (students vs faculty)", "u": ["unit-1"], "o": {"unit-1": 2}}, {"y": 2002, "f": "B", "q": 6, "t": "Lab Classes", "top": "Two-sample t-test, chi-square homogeneity test, changes in distributions", "u": ["unit-8"], "o": {"unit-8": 14}}, {"y": 2001, "f": "", "q": 1, "t": "Rain in LA", "top": "Outliers", "u": ["unit-1"], "o": {"unit-1": 4}}, {"y": 2001, "f": "", "q": 2, "t": "Copy Machines", "top": "Expected value", "u": ["unit-4"]}, {"y": 2001, "f": "", "q": 3, "t": "Coupon Simulation", "top": "Simulation using a random digit table", "u": ["unit-4"], "o": {"unit-4": 4}}, {"y": 2001, "f": "", "q": 4, "t": "Forest", "top": "Blocking, purpose of randomization", "u": ["unit-3"], "o": {"unit-3": 17}}, {"y": 2001, "f": "", "q": 5, "t": "Pharmacies", "top": "Matched-pairs t-test", "u": ["unit-7"], "o": {"unit-7": 20}}, {"y": 2001, "f": "", "q": 6, "t": "Credit Hours & GPA", "top": "Comparing distributions, t-test for slope, classification", "u": ["unit-9"]}, {"y": 2000, "f": "", "q": 1, "t": "Drug Strengths", "top": "Describing scatterplots", "u": ["unit-2"], "o": {"unit-2": 10}}, {"y": 2000, "f": "", "q": 2, "t": "Footprints in Caves", "top": "Conditions for a one-sample t-interval", "u": ["unit-7"], "o": {"unit-7": 2}}, {"y": 2000, "f": "", "q": 3, "t": "Flexibility Ratings", "top": "Graphing and comparing frequency distributions", "u": ["unit-1"], "o": {"unit-1": 21}}, {"y": 2000, "f": "", "q": 4, "t": "Baby Walkers", "top": "Two-sample t-test for a difference of means, cause and effect", "u": ["unit-7"], "o": {"unit-7": 29}}, {"y": 2000, "f": "", "q": 5, "t": "Cholesterol Drugs", "top": "Experimental design, blocking, double blind", "u": ["unit-3"], "o": {"unit-3": 18}}, {"y": 2000, "f": "", "q": 6, "t": "Heights of Married Couples", "top": "CI for one proportion, combining normal random variables, independence", "u": ["unit-6"], "o": {"unit-6": 22}}, {"y": 1999, "f": "", "q": 1, "t": "Commercial Aircraft", "top": "Regression output, interpreting slope and intercept, residuals", "u": ["unit-2"], "o": {"unit-2": 11}}, {"y": 1999, "f": "", "q": 2, "t": "Hikers", "top": "Chi-square test of independence", "u": ["unit-8"], "o": {"unit-8": 12}}, {"y": 1999, "f": "", "q": 3, "t": "Dentist and Apples", "top": "Experiment vs observational study, confounding, cause and effect", "u": ["unit-3"], "o": {"unit-3": 19}}, {"y": 1999, "f": "", "q": 4, "t": "Batteries", "top": "Normal, binomial, outliers", "u": ["unit-4"]}, {"y": 1999, "f": "", "q": 5, "t": "Dice", "top": "Sample space, expected values", "u": ["unit-4"]}, {"y": 1999, "f": "", "q": 6, "t": "Coin Flipping", "top": "One-sample t-test, matched-pairs test, scatterplot", "u": ["unit-7"], "o": {"unit-7": 16}}, {"y": 1998, "f": "", "q": 1, "t": "Sampling Distributions", "top": "Sampling distribution of the sample mean", "u": ["unit-5"], "o": {"unit-5": 11}}, {"y": 1998, "f": "", "q": 2, "t": "Number of Defective Items", "top": "Histograms and scatterplots", "u": ["unit-2"], "o": {"unit-2": 12}}, {"y": 1998, "f": "", "q": 3, "t": "Butterflies", "top": "Random assignment, chi-square tests", "u": ["unit-8"], "o": {"unit-8": 13}}, {"y": 1998, "f": "", "q": 4, "t": "Weed Killer", "top": "Regression output, residuals", "u": ["unit-2"], "o": {"unit-2": 13}}, {"y": 1998, "f": "", "q": 5, "t": "Student Housing", "top": "One-sample z-test for a proportion", "u": ["unit-6"], "o": {"unit-6": 24}}, {"y": 1998, "f": "", "q": 6, "t": "Pearls (Simulation)", "top": "Normal distribution, simulations, expected value", "u": ["unit-4"]}, {"y": 1997, "f": "", "q": 1, "t": "Age Distributions", "top": "Cumulative frequency plot, median, IQR", "u": ["unit-1"]}, {"y": 1997, "f": "", "q": 2, "t": "Fish Tanks", "top": "Design of experiments, blocking", "u": ["unit-3"], "o": {"unit-3": 20}}, {"y": 1997, "f": "", "q": 3, "t": "Disease Testing", "top": "Conditional probability", "u": ["unit-4"]}, {"y": 1997, "f": "", "q": 4, "t": "Voter Support", "top": "Two-sample z-test for proportions", "u": ["unit-6"], "o": {"unit-6": 35}}, {"y": 1997, "f": "", "q": 5, "t": "Ovens", "top": "Matched-pairs t-test", "u": ["unit-7"], "o": {"unit-7": 21}}, {"y": 1997, "f": "", "q": 6, "t": "Used Cars", "top": "Re-expressing (transforming) data", "u": ["unit-2"]}];
+const unitById = Object.fromEntries(UNITS.map(u=>[u.id,u]));
+const tabs = document.getElementById("tabs"), content = document.getElementById("content");
+const q = document.getElementById("q");
+let current = "all", lbList = [], lbIdx = 0;
+
+function postersFor(id){ if(id==="inf-folder") return POSTERS.filter(p=>p.units.some(u=>["unit-5","unit-6","unit-7","inference"].includes(u))); if(id==="frq"||id==="practice"||RESOURCES[id]) return []; return POSTERS.filter(p=>p.units.includes(id)); }
+
+const tip = document.getElementById("tip");
+function showTip(el, html){
+  tip.innerHTML = html; tip.classList.add("on");
+  const r = el.getBoundingClientRect(), w = tip.offsetWidth;
+  let x = r.left + r.width/2 - w/2; x = Math.max(8, Math.min(x, window.innerWidth - w - 8));
+  tip.style.left = x + "px"; tip.style.top = (r.bottom + 10) + "px";
+}
+function hideTip(){ tip.classList.remove("on"); }
+document.getElementById("tabs").addEventListener("scroll", hideTip);
+window.addEventListener("scroll", hideTip, {passive:true});
+
+function renderTabs(){
+  tabs.innerHTML = "";
+  const GROUPS = [
+    ["Start here", ["finder"]],
+    ["Units", ["all","unit-1","unit-2","unit-3","unit-4","unit-5","unit-6","unit-7","unit-8","unit-9"]],
+    ["Inference", ["inference","inf-folder"]],
+    ["Practice & resources", ["practice","frq","books","apps","calc"]],
+    ["Beyond AP", ["beyond"]]
+  ];
+  const gEl = {};
+  for(const [label, ids] of GROUPS){
+    const g=document.createElement("div"); g.className="tgroup"; g.innerHTML=`<span class="glabel">${label}</span>`;
+    tabs.appendChild(g); ids.forEach(id=>gEl[id]=g);
+  }
+  const all = [{id:"all", short:"All units", count:POSTERS.length}, ...UNITS.map(u=>({id:u.id, short:u.short, count:u.id==='frq'?FRQS.length:RESOURCES[u.id]?resCount(u.id):postersFor(u.id).length}))];
+  if(window.APNAV){ APNAV.render(tabs, all, current, unitById, GROUPS, COLORS); return; }
+  for(const t of all){
+    const b = document.createElement("button");
+    b.innerHTML = t.count ? `${t.short}<span class="n">${t.count}</span>` : t.short;
+    b.setAttribute("aria-current", t.id===current);
+    b.onclick = ()=>{ location.hash = t.id==="all" ? "" : t.id; if(t.id==="all") route(); };
+    const u = unitById[t.id];
+    const tipHtml = u ? `<b>${esc(u.name)}</b><span>${esc(u.sub)}</span><small>${t.count} ${t.id==="frq"?"questions":RESOURCES[t.id]?"links":"poster"+(t.count===1?"":"s")}</small>`
+                      : `<b>All units</b><span>Show every poster in the book</span><small>${t.count} posters</small>`;
+    b.setAttribute("aria-label", u ? u.name : "All units");
+    b.addEventListener("mouseenter", ()=>showTip(b, tipHtml));
+    b.addEventListener("focus", ()=>showTip(b, tipHtml));
+    b.addEventListener("mouseleave", hideTip);
+    b.addEventListener("blur", hideTip);
+    if(COLORS[t.id]) b.style.cssText = cv(t.id);
+    (gEl[t.id]||tabs).appendChild(b);
+  }
+}
+
+const COLORS = {"finder":"#0f7c7a","unit-1":"#1f5fa8","unit-2":"#2a7a46","unit-3":"#b8650f","unit-4":"#b03a2e","unit-5":"#6b3fa0","unit-6":"#0f7c7a","unit-7":"#a8326e","unit-8":"#3d4fb5","unit-9":"#7a5a12","inference":"#1d2b44","beyond":"#5f6670","frq":"#8a1c1c","practice":"#1d2b44","books":"#7a3b12","apps":"#0b5d6b","calc":"#4a4a8a"};
+const TINTS = Object.fromEntries(Object.entries(COLORS).map(([k,v])=>[k, v+"14"]));
+const cv = id => COLORS[id] ? `--c:${COLORS[id]};--t:${TINTS[id]}` : "";
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+function pgrid(list, sid){
+  return `<div class="pgrid">${list.map(p=>{
+    const also = p.units.filter(x=>x!==sid).map(x=>unitById[x].short);
+    const meta = [p.original?"New solved example":"", also.length?"Also in "+also.join(", "):""].filter(Boolean).join(" · ");
+    return `<div class="pitem" style="${cv(p.units[0])}"><button type="button" class="posterbtn" data-img="${p.img}" aria-label="Open ${esc(p.title)}"><img loading="lazy" src="img/${p.img}" alt=""><span class="pt">${esc(p.title)}${meta?`<small>${esc(meta)}</small>`:""}</span></button>${p.note?`<details class="note"><summary>${p.nl||"⚠ Note: this poster has an error"}</summary>${esc(p.note)}</details>`:""}${p.by||p.src?`<div class="srcl">${p.by?"By "+esc(p.by):""}${p.src?` · <a href="${p.src}" target="_blank" rel="noopener">original post on Facebook ↗</a>`:""}</div>`:""}</div>`;
+  }).join("")}</div>`;
+}
+function card(p){
+  const tags = p.units.map(id=>`<span class="tag ${id==="beyond"?"beyond":""}" style="${cv(id)}">${esc(unitById[id].short)}</span>`).join("") + (p.original?`<span class="tag orig">New</span>`:"");
+  const note = p.note ? `<details class="note"><summary>⚠ Note: this poster has an error</summary>${esc(p.note)}</details>` : "";
+  if(p.link){
+    return `<article class="card linkcard" style="${cv(p.units[0])}"><a class="thumb" href="${p.link}" target="_blank" rel="noopener">${esc(p.title)}<br><small style="font-size:15px;font-style:italic;font-weight:400">View on Facebook ↗</small></a>
+      <div class="body"><h3>${esc(p.title)}</h3><div class="tags">${tags}</div>${note}</div></article>`;
+  }
+  return `<article class="card" style="${cv(p.units[0])}"><button class="thumb" data-img="${p.img}" aria-label="Open ${esc(p.title)}"><img loading="lazy" src="img/${p.img}" alt="${esc(p.title)}"></button>
+    <div class="body"><h3>${esc(p.title)}</h3><div class="tags">${tags}</div>${note}</div></article>`;
+}
+
+const FRQ_PDF={"1997": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%201997%20FULL%20PAPER.pdf?id=20050891", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%201997%20MS.pdf?id=20050880", null], "1998": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%201998%20PAPER.pdf?id=20050907", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%201998%20MS.pdf?id=20050929", null], "1999": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%201999%20PAPER.pdf?id=20050903", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%201999%20MS.pdf?id=20050921", null], "2000": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202000%20PAPER.pdf?id=20050928", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202000%20MS.pdf?id=20050879", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202000%20STUDENT%20MS.pdf?id=aRCjU4g2TOmic-Qkcu9IhQ"], "2001": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202001%20PAPER.pdf?id=20050878", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202001%20MS.pdf?id=20050892", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202001%20STUDENT%20MS.pdf?id=LgxYIsAUSSe9mDoN9XlNTA"], "2002B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202002%20FORM%20B%20PAPER.pdf?id=20050934", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202002%20FORM%20B%20MS.pdf?id=20050890", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202002%20FORM%20B%20STUDENT%20MS.pdf?id=fqJNvAtUQlqSBpeJWeyPBA"], "2002": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202002%20PAPER.pdf?id=20050893", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202002%20MS.pdf?id=20050945", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202002%20STUDENT%20MS.pdf?id=cQtsaobmSpeV2s5pgChtog"], "2003B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202003%20FORM%20B%20PAPER.pdf?id=20050952", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202003%20FORM%20B%20MS.pdf?id=20050894", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202003%20FORM%20B%20STUDENT%20MS.pdf?id=KNnkANS4RSeXoEVVv028zA"], "2003": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202003%20PAPER.pdf?id=20050885", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202003%20MS.pdf?id=20050905", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202003%20STUDENT%20MS.pdf?id=K51fQI6lR8-m94uzxKncOA"], "2004B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202004%20FORM%20B%20PAPER.pdf?id=20050900", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202004%20FORM%20B%20MS.pdf?id=20050956", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202004%20FORM%20B%20STUDENT%20MS.pdf?id=PrJ3NgbMT4KPop8pT3JZow"], "2004": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202004%20PAPER.pdf?id=20050925", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202004%20MS.pdf?id=20050909", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202004%20STUDENT%20MS.pdf?id=DBaRAboBSd6NIhCR-rMqHQ"], "2005B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202005%20FORM%20B%20PAPER.pdf?id=20050882", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202005%20FORM%20B%20MS.pdf?id=20050922", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202005%20FORM%20B%20STUDENT%20MS.pdf?id=YsXUOVmdQ6i8eBWffwIw4Q"], "2005": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202005%20PAPER.pdf?id=20050895", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202005%20MS.pdf?id=20050881", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202005%20STUDENT%20MS.pdf?id=Y7AE9Dq3QaiaGS2KEXZIlA"], "2006B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202006%20FORM%20B%20PAPER.pdf?id=20050937", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202006%20FORM%20B%20MS.pdf?id=20050915", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202006%20FORM%20B%20STUDENT%20MS.pdf?id=MvMn9OwyQf-KVQ-cBdj42g"], "2006": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202006%20PAPER.pdf?id=20050914", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202006%20MS.pdf?id=20050930", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202006%20STUDENT%20MS.pdf?id=Eu0eXHNQQEGNlNOTDHHQYw"], "2007B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202007%20FORM%20B%20PAPER.pdf?id=20050889", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202007%20FORM%20B%20MS.pdf?id=20050899", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202007%20FORM%20B%20STUDENT%20MS.pdf?id=RaSZz86iSwa1AgBmFedB_A"], "2007": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202007%20PAPER.pdf?id=20050920", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202007%20MS.pdf?id=20050916", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202007%20STUDENT%20MS.pdf?id=M1-xtz_3SZOFGK3wNTrV4w"], "2008B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202008%20FORM%20B%20PAPER.pdf?id=20050924", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202008%20FORM%20B%20MS.pdf?id=20050957", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202008%20FORM%20B%20STUDENT%20MS.pdf?id=FcTfDkR8TXSQg-EN8soM2Q"], "2008": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202008%20PAPER.pdf?id=20050946", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202008%20MS.pdf?id=20050943", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202008%20STUDENT%20MS.pdf?id=IUrwujCOReGhH2d-y2csAg"], "2009B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202009%20FORM%20B%20PAPER.pdf?id=20050906", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202009%20FORM%20B%20MS.pdf?id=20050917", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202009%20FORM%20B%20STUDENT%20MS.pdf?id=YzEog2lAQF2lM8MPmzL-TQ"], "2009": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202009%20PAPER.pdf?id=20050923", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202009%20MS.pdf?id=20050918", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202009%20STUDENT%20MS.pdf?id=Jc28YVmiQISJr0cH8TjfIw"], "2010B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202010%20FORM%20B%20PAPER.pdf?id=20050949", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202010%20FORM%20B%20MS.pdf?id=20050927", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202010%20FORM%20B%20STUDENT%20MS.pdf?id=A6Ta0M1STNinOSb8pdbQHQ"], "2010": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202010%20PAPER.pdf?id=20050884", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202010%20MS.pdf?id=20050904", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202010%20STUDENT%20MS.pdf?id=UvuFufVzSJ23xMlMmiqK_Q"], "2011B": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202011%20FORM%20B.pdf?id=20050897", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202011%20FORM%20B%20MS.pdf?id=20050932", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202011%20FORM%20B%20STUDENT%20MS.pdf?id=ctIV9_RiSiuuSiDihq5o4A"], "2011": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202011%20PAPER.pdf?id=20050948", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202011%20MS.pdf?id=20050898", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202011%20STUDENT%20MS.pdf?id=Jjwy0CwgTzmRqRY0yxiO0Q"], "2012": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202012%20PAPER.pdf?id=20050931", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202012%20MS.pdf?id=20050944", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202012%20STUDENT%20MS.pdf?id=CSK0LZZ4QH2MkgbLoBQ-3w"], "2013": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202013%20PAPER.pdf?id=20050954", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202013%20MS.pdf?id=20050913", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202013%20STUDENT%20MS.pdf?id=HqWmc__-SmOhsQ_FYEWBqA"], "2014": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202014%20PAPER.pdf?id=20050940", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202014%20MS.pdf?id=20050908", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202014%20STUDENT%20MS.pdf?id=TwHRk0Z8RIyDVQGECc3zvg"], "2015": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202015%20PAPER.pdf?id=20050939", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202015%20MS.pdf?id=20050936", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202015%20STUDENT%20MS.pdf?id=YD9-q3zkTbuMviC0FnKvTQ"], "2016": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202016%20PAPER.pdf?id=20050951", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202016%20MS.pdf?id=20050912", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202016%20STUDENT%20MS.pdf?id=NXZTF2LkSu2Sh4GPihMW0Q"], "2017": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202017%20PAPER.pdf?id=20050938", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202017%20MS.pdf?id=20050950", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202017%20STUDENT%20MS.pdf?id=PRnochlYSEefK7PeBaovDw"], "2018": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202018%20PAPER.pdf?id=20050947", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202018%20MS.pdf?id=20050935", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202018%20STUDENT%20MS.pdf?id=YKb3TgqaQcKJIpv8-wPR5Q"], "2019": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202019%20PAPER.pdf?id=20050886", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202019%20MS.pdf?id=20050887", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202019%20STUDENT%20MS.pdf?id=A5N8YhIZQ2uOPFVwie3meg"], "2021": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202021%20PAPER.pdf?id=121310073", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202021%20MS.pdf?id=121310074", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202021%20STUDENT%20MS.pdf?id=RHOJbUpaQQGUpofUJhNutQ"], "2022": ["https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202022%20PAPER.pdf?id=147383389", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202022%20MS.pdf?id=147383388", "https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/STATS%202022%20STUDENT%20MS.pdf?id=GpdSjFAlReqatTlOxVpxuQ"]};
+const A=(h,t)=>`<a class="btn" href="${h}" target="_blank" rel="noopener">${t}</a>`;
+function frqLinks(r){
+  if(r.qu) return A(r.qu,"Question")+A(r.sg,"Scoring guidelines")+(r.sa?A(r.sa,"Sample responses"):"");
+  const e=FRQ_PDF[r.y+(r.f||"")]; if(!e) return "";
+  return (e[0]?A(e[0],"Question"):"")+(e[1]?A(e[1],"Scoring guidelines"):"")+(e[2]?A(e[2],"Sample responses"):"");
+}
+function skipNote(r,id){
+  return r.y===2026?`<div class="pe">Practice exam: week before AP exam (5/11/2027)</div>`:"";
+}
+function ordLabel(r,id){
+  if(!r.o) return "";
+  if(id==="frq") return ` <span class="ord">(${Object.keys(r.o).map(u=>"U"+u.split("-")[1]+"Q"+r.o[u]).join(", ")})</span>`;
+  return r.o[id]?` <span class="ord">(Q${r.o[id]})</span>`:"";
+}
+function frqTable(id, open){
+  const list = FRQS.filter(r=>id==="frq" || r.u.includes(id));
+  if(!list.length) return "";
+  const rows = list.map(r=>`<tr><td class="yq">${r.y}${r.f?" Form B":""} · Q${r.q}${ordLabel(r,id)}${skipNote(r,id)}</td><td class="t"><b>${esc(r.t)}</b><span>${esc(r.top)}</span></td><td>${r.u.map(u=>`<span class="tag" style="${cv(u)}">${esc(unitById[u].short)}</span>`).join(" ")}</td><td class="l">${frqLinks(r)}</td></tr>`).join("");
+  return `<details class="frq"${open?" open":""}><summary>Released FRQs for this unit (${list.length})</summary><table><tr><th>Exam</th><th>Question</th><th>Units</th><th>Official PDFs</th></tr>${rows}</table><div class="note2">Every button opens a free PDF of the official College Board file, with no account or sign-in. 2023–2026 come straight from AP Central; 1997–2022 come from the free MyMathsCloud archive. The scoring guidelines show the rubric for all six questions; sample responses show graded student work with commentary. No exam was released in 2020.</div></details>`;
+}
+
+function route(){
+  const h = location.hash.slice(1);
+  current = unitById[h] ? h : "all";
+  renderTabs(); render();
+  window.scrollTo({top:0});
+}
+
+function render(){
+  const term = q.value.trim().toLowerCase();
+  const match = p => !term || (p.title+" "+(p.note||"")+" "+p.units.map(u=>unitById[u].name).join(" ")).toLowerCase().includes(term);
+  const ids = current==="all" ? UNITS.map(u=>u.id) : [current];
+  let html = (current==="all" && !term && window.APNAV) ? APNAV.home() : "";
+  for(const id of ids){
+    const u = unitById[id];
+    if(id==="practice"){
+      if(term) continue;
+      html += `<section class="unit" id="sec-practice" style="${cv("inference")}"><div class="chapter">${u.chapter}</div><h2>${esc(u.name)}</h2><p class="sub">${esc(u.sub)}</p>`;
+      html += `<div style="--c:#1d2b44"><h3 style="margin:22px 0 4px;color:var(--c);font-size:22px">AP Task Words — what each free-response verb asks you to do</h3><p class="sub" style="margin:0">Every FRQ part starts with a task word. Know exactly what each one requires to earn full credit.</p>${PRACTICE.verbsTable()}${PRACTICE.block("verbs",false)}</div>`;
+      for(const uu of UNITS.filter(x=>PRACTICE.units.includes(x.id))) html += `<div style="${cv(uu.id)}"><h3 style="margin:22px 0 0;color:var(--c);font-size:22px">${esc(uu.name)}</h3>${PRACTICE.block(uu.id,false)}</div>`;
+      const M="https://www.mymathscloud.com/api/download/modules/AP-Statistics/Past-Papers/";
+      const L=[["2002 multiple choice","STATS%202002%20MULTIPLE%20CHOICE.pdf?id=20050896"],["2002 answer key","STATS%202002%20MULTIPLE%20CHOICE%20MS.pdf?id=20050910"],["2007 multiple choice","STATS%202007%20MULTIPLE%20CHOICE.pdf?id=20050901"],["2015 multiple choice","STATS%202015%20MULTIPLE%20CHOICE.pdf?id=20050958"],["2015 answer key","STATS%202015%20MULTIPLE%20CHOICE%20MS.pdf?id=20050919"],["Multiple-choice practice set","STATS%20MULTIPLE%20CHOICE%20PRACTICE.pdf?id=20050942"],["Full practice exam","STATS%20PRACTICE%20EXAM.pdf?id=20050926"],["2012 practice exam","STATS%202012%20PRACTICE%20PAPER.pdf?id=20050888"],["2013 practice exam","STATS%202013%20PRACTICE%20PAPER.pdf?id=20050953"],["2014 practice exam","STATS%202014%20PRACTICE%20PAPER.pdf?id=20050941"]];
+      html += `<h3 style="margin:30px 0 6px;font-size:22px">Full released multiple-choice exams (free PDFs)</h3><p class="sub" style="margin:0 0 6px">Complete College Board multiple-choice sections and practice exams for timed, mixed-unit review.</p><div class="mclinks">${L.map(x=>`<a href="${M+x[1]}" target="_blank" rel="noopener">${x[0]}</a>`).join("")}</div></section>`;
+      continue;
+    }
+    if(id==="finder"){
+      if(term) continue;
+      const fp = window.APF ? APF.finderPanels() : [];
+      html += `<section class="unit" id="sec-finder" style="${cv("finder")}"><div class="chapter">${u.chapter}</div><h2>${esc(u.name)}</h2><p class="sub">${esc(u.sub)}</p>`;
+      html += `<div class="ubar">${fp.map((pn,i)=>`<button type="button" class="ubtn" data-p="${pn.k}" aria-expanded="${i===0}">${pn.label}</button>`).join("")}</div>`;
+      html += fp.map((pn,i)=>`<div class="upanel" data-p="${pn.k}"${i===0?"":" hidden"}>${pn.body}</div>`).join("") + `</section>`;
+      continue;
+    }
+    if(RESOURCES[id]){
+      const body = resSection(id, term);
+      if(term && !body) continue;
+      html += `<section class="unit" id="sec-${id}" style="${cv(id)}"><div class="chapter">${u.chapter}</div><h2>${esc(u.name)}</h2><p class="sub">${esc(u.sub)}</p>${body}</section>`;
+      continue;
+    }
+    if(id==="frq"){
+      if(term) continue;
+      html += `<section class="unit" id="sec-frq"><div class="chapter">${u.chapter}</div><h2>${esc(u.name)}</h2><p class="sub">${esc(u.sub)}</p>`;
+      for(const uu of UNITS.filter(x=>/^unit-/.test(x.id))){
+        const t = frqTable(uu.id, true);
+        if(t) html += `<div style="${cv(uu.id)}"><h3 style="margin:26px 0 0;color:var(--c);font-size:22px">${esc(uu.name)}</h3>${t.replace(/Released FRQs for this unit/,'Questions')}</div>`;
+      }
+      html += `</section>`; continue;
+    }
+    const items = postersFor(id).filter(match);
+    if(term && !items.length) continue;
+    html += `<section class="unit" id="sec-${id}" style="${cv(id)}"><div class="chapter">${u.chapter}</div><h2>${esc(u.name)}</h2><p class="sub">${esc(u.sub)}</p>`;
+    const panels = [];
+    const reg = items.filter(p=>!p.original), sol = items.filter(p=>p.original && !p.gallery), gal = items.filter(p=>p.gallery).sort((x,y)=>GORDER.indexOf(x.img.split(".")[0])-GORDER.indexOf(y.img.split(".")[0]));
+    if(reg.length) panels.push({k:"posters", label:"Posters", n:reg.length, body:`<p class="ptitle">Click a poster to open it full size. A ⚠ Note under a poster explains an error in it and gives the correct answer.</p>${pgrid(reg, id)}`});
+    if(gal.length) panels.push({k:"gallery", label:"Distribution gallery", n:gal.length, body:`<p class="ptitle">One poster per probability distribution: what it models, formulas, a graph of its shape and a solved example. Start with the cheat sheet.</p>${pgrid(gal, id)}`});
+    if(sol.length) panels.push({k:"solved", label:"Solved examples", n:sol.length, body:`<p class="ptitle">Step-by-step solved examples made for this book. Click one to open it.</p>${pgrid(sol, id)}`});
+    if(!term && /^unit-/.test(id)){
+      if(PRACTICE.units.includes(id)) panels.push({k:"quick", label:"Quick practice", n:"", body:PRACTICE.block(id, true)});
+      if(window.UNITSETS && UNITSETS.count(id)) panels.push({k:"sets", label:"Extra practice sets", n:UNITSETS.count(id), body:UNITSETS.html(id)});
+      const nf = FRQS.filter(r=>r.u.includes(id)).length;
+      if(nf) panels.push({k:"frq", label:"Released FRQs", n:nf, body:frqTable(id, true)});
+    }
+    if(!term && id==="beyond"){
+      if(window.UNITSETS && UNITSETS.count(id)) panels.push({k:"sets", label:"Practice sets", n:UNITSETS.count(id), body:UNITSETS.html(id)});
+      if(RESOURCES._beyond) panels.push({k:"res", label:"Courses, books & tools", n:resCount("_beyond"), body:resSection("_beyond","")});
+    }
+    if(!panels.length){ html += `<p class="empty">No posters here yet.</p></section>`; continue; }
+    const openAll = !!term;
+    html += `<div class="ubar">${panels.map(pn=>`<button type="button" class="ubtn" data-p="${pn.k}" aria-expanded="${openAll&&["posters","solved","gallery"].includes(pn.k)}">${pn.label}${pn.n!==""?`<span class="n">${pn.n}</span>`:""}</button>`).join("")}</div>`;
+    html += panels.map(pn=>`<div class="upanel" data-p="${pn.k}"${openAll&&["posters","solved","gallery"].includes(pn.k)?"":" hidden"}>${pn.body}</div>`).join("");
+    html += `</section>`;
+  }
+  content.innerHTML = html || `<p class="empty">No posters match "${esc(term)}".</p>`;
+  PRACTICE.bind(content);
+  if(window.UNITSETS) UNITSETS.bind(content);
+  if(window.APF) APF.bind(content);
+  content.querySelectorAll(".ubtn").forEach(b=>b.onclick=()=>{
+    const sec=b.closest("section"), willOpen=b.getAttribute("aria-expanded")!=="true";
+    sec.querySelectorAll(".ubtn").forEach(x=>x.setAttribute("aria-expanded","false"));
+    sec.querySelectorAll(".upanel").forEach(x=>x.hidden=true);
+    if(willOpen){ b.setAttribute("aria-expanded","true"); sec.querySelector(`.upanel[data-p="${b.dataset.p}"]`).hidden=false; }
+  });
+  content.querySelectorAll("button.posterbtn").forEach(b=>b.onclick=()=>{
+    const scope=b.closest(".upanel")||content; lbList=[...scope.querySelectorAll("button.posterbtn")]; openLb(lbList.indexOf(b));
+  });
+}
+
+const lb=document.getElementById("lb"), lbImg=document.getElementById("lbImg"), lbTitle=document.getElementById("lbTitle");
+function openLb(i){
+  lbIdx=(i+lbList.length)%lbList.length;
+  const b=lbList[lbIdx], p=POSTERS.find(x=>x.img===b.dataset.img);
+  lbImg.src="img/"+p.img; lbImg.alt=p.title; lbTitle.textContent=p.title;
+  const ln=document.getElementById("lbNote"); ln.className=p.note&&notes.checked?"on":""; ln.innerHTML=p.note?`<b>⚠ Note (correction):</b> ${esc(p.note)}`:"";
+  lb.classList.add("open"); lb.querySelector(".stage").scrollTop=0; document.body.style.overflow="hidden";
+}
+function closeLb(){lb.classList.remove("open"); document.body.style.overflow="";}
+document.getElementById("lbClose").onclick=closeLb;
+document.getElementById("lbPrev").onclick=()=>openLb(lbIdx-1);
+document.getElementById("lbNext").onclick=()=>openLb(lbIdx+1);
+lb.addEventListener("click",e=>{if(e.target===lb||e.target.classList.contains("stage"))closeLb();});
+document.addEventListener("keydown",e=>{
+  if(!lb.classList.contains("open"))return;
+  if(e.key==="Escape")closeLb(); if(e.key==="ArrowLeft")openLb(lbIdx-1); if(e.key==="ArrowRight")openLb(lbIdx+1);
+});
+
+const notes=document.getElementById("notes");
+try{ if(localStorage.getItem("apstat-notes")==="off"){notes.checked=false;} }catch(e){}
+function applyNotes(){document.body.classList.toggle("hide-notes",!notes.checked); try{localStorage.setItem("apstat-notes",notes.checked?"on":"off")}catch(e){}}
+notes.onchange=applyNotes; applyNotes();
+q.oninput=render;
+window.addEventListener("hashchange",route);
+route();
+</script>
+</body>
+</html>

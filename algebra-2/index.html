@@ -1,0 +1,567 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}section.unit .secnav.sticky{flex-wrap:wrap!important;overflow:visible!important;row-gap:7px}
+section.unit .secnav .jb{flex-basis:100%;display:flex;flex-wrap:wrap;gap:8px}
+@media (max-width:760px){section.unit .secnav .jb{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}}
+.p140-go{display:block;width:100%;margin:14px 0 4px;padding:12px 14px;font:inherit;font-size:19px;font-weight:700;color:#fff;background:#c8102e;border:0;border-radius:12px;cursor:pointer;text-align:center}
+</style><script defer src="https://cloud.umami.is/script.js" data-website-id="0c59c8ac-f594-41fb-ac04-392482ab3e25"></script>
+<script>/* Z-Math time counter: counts only time the page is open, visible and in use. No names, no cookies. */
+(function(){ var BOOK='Z-Algebra 2', STEP=300, acc=0, last=Date.now(), active=Date.now();
+ function used(){ active=Date.now(); } ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,used,{passive:true}); });
+ function send(n){ for(var i=0;i<n;i++){ try{ window.umami&&umami.track("5 minutes of use",{book:BOOK}); }catch(e){} } }
+ function tick(){ var now=Date.now(); if(document.visibilityState==="visible"&&now-active<120000) acc+=(now-last)/1000; last=now; if(acc>=STEP){ var n=Math.floor(acc/STEP); acc-=n*STEP; send(n); } }
+ setInterval(tick,15000);
+ document.addEventListener("visibilitychange",function(){ tick(); if(document.visibilityState==="hidden"&&acc>=STEP/2){ acc=0; send(1); } });
+})();</script>
+</head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Z-Algebra 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--muted:#555;--line:#111;--paper:#fff}
+*{box-sizing:border-box}
+html{background:#fff}
+body{margin:0;font-family:'EB Garamond',Georgia,'Times New Roman',serif;color:var(--ink);background:var(--paper);line-height:1.5;font-size:18px}
+header{padding:56px 24px 26px;text-align:center}
+header .wrap{max-width:900px;margin:0 auto;border-top:3px double var(--ink);border-bottom:3px double var(--ink);padding:26px 10px 22px}
+.kicker{text-transform:uppercase;letter-spacing:.3em;font-size:13px;margin:0 0 10px}
+h1{font-weight:800;font-size:clamp(34px,6vw,60px);margin:0 0 8px;letter-spacing:-.5px;line-height:1.05}
+header p{margin:0 auto;font-style:italic;color:#333;max-width:640px;font-size:19px}
+nav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--ink)}
+nav .wrap{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+nav button{flex:0 0 auto;border:1px solid var(--ink);background:#fff;color:var(--ink);border-radius:0;padding:5px 13px;font:500 16px 'EB Garamond',Georgia,serif;cursor:pointer;white-space:nowrap}
+nav button:hover{background:#f1f1f1}
+nav button[aria-current="true"]{background:var(--ink);color:#fff}
+nav button .n{opacity:.6;margin-left:5px;font-size:13px}
+main{max-width:1180px;margin:0 auto;padding:28px 16px 60px}
+.toolbar{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-bottom:26px}
+.toolbar input[type=search]{flex:1 1 260px;max-width:400px;padding:7px 2px;border:0;border-bottom:1.5px solid var(--ink);font:italic 18px 'EB Garamond',Georgia,serif;background:transparent;outline:none}
+.toggle{display:flex;gap:8px;align-items:center;font-size:16px;color:var(--muted);cursor:pointer;user-select:none}
+.toggle input{accent-color:#111}
+section.unit{margin-bottom:54px}
+section.unit h2{font-weight:800;font-size:clamp(24px,3.4vw,32px);margin:0;line-height:1.15}
+section.unit .chapter{text-transform:uppercase;letter-spacing:.28em;font-size:12.5px;margin-bottom:4px}
+section.unit .sub{color:var(--muted);margin:6px 0 20px;font-style:italic;padding-bottom:12px;border-bottom:1px solid var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;align-items:start}
+.card{background:#fff;border:1px solid var(--ink);display:flex;flex-direction:column;transition:box-shadow .15s}
+.card:hover{box-shadow:6px 6px 0 #111}
+.thumb{display:block;aspect-ratio:1/1;background:#f4f4f4;border:0;border-bottom:1px solid var(--ink);padding:0;cursor:zoom-in;width:100%;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:top;display:block;filter:grayscale(100%);transition:filter .25s}
+.card:hover .thumb img{filter:none}
+.body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.body h3{font-size:19px;margin:0;line-height:1.25;font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:13px;letter-spacing:.02em;padding:0 7px;border:1px solid var(--ink);white-space:nowrap}
+.tag.beyond{border-style:dashed}
+.tag.orig{background:#111;color:#fff}
+.note{font-size:15.5px;border-left:3px solid var(--ink);padding:2px 0 2px 10px;color:#222;line-height:1.4}
+.note b{display:block;font-variant:small-caps;letter-spacing:.06em;font-size:15px}
+body.hide-notes .note{display:none}
+.linkcard .thumb{display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;color:#111;background:repeating-linear-gradient(0deg,#fff 0 27px,#e6e6e6 27px 28px);font-size:24px;font-weight:600;text-align:center;padding:20px}
+.empty{color:var(--muted);font-style:italic}
+footer{max-width:900px;margin:0 auto;padding:18px 16px 50px;color:#333;font-size:16px;text-align:center;border-top:3px double var(--ink);font-style:italic}
+footer a{color:#111}
+#lb{position:fixed;inset:0;background:rgba(255,255,255,.97);display:none;z-index:20;flex-direction:column}
+#lb.open{display:flex}
+#lb .top{display:flex;justify-content:space-between;align-items:center;color:#111;padding:10px 16px;gap:12px;border-bottom:1px solid #111}
+#lb .top span{font-weight:600;font-size:20px}
+#lb .top button,#lb .nav{background:#fff;color:#111;border:1px solid #111;padding:6px 14px;font:500 17px 'EB Garamond',Georgia,serif;cursor:pointer}
+#lb .stage{flex:1;overflow:auto;display:flex;justify-content:center;align-items:flex-start;padding:16px 12px}
+#lb .stage img{max-width:min(100%,1200px);height:auto;border:1px solid #111}
+#lb .nav{position:fixed;top:50%;transform:translateY(-50%);font-size:26px;padding:10px 16px}
+#lb .prev{left:10px} #lb .next{right:10px}
+@media (max-width:640px){#lb .nav{display:none}}
+@media (max-width:700px){nav .wrap{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scrollbar-width:thin}}
+
+.secnav{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 26px;padding:12px 14px;border:2px solid #111;background:#fafafa}
+.secnav>span{font-variant:small-caps;letter-spacing:.08em;font-weight:600;margin-right:4px}
+.secnav button{border:1px solid #111;background:#fff;color:#111;padding:4px 11px;font:500 16px 'EB Garamond',Georgia,serif;cursor:pointer;display:inline-flex;gap:6px;align-items:baseline}
+.secnav button:hover{background:#111;color:#fff}
+.secnav button b{display:inline-block;min-width:18px;height:18px;line-height:18px;border-radius:50%;background:#111;color:#fff;font-size:12px;text-align:center}
+.secnav button:hover b{background:#fff;color:#111}
+.secnav button small{font-size:12.5px;opacity:.65}
+.subsec{margin:0 0 40px;scroll-margin-top:120px}
+.subh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:25px;margin:0 0 12px;padding:0 0 6px;border-bottom:3px double #111}
+.subh .num{display:inline-block;width:32px;height:32px;line-height:32px;border-radius:50%;background:#111;color:#fff;text-align:center;font-size:17px;flex:none}
+.subh small{font-size:15px;font-weight:400;font-style:italic;color:#555}
+.subh .totop{margin-left:auto;border:1px solid #999;background:#fff;color:#555;font:14px 'EB Garamond',Georgia,serif;padding:1px 9px;cursor:pointer}
+.subh .totop:hover{border-color:#111;color:#111}
+.h4{font-size:20px;margin:22px 0 8px}
+.lead2{font-style:italic;color:#444;margin:0 0 8px}
+.more{margin:14px 0 0}
+.openu{border:1.5px solid #111;background:#111;color:#fff;padding:6px 14px;font:600 16px 'EB Garamond',Georgia,serif;cursor:pointer}
+.openu:hover{background:#333}
+.quiz{margin-top:4px}
+@media (max-width:640px){.subh{font-size:21px}.subh .totop{margin-left:0}.secnav button small{display:none}}
+
+.secnav.sticky{position:sticky;top:var(--navh,60px);z-index:4;flex-wrap:nowrap;overflow-x:auto;padding:8px 12px;margin-bottom:22px;box-shadow:0 3px 0 rgba(0,0,0,.08);scrollbar-width:thin}
+.secnav.sticky button{white-space:nowrap;flex:none}
+.secnav>span{white-space:nowrap}
+.secnav button.cur{background:#111;color:#fff}
+.secnav button.cur b{background:#fff;color:#111}
+.pnav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:10px 0 0;padding-top:16px;border-top:3px double #111}
+.pnav button{border:1.5px solid #111;background:#fff;color:#111;padding:8px 14px;font:600 17px 'EB Garamond',Georgia,serif;cursor:pointer;max-width:48%;text-align:left}
+.pnav button:last-child{text-align:right}
+.pnav button:hover{background:#111;color:#fff}
+.gotol{font-size:16px;color:#333;display:flex;gap:6px;align-items:center}
+.gotol select{font:16px 'EB Garamond',Georgia,serif;padding:4px 6px;border:1.5px solid #111;background:#fff;max-width:260px}
+.hits{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.hits button{border:1px solid #111;background:#fff;padding:5px 12px;font:500 16px 'EB Garamond',Georgia,serif;cursor:pointer;text-align:left}
+.hits button:hover{background:#111;color:#fff}
+.hits small{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.65}
+@media (max-width:640px){.pnav button{max-width:100%;width:100%;text-align:center!important}.gotol select{max-width:200px}}
+
+details.fold{border:1.5px solid #111;margin:0 0 12px;background:#fff;scroll-margin-top:120px}
+details.fold>summary.subh{list-style:none;cursor:pointer;margin:0;padding:10px 14px;border-bottom:0;font-size:22px;user-select:none}
+details.fold>summary.subh::-webkit-details-marker{display:none}
+details.fold>summary.subh::after{content:"▸ open";margin-left:auto;font-size:14px;font-weight:600;border:1px solid #111;padding:1px 10px;letter-spacing:.04em}
+details.fold[open]>summary.subh::after{content:"▾ close";background:#111;color:#fff}
+details.fold>summary.subh .totop{display:none}
+details.fold[open]>summary.subh{border-bottom:3px double #111;background:#f6f6f6}
+details.fold>summary.subh:hover{background:#f1f1f1}
+details.fold>*:not(summary){margin-left:14px;margin-right:14px}
+details.fold[open]{padding-bottom:12px}
+details.fold>.grid,details.fold>.cs,details.fold>.quiz,details.fold>.sat,details.fold>.pwrap,details.fold>.res{margin-top:12px}
+.ocall{display:inline-flex;gap:6px;flex:none;padding-right:8px;margin-right:4px;border-right:1px solid #bbb}
+.ocall button{border:1px solid #777!important;color:#444!important;font-size:14px!important;padding:2px 9px!important}
+@media (max-width:640px){details.fold>summary.subh{font-size:18px;padding:8px 10px}details.fold>*:not(summary){margin-left:8px;margin-right:8px}}
+#toTop{position:fixed;right:18px;bottom:18px;z-index:15;border:2px solid #111;background:#111;color:#fff;font:600 17px 'EB Garamond',Georgia,serif;padding:8px 16px;cursor:pointer;box-shadow:3px 3px 0 rgba(0,0,0,.25);opacity:0;pointer-events:none;transform:translateY(8px);transition:opacity .2s,transform .2s}
+#toTop.on{opacity:1;pointer-events:auto;transform:none}
+#toTop:hover{background:#fff;color:#111}
+@media print{#toTop{display:none}}
+#tip{position:fixed;z-index:30;max-width:320px;background:#111;color:#fff;padding:10px 14px;font:16px/1.35 'EB Garamond',Georgia,serif;pointer-events:none;opacity:0;transition:opacity .12s;box-shadow:4px 4px 0 rgba(0,0,0,.18)}
+#tip.on{opacity:1}
+#tip b{display:block;font-size:17px;margin-bottom:3px}
+#tip span{font-style:italic;color:#ddd}
+#tip small{display:block;margin-top:5px;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#bbb}
+</style>
+</head>
+<body>
+<div data-zmath-link style="max-width:1180px;margin:0 auto;padding:12px 16px 0"><a href="../" style="color:#111;font-weight:600;text-decoration:none;border:1.5px solid #111;border-radius:999px;padding:4px 14px;display:inline-block;font-size:16px">← Z-Math: all courses</a></div>
+<header><div class="wrap">
+  <p class="kicker">Algebra 2 Honors · Zogovic</p>
+  <h1>Z-Algebra 2</h1>
+  <p>Cheat sheets, step-by-step solved examples, and practice problems with full solutions. Click any poster to open it full size.</p>
+</div></header>
+
+<nav><div class="wrap" id="tabs"></div></nav>
+
+<main>
+  <div class="toolbar">
+    <input type="search" id="q" placeholder="Search topics & posters (e.g. logarithms, factoring, asymptotes)">
+    <label class="gotol">Go to: <select id="goto" aria-label="Go to a unit or page"></select></label>
+    
+  </div>
+  <div id="content"></div>
+</main>
+
+<footer>Every poster in this book was written for Zogovic's Algebra 2 Honors class. Try each example on your own first, then check your work against the solution.</footer>
+
+<button type="button" id="toTop" aria-label="Back to the top of the page">↑ Top</button>
+<div id="tip" role="tooltip"></div>
+<div id="lb" role="dialog" aria-modal="true" aria-label="Poster viewer">
+  <div class="top"><span id="lbTitle"></span><button id="lbClose">Close ✕</button></div>
+  <div class="stage"><img id="lbImg" alt=""></div>
+  <button class="nav prev" id="lbPrev" aria-label="Previous">‹</button>
+  <button class="nav next" id="lbNext" aria-label="Next">›</button>
+</div>
+
+<script src="plot.js"></script>
+<script src="practice.js"></script>
+<script src="gen.js"></script>
+<script src="sat.js"></script>
+<script src="res.js"></script>
+<script src="cheat.js"></script>
+<script src="explog.js"></script>
+<script src="moregen.js"></script>
+<script src="formulas.js"></script>
+<script src="ws.js"></script>
+<script src="poly.js"></script>
+<script src="unitplus.js"></script>
+<script src="frac.js"></script>
+<script src="factor.js"></script>
+<script src="pro.js"></script>
+<script src="sys3.js"></script>
+<script src="mathfix.js"></script>
+<script>
+const UNITS = [
+  {id:"formulas", chapter:"Formulas", short:"Formulas & 140 Problems", name:"Formulas: Special Products & Factoring Patterns", sub:"Difference of squares, difference and sum of cubes, square and cube of a binomial. Formulas with examples, multiple choice, flashcards and type-the-answer practice."},
+  {id:"cheats", chapter:"Cheat Sheets", short:"Cheat Sheets", name:"Cheat Sheets for Every Unit", sub:"Rules, a worked example and a common mistake for every topic, with a button for more solved examples. Print any unit on two pages."},
+  {id:"practice", chapter:"Practice", short:"Practice Problems", name:"Practice Problems with Full Solutions", sub:"Quick Quizzes for all 11 units with new problems every time (choose a topic and 10, 15 or 20 problems), plus worked practice sets and Honors Challenge problems, all with full solutions and graphs."},
+  {id:"toolkit", chapter:"Toolkit", short:"Functions Toolkit", name:"Functions Toolkit (Precalc Ready)", sub:"Parent functions, domain & range, key features, transformations, rates of change, rules for exponents, radicals & logs, limit notation"},
+  {id:"unit-1", chapter:"Chapter I", short:"Linear & Absolute Value", name:"Unit 1: Linear Equations, Inequalities & Functions", sub:"Absolute value, lines, systems in three variables, piecewise functions"},
+  {id:"unit-2", chapter:"Chapter II", short:"Polynomials & Complex Numbers", name:"Unit 2: Polynomials, Factoring & Solving Quadratics", sub:"Factoring, polynomial division, binomial theorem, four ways to solve, complex numbers"},
+  {id:"factor", chapter:"Factoring", short:"Factoring", name:"Factoring: Cross Table & Ruffini's Method", sub:"Which method to use, the Cross Table method for ax² + bx + c, and Ruffini's method for degree 3 and higher. Solved examples plus practice where you type numbers into the boxes and check them as you go."},
+  {id:"unit-3", chapter:"Chapter III", short:"Quadratic Functions", name:"Unit 3: Quadratic Functions", sub:"Forms, vertex form, zeros, discriminant, inequalities, writing equations, max/min, nonlinear systems"},
+  {id:"systems", chapter:"Systems", short:"Systems", name:"Systems of Equations (Step by Step)", sub:"2 × 2 and 3 × 3 by graphing, substitution, elimination, Cramer's rule, inverse matrices, Gaussian elimination; nonlinear systems and tangent lines"},
+  {id:"unit-13", chapter:"Chapter XIII", short:"Matrices", name:"Unit 13: Matrices", sub:"Dimensions, operations, multiplication, determinants, inverses, transformations, and solving systems with AX = B"},
+  {id:"unit-4", chapter:"Chapter IV", short:"Polynomial Functions", name:"Unit 4: Polynomial Functions", sub:"End behavior, multiplicity, finding all real and complex zeros"},
+  {id:"poly", chapter:"Polynomials", short:"Polynomials", name:"Polynomial Functions: Complete Guide", sub:"Properties, end behavior, zeros and multiplicity, the Remainder and Factor Theorems, rational, irrational and imaginary zeros, approximating zeros. Detailed explanations, graphs and new examples on demand."},
+  {id:"unit-5", chapter:"Chapter V", short:"Rational Functions", name:"Unit 5: Rational Expressions & Functions", sub:"Operations, graphs and asymptotes, rational equations"},
+  {id:"unit-6", chapter:"Chapter VI", short:"Radicals & Inverses", name:"Unit 6: Radicals, Rational Exponents & Inverses", sub:"Simplifying radicals, radical equations, composition and inverse functions"},
+  {id:"unit-7", chapter:"Chapter VII", short:"Exponentials & Logs", name:"Unit 7: Exponential & Logarithmic Functions", sub:"Growth and decay, interest, log properties, solving equations"},
+  {id:"unit-8", chapter:"Chapter VIII", short:"Sequences & Series", name:"Unit 8: Sequences & Series", sub:"Arithmetic and geometric sequences, sums, sigma notation"},
+  {id:"unit-14", chapter:"Chapter XIV", short:"Induction", name:"Unit 14: Mathematical Induction", sub:"Base case, hypothesis and inductive step; summation formulas Σk to Σk⁶; divisibility, inequalities and recursive sequences"},
+  {id:"unit-9", chapter:"Chapter IX", short:"Trigonometry", name:"Unit 9: Trigonometry", sub:"Right-triangle trig, unit circle, graphs, identities, equations, polar"},
+  {id:"unit-10", chapter:"Chapter X", short:"Counting & Probability", name:"Unit 10: Counting & Probability", sub:"Permutations, combinations, probability, expected value"},
+  {id:"unit-12", chapter:"Chapter XII", short:"Statistics (SAT)", name:"Unit 12: Statistics & Probability for the SAT", sub:"Every SAT data topic: center, spread, displays, percents, scatterplots, two-way tables, probability, sampling, margin of error and experiments"},
+  {id:"unit-11", chapter:"Chapter XI", short:"Conic Sections", name:"Unit 11: Conic Sections", sub:"Circles, parabolas, ellipses, hyperbolas, nonlinear systems"},
+  {id:"sat", chapter:"SAT", short:"SAT Practice", name:"SAT-Style Practice (all units)", sub:"Interactive SAT-style multiple-choice and grid-in questions for every unit (click to check), plus printable SAT practice pages"},
+  {id:"resources", chapter:"Resources", short:"Resources", name:"Free Resources for Every Unit", sub:"Lessons, notes, free textbooks, worksheets, videos and tools, organized by unit"}
+];
+
+const POSTERS = [
+  {img:"d3_approx_zeros.png", title:"Approximating Real Zeros", units:["unit-4"]},
+  {img:"d4_division_zeros.png", title:"Using Division to Find Zeros & Sketch", units:["unit-4"]},
+  {img:"d5_remainder_factor.png", title:"Remainder & Factor Theorems", units:["unit-4"]},
+  {img:"e4_asymptotes.png", title:"Asymptotes & Holes: Four Cases", units:["unit-5"]},
+  {img:"e5_rational_sketch.png", title:"Sketching a Rational Function in 6 Steps", units:["unit-5"]},
+  {img:"h2_arith.png", title:"Arithmetic Sequences: Solved Examples", units:["unit-8"]},
+  {img:"h3_geo.png", title:"Geometric Sequences: Solved Examples", units:["unit-8"]},
+  {img:"h4_series.png", title:"Series & Sigma Notation: Solved Examples", units:["unit-8"]},
+  {img:"h5_recursive.png", title:"Recursive Formulas", units:["unit-8"]},
+  {img:"sys6_three_ways.png", title:"One 2 × 2 System, Three Methods (graph, substitute, eliminate)", units:["systems", "unit-1"]},
+  {img:"sys7_cramer2.png", title:"Cramer's Rule & Inverse Matrices (2 × 2)", units:["systems"]},
+  {img:"sys8_cramer3.png", title:"Cramer's Rule for 3 × 3 Systems", units:["systems"]},
+  {img:"sys9_gauss.png", title:"Gaussian Elimination (Augmented Matrices)", units:["systems"]},
+  {img:"sys10_which.png", title:"Choosing a Method & Word Problems", units:["systems"]},
+  {img:"th1_quad_formula.png", title:"Deriving the Quadratic Formula", units:["unit-2", "unit-3"]},
+  {img:"th2_vieta.png", title:"Vieta's Formulas (Sum & Product of Roots)", units:["unit-2", "unit-3"]},
+  {img:"th3_discriminant.png", title:"The Discriminant: Theory & Graphs", units:["unit-3"]},
+  {img:"th4_even_odd.png", title:"Even & Odd Functions", units:["toolkit", "unit-4"]},
+  {img:"th5_tangent_conics1.png", title:"Tangent Lines to Conics · Circle & Parabola", units:["unit-11", "systems"]},
+  {img:"th6_tangent_conics2.png", title:"Tangent Lines to Conics · Ellipse & Hyperbola", units:["unit-11", "systems"]},
+  {img:"sys1_linear.png", title:"Linear–Linear Systems", units:["systems", "unit-1"]},
+  {img:"sys2_lin_quad.png", title:"Linear–Quadratic Systems", units:["systems", "unit-3"]},
+  {img:"sys3_quad_quad.png", title:"Quadratic–Quadratic Systems", units:["systems", "unit-11"]},
+  {img:"sys4_higher.png", title:"Higher-Degree & Other Systems", units:["systems", "unit-4"]},
+  {img:"sys5_tangent.png", title:"Tangent Lines with Systems", units:["systems", "unit-3"]},
+  {img:"s1a.png", title:"Unit 1 Summary · Page 1 of 2", units:["unit-1"], summary:true},
+  {img:"s1b.png", title:"Unit 1 Summary · Page 2 of 2", units:["unit-1"], summary:true},
+  {img:"s2a.png", title:"Unit 2 Summary · Page 1 of 2", units:["unit-2"], summary:true},
+  {img:"s2b.png", title:"Unit 2 Summary · Page 2 of 2", units:["unit-2"], summary:true},
+  {img:"s3a.png", title:"Unit 3 Summary · Page 1 of 2", units:["unit-3"], summary:true},
+  {img:"s3b.png", title:"Unit 3 Summary · Page 2 of 2", units:["unit-3"], summary:true},
+  {img:"s4.png", title:"Unit 4 Summary", units:["unit-4"], summary:true},
+  {img:"s5.png", title:"Unit 5 Summary", units:["unit-5"], summary:true},
+  {img:"s6.png", title:"Unit 6 Summary", units:["unit-6"], summary:true},
+  {img:"s7a.png", title:"Unit 7 Summary · Page 1 of 2", units:["unit-7"], summary:true},
+  {img:"s7b.png", title:"Unit 7 Summary · Page 2 of 2", units:["unit-7"], summary:true},
+  {img:"s8.png", title:"Unit 8 Summary", units:["unit-8"], summary:true},
+  {img:"s9a.png", title:"Unit 9 Summary · Page 1 of 2", units:["unit-9"], summary:true},
+  {img:"s9b.png", title:"Unit 9 Summary · Page 2 of 2", units:["unit-9"], summary:true},
+  {img:"s10.png", title:"Unit 10 Summary", units:["unit-10"], summary:true},
+  {img:"s11.png", title:"Unit 11 Summary", units:["unit-11"], summary:true},
+  {img:"p01_parent.png", title:"Parent Functions (12 graphs)", units:["toolkit"]},
+  {img:"p02_domain_range.png", title:"Finding Domain & Range", units:["toolkit"]},
+  {img:"p03_key_features.png", title:"Key Features of a Function", units:["toolkit"]},
+  {img:"p04_transformations.png", title:"Transformations of Functions", units:["toolkit"]},
+  {img:"p05_rate_of_change.png", title:"Rates of Change & Concavity", units:["toolkit"]},
+  {img:"p06_piecewise_more.png", title:"Absolute Value, Step & Continuous Piecewise", units:["toolkit", "unit-1"]},
+  {img:"p07_exp_rad_rules.png", title:"Exponent & Radical Rules", units:["toolkit", "unit-6"]},
+  {img:"p08_log_rules.png", title:"Logarithm Rules: Complete Reference", units:["toolkit", "unit-7"]},
+  {img:"p09_exp_log_graphs.png", title:"Graphing Transformed Exponentials & Logs", units:["unit-7", "toolkit"]},
+  {img:"p14_limits_asymptotes.png", title:"End Behavior & Asymptotes in Limit Notation", units:["toolkit", "unit-5"]},
+  {img:"t1_sin1.png", title:"Graphing Sine · Page 1 of 2", units:["unit-9"]},
+  {img:"t2_sin2.png", title:"Graphing Sine · Page 2 of 2 (transformations)", units:["unit-9"]},
+  {img:"t3_cos1.png", title:"Graphing Cosine · Page 1 of 2", units:["unit-9"]},
+  {img:"t4_cos2.png", title:"Graphing Cosine · Page 2 of 2 (transformations)", units:["unit-9"]},
+  {img:"t5_tan1.png", title:"Graphing Tangent · Page 1 of 2", units:["unit-9"]},
+  {img:"t6_tan2.png", title:"Graphing Tangent · Page 2 of 2 (transformations)", units:["unit-9"]},
+  {img:"t7_cot1.png", title:"Graphing Cotangent · Page 1 of 2", units:["unit-9"]},
+  {img:"t8_cot2.png", title:"Graphing Cotangent · Page 2 of 2 (transformations)", units:["unit-9"]},
+  {img:"p10_right_trig.png", title:"Right-Triangle Trig & Special Triangles", units:["unit-9"]},
+  {img:"p11_trig_graphs.png", title:"Graphs of Sine, Cosine & Tangent", units:["unit-9"]},
+  {img:"p12_trig_equations.png", title:"Trig Identities, Inverse Trig & Equations", units:["unit-9"]},
+  {img:"p13_polar.png", title:"Polar Coordinates & Graphs", units:["unit-9"]},
+  {img:"a1_absolute_value.png", title:"Absolute Value Equations & Inequalities", units:["unit-1"]},
+  {img:"a2_linear_forms.png", title:"Equations of Lines (parallel & perpendicular)", units:["unit-1"]},
+  {img:"a3_systems3.png", title:"Systems in Three Variables", units:["unit-1"]},
+  {img:"a4_piecewise.png", title:"Piecewise Functions: Graph, Domain & Range", units:["unit-1"]},
+  {img:"b1_factoring.png", title:"The Factoring Toolkit", units:["unit-2"]},
+  {img:"b2_division.png", title:"Dividing Polynomials (synthetic & long)", units:["unit-2"]},
+  {img:"b3_solve_quadratics.png", title:"Four Ways to Solve a Quadratic", units:["unit-2"]},
+  {img:"b4_complex.png", title:"Complex Numbers", units:["unit-2"]},
+  {img:"b5_binomial.png", title:"The Binomial Theorem", units:["unit-2"]},
+  {img:"c1_quadratic_forms.png", title:"Three Forms of a Quadratic", units:["unit-3"]},
+  {img:"c2_vertex_form.png", title:"Vertex Form & Completing the Square", units:["unit-3"]},
+  {img:"c3_zeros.png", title:"Zeros of a Quadratic Function", units:["unit-3"]},
+  {img:"c4_discriminant.png", title:"The Discriminant", units:["unit-3"]},
+  {img:"c5_inequalities.png", title:"Quadratic Inequalities (one & two variables)", units:["unit-3"]},
+  {img:"c6_writing.png", title:"Writing Quadratic Equations", units:["unit-3"]},
+  {img:"c7_maxmin.png", title:"Maximum & Minimum Applications", units:["unit-3"]},
+  {img:"c8_nonlinear_systems.png", title:"Nonlinear Systems of Equations", units:["unit-3"]},
+  {img:"d1_poly_graphs.png", title:"Graphing Polynomials from Factored Form", units:["unit-4"]},
+  {img:"d2_find_zeros.png", title:"Finding All Zeros of a Polynomial", units:["unit-4"]},
+  {img:"e1_rational_ops.png", title:"Operations with Rational Expressions", units:["unit-5"]},
+  {img:"e2_rational_graphs.png", title:"Graphing Rational Functions", units:["unit-5"]},
+  {img:"e3_rational_eq.png", title:"Solving Rational Equations", units:["unit-5"]},
+  {img:"f1_radicals.png", title:"Radicals & Rational Exponents", units:["unit-6"]},
+  {img:"f2_radical_eq.png", title:"Solving Radical Equations", units:["unit-6"]},
+  {img:"f3_inverses.png", title:"Composition & Inverse Functions", units:["unit-6"]},
+  {img:"g1_exp_models.png", title:"Exponential Growth, Decay & Interest", units:["unit-7"]},
+  {img:"g2_logs.png", title:"Logarithms & Their Properties", units:["unit-7"]},
+  {img:"g3_exp_log_eq.png", title:"Solving Exponential & Log Equations", units:["unit-7"]},
+  {img:"h1_sequences.png", title:"Arithmetic & Geometric Sequences and Series", units:["unit-8"]},
+  {img:"i1_unit_circle.png", title:"Radians & the Unit Circle", units:["unit-9"]},
+  {img:"i2_sinusoids.png", title:"Graphing & Modeling Sinusoids", units:["unit-9"]},
+  {img:"j1_counting.png", title:"Counting & Probability", units:["unit-10"]},
+  {img:"k1_circles_parabolas.png", title:"Circles & Parabolas", units:["unit-11"]},
+  {img:"k2_ellipses_hyperbolas.png", title:"Ellipses, Hyperbolas & Nonlinear Systems", units:["unit-11"]},
+  {img:"sat1a.png", title:"SAT Practice · Unit 1 · Linear Equations & Functions", units:["unit-1","sat"]},
+  {img:"sat1b.png", title:"SAT Practice · Unit 1 · Systems & Functions", units:["unit-1","sat"]},
+  {img:"sat2a.png", title:"SAT Practice · Unit 2 · Polynomials & Factoring", units:["unit-2","sat"]},
+  {img:"sat2b.png", title:"SAT Practice · Unit 2 · Quadratics & Complex Numbers", units:["unit-2","sat"]},
+  {img:"sat3a.png", title:"SAT Practice · Unit 3 · Quadratic Functions", units:["unit-3","sat"]},
+  {img:"sat3b.png", title:"SAT Practice · Unit 3 · Models & Systems", units:["unit-3","sat"]},
+  {img:"sat4a.png", title:"SAT Practice · Unit 4 · Polynomial Functions", units:["unit-4","sat"]},
+  {img:"sat4b.png", title:"SAT Practice · Unit 4 · Zeros & Theorems", units:["unit-4","sat"]},
+  {img:"sat5a.png", title:"SAT Practice · Unit 5 · Rational Expressions", units:["unit-5","sat"]},
+  {img:"sat5b.png", title:"SAT Practice · Unit 5 · Rational Models", units:["unit-5","sat"]},
+  {img:"sat6a.png", title:"SAT Practice · Unit 6 · Radicals & Exponents", units:["unit-6","sat"]},
+  {img:"sat6b.png", title:"SAT Practice · Unit 6 · Functions & Inverses", units:["unit-6","sat"]},
+  {img:"sat7a.png", title:"SAT Practice · Unit 7 · Exponential Models", units:["unit-7","sat"]},
+  {img:"sat7b.png", title:"SAT Practice · Unit 7 · Logarithms", units:["unit-7","sat"]},
+  {img:"sat8a.png", title:"SAT Practice · Unit 8 · Sequences", units:["unit-8","sat"]},
+  {img:"sat8b.png", title:"SAT Practice · Unit 8 · Series & Models", units:["unit-8","sat"]},
+  {img:"sat9a.png", title:"SAT Practice · Unit 9 · Right-Triangle Trig", units:["unit-9","sat"]},
+  {img:"sat9b.png", title:"SAT Practice · Unit 9 · Unit Circle & Graphs", units:["unit-9","sat"]},
+  {img:"sat10a.png", title:"SAT Practice · Unit 10 · Probability", units:["unit-10","sat"]},
+  {img:"sat10b.png", title:"SAT Practice · Unit 10 · Statistics & Expected Value", units:["unit-10","sat"]},
+  {img:"sat11a.png", title:"SAT Practice · Unit 11 · Circles", units:["unit-11","sat"]},
+  {img:"sat11b.png", title:"SAT Practice · Unit 11 · Conics & Tangents", units:["unit-11","sat"]},
+  {img:"ri1.png", title:"Rational Inequalities · Page 1 of 2 (sign tables & graphs)", units:["unit-5"]},
+  {img:"ri2.png", title:"Rational Inequalities · Page 2 of 2", units:["unit-5"]}
+];
+
+const unitById = Object.fromEntries(UNITS.map(u=>[u.id,u]));
+const tabs = document.getElementById("tabs"), content = document.getElementById("content");
+const q = document.getElementById("q");
+let current = "all", lbList = [], lbIdx = 0;
+
+function postersFor(id){ if(id==="formulas"||id==="poly"||id==="factor") return []; if(id==="practice"||id==="resources"||id==="cheats") return []; const a=POSTERS.filter(p=>p.units.includes(id)); return a.filter(p=>p.summary).concat(a.filter(p=>!p.summary)); }
+
+const tip = document.getElementById("tip");
+function showTip(el, html){
+  tip.innerHTML = html; tip.classList.add("on");
+  const r = el.getBoundingClientRect(), w = tip.offsetWidth;
+  let x = r.left + r.width/2 - w/2; x = Math.max(8, Math.min(x, window.innerWidth - w - 8));
+  tip.style.left = x + "px"; tip.style.top = (r.bottom + 10) + "px";
+}
+function hideTip(){ tip.classList.remove("on"); }
+document.getElementById("tabs").addEventListener("scroll", hideTip);
+window.addEventListener("scroll", hideTip, {passive:true});
+
+function renderTabs(){
+  tabs.innerHTML = "";
+  const all = [{id:"all", short:"All topics", count:POSTERS.length}, ...UNITS.map(u=>({id:u.id, short:u.short, count:u.id==="poly"?A2POLY.count():u.id==="factor"?A2FACT.count():u.id==="formulas"?A2FORM.count():u.id==="cheats"?Object.keys(A2CHEAT.all).reduce((n,k)=>n+A2CHEAT.count(k),0):u.id==="practice"?A2PRACTICE.count("practice"):u.id==="resources"?Object.keys(A2RES.all).reduce((n,k)=>n+A2RES.count(k),0):u.id==="sat"?postersFor("sat").length+A2SAT.count("sat"):(postersFor(u.id).length||(window.A2PRO?A2PRO.count(u.id):0))}))];
+  if(window.A2NAV){ A2NAV.render(tabs, all, current, unitById); return; }
+  for(const t of all){
+    const b = document.createElement("button");
+    b.innerHTML = `${t.short}<span class="n">${t.count}</span>`;
+    b.setAttribute("aria-current", t.id===current); if(t.id==="formulas") b.className="fbtn"; if(t.id==="poly") b.className="pbtn"; if(t.id==="factor") b.className="xbtn";
+    b.onclick = ()=>{ location.hash = t.id==="all" ? "" : t.id; if(t.id==="all") route(); };
+    const u = unitById[t.id];
+    const tipHtml = u ? `<b>${esc(u.name)}</b><span>${esc(u.sub)}</span><small>${t.id==="factor"?A2FACT.tip():t.id==="poly"?t.count+" examples · 15 worksheets":t.id==="formulas"?t.count+" formulas · quiz · flashcards · typing":t.id==="cheats"?t.count+" topics":t.id==="resources"?t.count+" links":t.id==="sat"?t.count+" pages & questions":t.id==="practice"?t.count+" problems":t.count+" poster"+(t.count===1?"":"s")+(A2PRACTICE.has(t.id)?" · "+A2PRACTICE.count(t.id)+" practice problems":"")}</small>`
+                      : `<b>All units</b><span>Show every poster in the book</span><small>${t.count} posters</small>`;
+    b.setAttribute("aria-label", u ? u.name : "All units");
+    b.addEventListener("mouseenter", ()=>showTip(b, tipHtml));
+    b.addEventListener("focus", ()=>showTip(b, tipHtml));
+    b.addEventListener("mouseleave", hideTip);
+    b.addEventListener("blur", hideTip);
+    tabs.appendChild(b);
+  }
+}
+
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+function card(p){
+  const tags = p.units.map(id=>`<span class="tag ${id==="beyond"?"beyond":""}">${esc(unitById[id].short)}</span>`).join("") + (p.summary?`<span class="tag orig">Unit Summary</span>`:"");
+  const note = p.note ? `<div class="note"><b>Check this</b>${esc(p.note)}</div>` : "";
+  if(p.link){
+    return `<article class="card linkcard"><a class="thumb" href="${p.link}" target="_blank" rel="noopener">${esc(p.title)}<br><small style="font-size:15px;font-style:italic;font-weight:400">View on Facebook ↗</small></a>
+      <div class="body"><h3>${esc(p.title)}</h3><div class="tags">${tags}</div>${note}</div></article>`;
+  }
+  return `<article class="card"><button class="thumb" data-img="${p.img}" aria-label="Open ${esc(p.title)}"><img loading="lazy" src="img/${p.img}" alt="${esc(p.title)}"></button>
+    <div class="body"><h3>${esc(p.title)}</h3><div class="tags">${tags}</div>${note}</div></article>`;
+}
+
+let pendingHit=null, spyOff=null;
+function foldify(root){
+  root.querySelectorAll(".subsec").forEach(div=>{
+    const h=div.querySelector(":scope > h3.subh"); if(!h) return;
+    const d=document.createElement("details"); d.className="fold"; d.id=div.id;
+    const sm=document.createElement("summary"); sm.className="subh"; sm.innerHTML=h.innerHTML; h.remove();
+    d.appendChild(sm); while(div.firstChild) d.appendChild(div.firstChild); div.replaceWith(d);
+  });
+  root.querySelectorAll(".secnav").forEach(bar=>{ if(!bar.parentElement.querySelector("details.fold")) return;
+    const oc=document.createElement("span"); oc.className="ocall"; oc.innerHTML=`<button type="button" data-oc="1">Open all</button><button type="button" data-oc="0">Close all</button>`; bar.insertBefore(oc,bar.children[1]||null);
+    oc.querySelectorAll("button").forEach(b=>b.onclick=()=>bar.parentElement.querySelectorAll("details.fold").forEach(d=>d.open=b.dataset.oc==="1"));
+  });
+}
+function navH(){ const n=document.querySelector("nav"); return n?n.offsetHeight:0; }
+function setupSpy(){
+  document.documentElement.style.setProperty("--navh",navH()+"px");
+  if(spyOff){ spyOff(); spyOff=null; }
+  const bar=content.querySelector(".secnav.sticky"); if(!bar) return;
+  const btns=[...bar.querySelectorAll("[data-jump]")], secs=btns.map(b=>document.getElementById(b.dataset.jump));
+  const on=()=>{ const y=navH()+bar.offsetHeight+30; let k=-1; secs.forEach((s,i)=>{ if(s&&s.getBoundingClientRect().top<=y) k=i; }); if(window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-4) k=secs.length-1; btns.forEach((b,i)=>b.classList.toggle("cur",i===k)); const cur=btns[k]; if(cur&&bar.scrollWidth>bar.clientWidth){ const bl=cur.offsetLeft-bar.clientWidth/2; if(Math.abs(bar.scrollLeft-bl)>40) bar.scrollLeft=bl; } };
+  window.addEventListener("scroll",on,{passive:true}); spyOff=()=>window.removeEventListener("scroll",on); on();
+}
+window.addEventListener("resize",()=>document.documentElement.style.setProperty("--navh",navH()+"px"));
+function route(){
+  const h = location.hash.slice(1);
+  current = unitById[h] ? h : "all";
+  renderTabs(); render();
+  window.scrollTo({top:0});
+  const gs=document.getElementById("goto"); if(gs) gs.value=current;
+  if(pendingHit){ const el=document.getElementById(pendingHit); pendingHit=null; if(el){ const f=el.closest("details.fold"); if(f) f.open=true; if(el.tagName==="DETAILS") el.open=true; setTimeout(()=>{ const off=navH()+70; window.scrollTo({top:el.getBoundingClientRect().top+window.scrollY-off,behavior:"smooth"}); el.classList.add("cs-hit"); setTimeout(()=>el.classList.remove("cs-hit"),2500); },60); } }
+}
+
+const UNITLIKE=id=>/^unit-|^toolkit$|^systems$/.test(id);
+function subsections(id,items){
+  // returns [[key,title,count,html]]
+  const out=[], sum=items.filter(p=>p.summary), sat=items.filter(p=>p.units.includes("sat")), rest=items.filter(p=>!p.summary&&!p.units.includes("sat"));
+  const grid=a=>`<div class="grid">${a.map(card).join("")}</div>`;
+  if(window.A2FACT&&A2FACT.flowHas(id)) out.push(["flow",A2FACT.flowTitle(id),A2FACT.flowCount(id),A2FACT.flowHtml(id)]);
+  if(window.A2PRO&&A2PRO.sheet(id)) out.push(["cheatx","Key Formulas & Rules","one page",A2PRO.sheet(id)]);
+  if(window.A2S3&&(id==="systems"||id==="unit-13"||id==="unit-1")) out.push(["lab3","3 × 3 Lab: Gauss, Matrices & 3D Graphs","solve · graph · practice",A2S3.html()]);
+  if(A2CHEAT.has(id)) out.push(["cheat","Cheat Sheet",A2CHEAT.count(id)+" topics",A2CHEAT.html(id)]);
+  if(window.A2EXPLOG&&A2EXPLOG.has(id)) out.push(["graphs","Graphs & Worked Examples",A2EXPLOG.count(id)+" examples",A2EXPLOG.html(id)]);
+  if(sum.length) out.push(["summary","Unit Summary",sum.length+" pages",grid(sum)]);
+  if(rest.length) out.push(["posters","Posters: Solved Examples",rest.length+" posters",grid(rest)]);
+  if(A2GEN.has(id)) out.push(["quiz","Quick Quiz (new problems every time)","10 · 15 · 20",A2GEN.html(id)]);
+  if(window.A2UP&&A2UP.has(id)) out.push(["drill","Practice: Problems, Deck & Quiz","new every time",A2UP.html(id)]);
+  const ws=A2PRACTICE.countSets(id,false); if(ws) out.push(["sets","Worked Practice Sets",ws+" problems",`<p class="lead2">Step-by-step sets, easiest first. Work on paper, then open the solution.</p>`+A2PRACTICE.setsHtml(id,false)]);
+  const hc=A2PRACTICE.countSets(id,true); if(hc) out.push(["honors","★ Honors Challenge",hc+" problems",`<p class="lead2">Harder, multi-step problems for extra challenge.</p>`+A2PRACTICE.setsHtml(id,true)]);
+  const sq=A2SAT.count(id); if(sq||sat.length) out.push(["sat","SAT Practice",(sq?sq+" questions":"")+(sq&&sat.length?" + ":"")+(sat.length?sat.length+" pages":""),(sq?A2SAT.html(id):"")+(sat.length?`<h4 class="h4">Printable SAT practice pages</h4>`+grid(sat):"")]);
+  if(window.A2PRO&&A2PRO.has(id,"sat")) out.push(["satgen","SAT Generator: MCQ · Deck · Type","new every time",A2PRO.boxHTML(id,"sat")]);
+  if(window.A2PRO&&A2PRO.has(id,"chal")) out.push(["chal","★ Challenge Lab: MCQ · Deck · Type","advanced",A2PRO.boxHTML(id,"chal")]);
+  if(A2RES.has(id)) out.push(["res","Resources & Links",A2RES.count(id)+" links",A2RES.html(id)]);
+  return out;
+}
+function unitBody(id,items){
+  const subs=subsections(id,items);
+  let h=`<div class="secnav sticky" role="navigation" aria-label="Sections"><span>Jump to:</span><div class="jb">${subs.map(([k,t,c],i)=>`<button type="button" data-jump="sub-${id}-${k}"><b>${i+1}</b> ${t}<small>${c}</small></button>`).join("")}</div></div>`;
+  subs.forEach(([k,t,c,body],i)=>{ h+=`<div class="subsec" id="sub-${id}-${k}"><h3 class="subh"><span class="num">${i+1}</span>${t}<small>${c}</small><button type="button" class="totop" data-jump="sec-${id}">↑ Sections</button></h3>${body}</div>`; });
+  const seq=UNITS.filter(x=>UNITLIKE(x.id)), ix=seq.findIndex(x=>x.id===id), pv=seq[ix-1], nx=seq[ix+1];
+  h+=`<div class="pnav">${pv?`<button type="button" data-open="${pv.id}">← ${esc(pv.name)}</button>`:"<span></span>"}${nx?`<button type="button" data-open="${nx.id}">${esc(nx.name)} →</button>`:""}</div>`;
+  return h;
+}
+function render(){
+  const term = q.value.trim().toLowerCase();
+  const match = p => !term || (p.title+" "+(p.note||"")+" "+p.units.map(u=>unitById[u].name).join(" ")).toLowerCase().includes(term);
+  const ids = current==="all" ? UNITS.map(u=>u.id) : [current];
+  let html = (current==="all"&&!term&&window.A2NAV) ? A2NAV.home() : "";
+  if(term){ const hits=A2CHEAT.index().filter(c=>c.text.includes(term)).slice(0,24);
+    if(hits.length) html+=`<section class="unit"><div class="chapter">Search</div><h2>Cheat sheet topics matching “${esc(term)}”</h2><div class="hits">${hits.map(c=>`<button type="button" data-hit="${c.u}|${c.i}"><small>${esc(unitById[c.u].short)}</small>${esc(c.t)}</button>`).join("")}</div></section>`; }
+  for(const id of ids){
+    const u = unitById[id];
+    const head = `<section class="unit" id="sec-${id}"><div class="chapter">${u.chapter}</div><h2>${esc(u.name)}</h2><p class="sub">${esc(u.sub)}</p>`;
+    if(id==="practice"){
+      if(term) continue;
+      html += head;
+      if(current==="practice"){
+        const pu=UNITS.filter(x=>A2GEN.has(x.id));
+        html += `<div class="secnav" role="navigation"><span>Jump to:</span><button type="button" data-jump="sub-mixed"><b>★</b> Mixed Review</button>${pu.map(x=>`<button type="button" data-jump="sub-p-${x.id}">${esc(x.short)}</button>`).join("")}</div>`;
+        html += `<div class="subsec" id="sub-mixed">`+A2GEN.html("mixed","Mixed Review Quiz (all units)")+`</div>`;
+        for(const uu of pu) html += `<div class="subsec" id="sub-p-${uu.id}"><h3 class="subh"><span class="num">${esc(uu.chapter.replace("Chapter ",""))}</span>${esc(uu.name)}<button type="button" class="totop" data-jump="sec-practice">↑ Top</button></h3>` + A2GEN.html(uu.id) + `<h4 class="h4">Worked practice sets</h4>` + A2PRACTICE.setsHtml(uu.id,false) + (A2PRACTICE.countSets(uu.id,true)?`<h4 class="h4">★ Honors Challenge</h4>`+A2PRACTICE.setsHtml(uu.id,true):"") + `</div>`;
+      } else html += A2PRACTICE.overview(UNITS);
+      html += `</section>`; continue;
+    }
+    if(id==="formulas"||id==="poly"||id==="factor"){
+      const MOD=id==="poly"?A2POLY:id==="factor"?A2FACT:A2FORM;
+      if(term) continue;
+      html += head;
+      if(current===id){
+        const subs=MOD.subs().concat(window.A2PRO?[["satgen","sat","SAT Generator: MCQ · Deck · Type","new every time","SAT Generator"],["chal","chal","★ Challenge Lab: MCQ · Deck · Type","advanced","Challenge Lab"]].filter(x=>A2PRO.has(id,x[1])).map(x=>[x[0],x[2],x[3],A2PRO.boxHTML(id,x[1]),x[4]]):[]);
+        html += `<div class="secnav sticky" role="navigation" aria-label="Sections"><span>Jump to:</span><div class="jb">${subs.map(([k,t,c,b,sh],i)=>`<button type="button" data-jump="sub-${id}-${k}"><b>${i+1}</b> ${sh||t}</button>`).join("")}</div></div>`;
+        if(id==="formulas") html += `<button type="button" class="p140-go" data-jump="sub-formulas-p140">★ Go to the 140 factoring problems ↓</button>`;
+        subs.forEach(([k,t,c,body],i)=>{ html += `<div class="subsec" id="sub-${id}-${k}"><h3 class="subh"><span class="num">${i+1}</span>${t}<small>${c}</small></h3>${body}</div>`; });
+      } else html += MOD.lead();
+      html += `</section>`; continue;
+    }
+    if(id==="cheats"){
+      if(term) continue;
+      html += head;
+      if(current==="cheats"){
+        const cu=UNITS.filter(x=>A2CHEAT.has(x.id));
+        html += `<div class="secnav" role="navigation"><span>Jump to:</span>${cu.map(x=>`<button type="button" data-jump="sub-c-${x.id}">${esc(x.short)}</button>`).join("")}</div>`;
+        for(const uu of cu) html += `<div class="subsec" id="sub-c-${uu.id}"><h3 class="subh">${esc(uu.name)}<small>${A2CHEAT.count(uu.id)} topics</small><button type="button" class="totop" data-jump="sec-cheats">↑ Top</button></h3>${A2CHEAT.html(uu.id)}</div>`;
+      } else html += `<p class="lead2">One-page summaries with rules, worked examples and common mistakes for every unit. <button type="button" class="openu" data-open="cheats">Open the Cheat Sheets →</button></p>`;
+      html += `</section>`; continue;
+    }
+    if(id==="resources"){
+      if(term) continue;
+      html += head;
+      if(current==="resources"){
+        const ru=UNITS.filter(x=>A2RES.has(x.id));
+        html += `<div class="secnav" role="navigation"><span>Jump to:</span>${ru.map(x=>`<button type="button" data-jump="sub-r-${x.id}">${esc(x.short)}</button>`).join("")}</div>`;
+        for(const uu of ru) html += `<div class="subsec" id="sub-r-${uu.id}"><h3 class="subh">${esc(uu.name)}<button type="button" class="totop" data-jump="sec-resources">↑ Top</button></h3>${A2RES.html(uu.id)}</div>`;
+      } else html += `<p class="lead2">Free lessons, notes, textbooks, worksheets and videos for every unit. <button type="button" class="openu" data-open="resources">Open the Resources page →</button></p>`;
+      html += `</section>`; continue;
+    }
+    if(id==="sat"){
+      const items = postersFor(id).filter(match);
+      if(term && !items.length) continue;
+      html += head;
+      if(current==="sat"&&!term){
+        const su=UNITS.filter(x=>/^unit-/.test(x.id));
+        html += `<div class="secnav" role="navigation"><span>Jump to:</span>${su.map(x=>`<button type="button" data-jump="sub-s-${x.id}">${esc(x.short)}</button>`).join("")}<button type="button" data-jump="sub-s-res">SAT links</button></div>`;
+        for(const uu of su){ const pg=items.filter(p=>p.units.includes(uu.id)); html += `<div class="subsec" id="sub-s-${uu.id}"><h3 class="subh">${esc(uu.name)}<small>${A2SAT.count(uu.id)} questions · ${pg.length} pages</small><button type="button" class="totop" data-jump="sec-sat">↑ Top</button></h3>${A2SAT.html(uu.id)}${pg.length?`<div class="grid">${pg.map(card).join("")}</div>`:""}</div>`; }
+        html += `<div class="subsec" id="sub-s-res"><h3 class="subh">Official SAT practice & links</h3>${A2RES.html("sat")}</div>`;
+      } else html += `<div class="grid">${items.map(card).join("")}</div>`;
+      html += `</section>`; continue;
+    }
+    const items = postersFor(id).filter(match);
+    if(term && !items.length) continue;
+    html += head;
+    if(current===id && !term) html += unitBody(id,items);
+    else { html += items.length ? (term?`<div class="grid">${items.map(card).join("")}</div>`:`<div class="subsec"><h3 class="subh">Posters<small>${items.length} posters</small></h3><div class="grid">${items.map(card).join("")}</div></div>`) : (window.A2PRO&&A2PRO.has(id,"sat")?`<p class="lead2">Method flowchart, key formulas, SAT Generator and Challenge Lab.</p>`:`<p class="empty">No posters here yet.</p>`);
+      if(!term && UNITLIKE(id)) html += `<p class="more"><button type="button" class="openu" data-open="${id}">Open ${esc(u.short)} for quizzes, practice sets, SAT questions and resources →</button></p>`; }
+    html += `</section>`;
+  }
+  content.innerHTML = html || `<p class="empty">No posters match "${esc(term)}".</p>`;
+  foldify(content);
+  A2PRACTICE.bind(content); if(window.A2PRO) A2PRO.bind(content); if(window.A2S3) A2S3.bind(content); if(window.A2NAV) A2NAV.bindHome(content); A2GEN.bind(content); A2SAT.bind(content); A2RES.bind(content); A2CHEAT.bind(content); A2FORM.bind(content); if(window.A2POLY) A2POLY.bind(content); if(window.A2UP){ A2UP.bind(content); A2UP.mapUnit(content); } if(window.A2EXPLOG) A2EXPLOG.bind(content); if(window.A2FACT) A2FACT.bind(content);
+  content.querySelectorAll("[data-hit]").forEach(b=>b.onclick=()=>{ const [u,i]=b.dataset.hit.split("|"); pendingHit=`cs-${u}-${i}`; q.value=""; if(location.hash.slice(1)===u) route(); else location.hash=u; });
+  setupSpy();
+  content.querySelectorAll("[data-jump]").forEach(b=>b.onclick=(e)=>{ e.preventDefault(); e.stopPropagation(); const t=document.getElementById(b.dataset.jump); if(!t) return; if(t.tagName==="DETAILS") t.open=true; const sb=content.querySelector(".secnav.sticky"), off=navH()+(sb?sb.offsetHeight:0)+8; window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-off,behavior:"smooth"}); });
+  content.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{ location.hash=b.dataset.open; });
+  lbList = [...content.querySelectorAll("button.thumb")];
+  lbList.forEach((b,i)=>b.onclick=()=>openLb(i));
+}
+
+const lb=document.getElementById("lb"), lbImg=document.getElementById("lbImg"), lbTitle=document.getElementById("lbTitle");
+function openLb(i){
+  lbIdx=(i+lbList.length)%lbList.length;
+  const b=lbList[lbIdx], p=POSTERS.find(x=>x.img===b.dataset.img);
+  lbImg.src="img/"+p.img; lbImg.alt=p.title; lbTitle.textContent=p.title;
+  lb.classList.add("open"); lb.querySelector(".stage").scrollTop=0; document.body.style.overflow="hidden";
+}
+function closeLb(){lb.classList.remove("open"); document.body.style.overflow="";}
+document.getElementById("lbClose").onclick=closeLb;
+document.getElementById("lbPrev").onclick=()=>openLb(lbIdx-1);
+document.getElementById("lbNext").onclick=()=>openLb(lbIdx+1);
+lb.addEventListener("click",e=>{if(e.target===lb||e.target.classList.contains("stage"))closeLb();});
+document.addEventListener("keydown",e=>{
+  if(!lb.classList.contains("open"))return;
+  if(e.key==="Escape")closeLb(); if(e.key==="ArrowLeft")openLb(lbIdx-1); if(e.key==="ArrowRight")openLb(lbIdx+1);
+});
+
+q.oninput=render;
+(()=>{ const gs=document.getElementById("goto"); gs.innerHTML=`<option value="all">All topics</option>`+UNITS.map(u=>`<option value="${u.id}">${esc(u.name)}</option>`).join(""); gs.onchange=()=>{ location.hash=gs.value==="all"?"":gs.value; if(gs.value==="all") route(); }; })();
+window.addEventListener("hashchange",route);
+const toTop=document.getElementById("toTop");
+toTop.onclick=()=>window.scrollTo({top:0,behavior:"smooth"});
+window.addEventListener("scroll",()=>toTop.classList.toggle("on",window.scrollY>600),{passive:true});
+window.route=route;
+route();
+</script>
+</body>
+</html>
+
+</body></html>

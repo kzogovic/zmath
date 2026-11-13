@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Z-Math</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'EB Garamond',Georgia,'Times New Roman',serif;color:#111;background:#fff;line-height:1.5;font-size:18px}
+header{padding:52px 20px 22px;text-align:center}
+header .wrap{max-width:860px;margin:0 auto;border-top:3px double #111;border-bottom:3px double #111;padding:24px 10px 20px}
+.kicker{text-transform:uppercase;letter-spacing:.3em;font-size:13px;margin:0 0 10px}
+h1{font-weight:800;font-size:clamp(44px,9vw,76px);margin:0 0 6px;letter-spacing:-1px;line-height:1}
+h1 .z{display:inline-block;background:#111;color:#fff;padding:0 .14em;margin-right:.04em;border-radius:6px}
+header p{margin:0 auto;font-style:italic;color:#333;max-width:620px;font-size:19px}
+main{max-width:1180px;margin:0 auto;padding:26px 16px 50px}
+h2{font-size:26px;margin:0 0 4px}
+.sub{color:#555;font-style:italic;margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid #111}
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px;align-items:start}
+.strand{background:#fbfcfe radial-gradient(#dde4ee 1px,transparent 1.2px) 0 0/18px 18px;border:1.5px solid #d9e0ea;border-radius:18px;padding:14px 14px 16px;display:flex;flex-direction:column}
+.sh{align-self:center;background:var(--c);color:#fff;border-radius:999px;padding:4px 18px;font-weight:700;font-size:18px}
+.sd{text-align:center;font-size:14.5px;font-style:italic;color:#555;margin:4px 0 0}
+.v{display:block;width:2px;height:18px;background:color-mix(in srgb,var(--c) 45%,#c8d2df);align-self:center}
+.course{display:block;text-decoration:none;color:#111;background:#fff;border:1.5px solid #dbe2ec;border-left:6px solid var(--c);border-radius:14px;padding:11px 14px 12px;box-shadow:0 4px 14px rgba(15,30,60,.08);transition:transform .14s,box-shadow .14s}
+a.course:hover,a.course:focus-visible{transform:translateY(-2px);box-shadow:0 10px 24px rgba(15,30,60,.16);outline:none}
+a.course:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 40%,transparent)}
+.ct{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.ct b{font-size:21px;line-height:1.15}
+.st{flex:none;font-size:12px;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:1px 9px;font-weight:600}
+.st.live{background:var(--c);color:#fff}
+.st.soon{border:1px dashed #888;color:#666}
+.cd{font-size:15.5px;color:#444;margin:3px 0 0;line-height:1.35}
+.go{display:inline-block;margin-top:7px;font-weight:600;color:var(--c)}
+.course.soon{border-left-style:dashed}
+.tools{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px}
+.tool{border:1.5px solid #111;padding:10px 14px;background:#fff}
+.tool b{display:block;font-size:17.5px}
+.tool span{font-size:15.5px;color:#444}
+footer{max-width:860px;margin:0 auto;padding:16px 16px 44px;color:#333;font-size:16px;text-align:center;border-top:3px double #111;font-style:italic}
+@media (max-width:640px){header{padding:34px 14px 16px}.ct b{font-size:19px}}
+</style>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="0c59c8ac-f594-41fb-ac04-392482ab3e25"></script>
+<script>/* Z-Math time counter: counts only time the page is open, visible and in use. No names, no cookies. */
+(function(){ var BOOK='Z-Math hub', STEP=300, acc=0, last=Date.now(), active=Date.now();
+ function used(){ active=Date.now(); } ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,used,{passive:true}); });
+ function send(n){ for(var i=0;i<n;i++){ try{ window.umami&&umami.track("5 minutes of use",{book:BOOK}); }catch(e){} } }
+ function tick(){ var now=Date.now(); if(document.visibilityState==="visible"&&now-active<120000) acc+=(now-last)/1000; last=now; if(acc>=STEP){ var n=Math.floor(acc/STEP); acc-=n*STEP; send(n); } }
+ setInterval(tick,15000);
+ document.addEventListener("visibilitychange",function(){ tick(); if(document.visibilityState==="hidden"&&acc>=STEP/2){ acc=0; send(1); } });
+})();</script>
+</head>
+<body>
+<header><div class="wrap">
+  <p class="kicker">Zogovic · Math &amp; Science</p>
+  <h1><span class="z">Z</span>-Math</h1>
+  <p>One place for every math and science course. Pick your course to open its book: method flowcharts, solved examples, and practice that's new every time.</p>
+</div></header>
+<main>
+  <h2>Math</h2>
+  <p class="sub">Courses are grouped into paths. Each path runs from top to bottom in the order students usually take them.</p>
+  <div class="map">
+    <section class="strand" style="--c:#1d4e89" aria-label="Algebra to Calculus path">
+      <div class="sh">Algebra → Calculus</div><p class="sd">high school</p>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="algebra-2/"><div class="ct"><b>Z-Algebra 2</b><span class="st live">Open</span></div><p class="cd">Algebra 2 Honors: every unit, factoring, quadratics, systems, matrices, induction, SAT statistics, flowcharts, SAT Generator and Challenge Lab.</p><span class="go">Open the book →</span></a>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="ap-precalculus/"><div class="ct"><b>Z-AP Precalculus</b><span class="st live">Open</span></div><p class="cd">AP Precalculus: polynomial, rational, exponential, logarithmic, trigonometric and polar functions, plus vectors and matrices.</p><span class="go">Open the book →</span></a>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="ap-calculus-ab/"><div class="ct"><b>Z-AP Calculus AB</b><span class="st live">Open</span></div><p class="cd">AP Calculus AB: limits, derivatives, integrals and their applications.</p><span class="go">Open the book →</span></a>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="ap-calculus-bc/"><div class="ct"><b>Z-AP Calculus BC</b><span class="st live">Open</span></div><p class="cd">AP Calculus BC: everything in AB plus series, parametric, polar and vector functions.</p><span class="go">Open the book →</span></a>
+    </section>
+    <section class="strand" style="--c:#0f7c7a" aria-label="Statistics path">
+      <div class="sh">Statistics</div><p class="sd">high school</p>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="ap-statistics/"><div class="ct"><b>Z-AP Statistics</b><span class="st live">Open</span></div><p class="cd">AP Statistics: all 9 units, the Method Finder (which test, which formula, which design), released FRQs and practice.</p><span class="go">Open the book →</span></a>
+    </section>
+    <section class="strand" style="--c:#6a3d9a" aria-label="College mathematics path">
+      <div class="sh">College Math</div><p class="sd">after AP</p>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="trigonometry/"><div class="ct"><b>Z-Trigonometry</b><span class="st live">Open</span></div><p class="cd">College Trigonometry (MAC 1114): unit circle, graphs, identities, equations, laws of sines and cosines, vectors, polar coordinates and complex numbers in polar form.</p><span class="go">Open the book →</span></a>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="linear-algebra/"><div class="ct"><b>Z-Linear Algebra</b><span class="st live">Open</span></div><p class="cd">Vectors, matrices, linear systems, vector spaces, eigenvalues.</p><span class="go">Open the book →</span></a>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="discrete-math/"><div class="ct"><b>Z-Discrete Math</b><span class="st live">Open</span></div><p class="cd">Logic, proofs, sets, counting, graphs and recurrences.</p><span class="go">Open the book →</span></a>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="multivariable-calculus/"><div class="ct"><b>Z-Multivariable Calculus</b><span class="st live">Open</span></div><p class="cd">Vectors in space, partial derivatives, multiple integrals, vector calculus.</p><span class="go">Open the book →</span></a>
+      <i class="v" aria-hidden="true"></i>
+      <a class="course" href="pde/"><div class="ct"><b>Z-Partial Differential Equations</b><span class="st live">Open</span></div><p class="cd">Heat, wave and Laplace equations, separation of variables, Fourier series.</p><span class="go">Open the book →</span></a>
+    </section>
+  </div>
+
+  <h2 style="margin-top:34px">Science</h2>
+  <p class="sub">AP Chemistry and all four AP Physics courses, with the College Board's current unit numbering.</p>
+  <div class="map">
+    <section class="strand" style="--c:#b03a2e" aria-label="Chemistry path">
+      <div class="sh">Chemistry</div><p class="sd">AP</p><i class="v" aria-hidden="true"></i>
+      <a class="course soon" href="https://claude.ai/artifact/LAHLuMSSbHCmWkimE8QR8H"><div class="ct"><b>Z-Chemistry</b><span class="st soon">In progress</span></div><p class="cd">AP Chemistry: atomic structure to thermodynamics and electrochemistry, 9 units.</p><span class="go">Open the book →</span></a>
+    </section>
+    <section class="strand" style="--c:#c2571a" aria-label="Algebra-based physics path">
+      <div class="sh">Physics (algebra-based)</div><p class="sd">AP Physics 1 → 2</p><i class="v" aria-hidden="true"></i>
+      <a class="course soon" href="https://claude.ai/artifact/GW2pURCtjAmQD6RF17441e"><div class="ct"><b>Z-Physics 1</b><span class="st soon">In progress</span></div><p class="cd">AP Physics 1: kinematics, forces, energy, momentum, rotation, oscillations, fluids. Units 1–8.</p><span class="go">Open the book →</span></a><i class="v" aria-hidden="true"></i>
+      <a class="course soon" href="https://claude.ai/artifact/TMZm7Vv4UHHktSdA4fETSA"><div class="ct"><b>Z-Physics 2</b><span class="st soon">In progress</span></div><p class="cd">AP Physics 2: thermodynamics, electricity, magnetism, optics, waves, modern physics. Units 9–15.</p><span class="go">Open the book →</span></a>
+    </section>
+    <section class="strand" style="--c:#3d4fb5" aria-label="Calculus-based physics path">
+      <div class="sh">Physics C (calculus-based)</div><p class="sd">Mechanics → E&amp;M</p><i class="v" aria-hidden="true"></i>
+      <a class="course soon" href="https://claude.ai/artifact/Af6eKkLdvdDBT7JC7arMnq"><div class="ct"><b>Z-Physics C: Mechanics</b><span class="st soon">In progress</span></div><p class="cd">AP Physics C: Mechanics with calculus. Units 1–7.</p><span class="go">Open the book →</span></a><i class="v" aria-hidden="true"></i>
+      <a class="course soon" href="https://claude.ai/artifact/Xpqoc1v6V52XY25VjzJj94"><div class="ct"><b>Z-Physics C: E&amp;M</b><span class="st soon">In progress</span></div><p class="cd">AP Physics C: Electricity and Magnetism: Gauss's law, potential, circuits, magnetism, induction. Units 8–13.</p><span class="go">Open the book →</span></a>
+    </section>
+  </div>
+  <div class="tools">
+    <div class="tool"><b>Method flowcharts</b><span>Which method, test or formula to use, and why.</span></div>
+    <div class="tool"><b>Solved examples</b><span>Step-by-step, with the common mistakes marked.</span></div>
+    <div class="tool"><b>Practice, new every time</b><span>Multiple choice, decks and type-the-answer, with full solutions.</span></div>
+    <div class="tool"><b>Challenge Lab</b><span>Harder problems for advanced learners.</span></div>
+  </div>
+</main>
+<footer>Every book here was written for Zogovic's classes. Try each example on your own first, then check your work.</footer>
+</body>
+</html>

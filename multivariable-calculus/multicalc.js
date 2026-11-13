@@ -1,0 +1,198 @@
+/* Z-Multivariable Calculus content. Every answer is computed. */
+(function(){
+const {R,pick,nz,gcd,shuffle,N,F,sq,cu,X,sg,poly,P,PF,PS}=window.ZH;
+const FR=(n,d)=>`<span class="frc"><span>${n}</span><span>${d}</span></span>`;
+const FF=(n,d)=>{ const f=F(n,d); const m=f.match(/^(−?)(\d+)\/(\d+)$/); return m?`${m[1]}${FR(m[2],m[3])}`:f; };
+const T=(...r)=>r;
+const bump=(a,k)=>{ let done=false; return a.replace(/\d+/,m=>{ done=true; return String(Math.max(1,+m*k[0]+k[1])); }); };
+const PSX=(t,q,a,w,s)=>{ a=String(a).replace(/^1π$/,"π"); let ww=[...new Set(w.map(x=>String(x).replace(/^1π$/,"π").replace(/(^|[^\d.])1π/,"$1π")))].filter(x=>x!==a); const muts=[[2,0],[1,1],[3,0],[1,2],[1,-1]]; for(const m of muts){ if(ww.length>=3) break; const c=bump(a,m); if(c!==a&&!ww.includes(c)) ww.push(c); } for(const p of ["2","3","4","½"]){ if(ww.length>=3) break; const c=p+a; if(!ww.includes(c)) ww.push(c); } return PS(t,q,a,ww.slice(0,3),s); };
+const NAVY="#1d4e89",ORG="#c2571a",RED="#c23a52",PURP="#6a3d9a",TEAL="#0f7a6c",GRN="#137333",BLU="#1f4fd1";
+const V3=v=>`⟨${v.map(N).join(", ")}⟩`;
+const dot=(u,v)=>u.reduce((s,x,i)=>s+x*v[i],0);
+const cross=(u,v)=>[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+const rv=()=>[R(-4,4),R(-4,4),R(-4,4)];
+const ig=(a,b)=>`∫<sub>${a}</sub><sup>${b}</sup>`;
+const r3=x=>+x.toFixed(3);
+const pyth=[[1,2,2,3],[2,3,6,7],[1,4,8,9],[2,6,9,11],[4,4,7,9],[2,10,11,15]];
+
+/* ===== U1 Vectors and the geometry of space ===== */
+const U1M={
+ a0:{grp:"Step 1",c:NAVY,name:"Write Vectors in Components",hint:"⟨a, b, c⟩",when:"Every problem.",rule:"PQ = Q − P. Direction of a line: a vector along it. Normal of a plane ax + by + cz = d: ⟨a, b, c⟩.",ex:[T("P(1, 2, 0), Q(4, 0, 5)",["PQ = ⟨3, −2, 5⟩"]),T("2x − y + 3z = 7",["n = ⟨2, −1, 3⟩"])]},
+ adot:{grp:"Angles & projections",c:ORG,name:"Dot Product",hint:"u·v = |u||v|cos θ",when:"Angles, orthogonality, work, projection.",rule:"u · v = Σu<sub>i</sub>v<sub>i</sub>. cos θ = u · v/(|u||v|). Orthogonal ⇔ u · v = 0. comp<sub>v</sub>u = u · v/|v|.",ex:[T("⟨1, 2, 2⟩ · ⟨2, 0, −1⟩",["0: perpendicular"]),T("Work F · d",["Force along displacement"])]},
+ acr:{grp:"Areas & normals",c:RED,name:"Cross Product",hint:"determinant with i, j, k",when:"A vector perpendicular to two vectors, areas, plane normals.",rule:"u × v = det[i j k; u; v]. |u × v| = area of the parallelogram; ½ of it for a triangle. u · (v × w) = volume of the parallelepiped.",ex:[T("⟨1, 0, 0⟩ × ⟨0, 1, 0⟩",["⟨0, 0, 1⟩"]),T("Triangle PQR",["½|PQ × PR|"])]},
+ aln:{grp:"Lines & planes",c:PURP,name:"Lines and Planes",hint:"point + direction / point + normal",when:"Equations and distances.",rule:"Line: r = P + tv. Plane: n · (r − P) = 0 ⇒ ax + by + cz = d. Distance from (x₀, y₀, z₀) to the plane: |ax₀ + by₀ + cz₀ − d|/|n|.",ex:[T("Plane through P(1, 1, 1) with n = ⟨2, −1, 3⟩",["2x − y + 3z = 4"]),T("Distance from origin to x + 2y + 2z = 6",["6/3 = 2"])]},
+ aend:{grp:"Last step",c:GRN,name:"Check",hint:"substitute the point",when:"Every answer.",rule:"Plug the point into your plane; dot your normal with the direction vectors (should be 0).",ex:[T("Normal check",["n · (Q − P) = 0"]),T("Units",["Area squared, volume cubed"])]}
+};
+const U1={id:"u1",num:1,short:"Vectors & Space",name:"Unit 1: Vectors and the Geometry of Space",sub:"3D coordinates, dot and cross products, projections, lines and planes, distances",c:NAVY,
+ flow:{M:U1M,label:"Vectors flowchart",lead:"Dot or cross product? Line or plane?",start:"3D problem",top:["a0"],q:"What do you need?",cols:[["Angle / projection","",ORG,["adot"]],["Perpendicular / area","",RED,["acr"]],["Line / plane","",PURP,["aln"]]],end:"aend"},
+ sheet:[[ORG,"Dot product",["u · v = |u||v|cos θ","proj<sub>v</sub>u = (u · v/|v|"+sq+")v"],""],[RED,"Cross product",["|u × v| = |u||v|sin θ","Area of parallelogram = |u × v|","Triple product = volume"],""],[PURP,"Lines & planes",["r(t) = P + tv","a(x − x₀) + b(y − y₀) + c(z − z₀) = 0","Distance |ax₀ + by₀ + cz₀ − d|/|n|"],""]],
+ gen:[
+ ()=>{ const u=rv(),v=rv(); return P("Dot product",`Find ${V3(u)} · ${V3(v)}.`,dot(u,v),[dot(u,u),-dot(u,v),dot(u,v)+1],[u.map((x,i)=>`(${N(x)})(${N(v[i])})`).join(" + "),`<b>${N(dot(u,v))}</b>`]); },
+ ()=>{ const u=rv(),v=rv(),i=R(0,2); const c=cross(u,v); return P("Cross product",`u = ${V3(u)}, v = ${V3(v)}. Find the ${"xyz"[i]}-component of u × v.`,c[i],[-c[i],c[(i+1)%3],dot(u,v)].filter(x=>x!==c[i]),[`u × v = ${V3(c)}`,`<b>${N(c[i])}</b>`]); },
+ ()=>{ const [a,b,c,m]=pick(pyth),s=pick([1,-1]); return P("Length",`Find |${V3([s*a,b,-s*c])}|.`,m,[m*m,a+b+c,m+1],[`√(${a*a} + ${b*b} + ${c*c})`,`<b>${m}</b>`]); },
+ ()=>{ const n=[nz(-4,4),nz(-4,4),nz(-4,4)],Pt=rv(); const d=dot(n,Pt); return P("Planes",`The plane through ${`(${Pt.map(N).join(", ")})`} with normal ${V3(n)} is ${N(n[0])}x + … = d. Find d.`.replace("… = d","by + cz = d"),d,[-d,n[0]+n[1]+n[2],0].filter(x=>x!==d),[`d = n · P = ${n.map((x,i)=>`(${N(x)})(${N(Pt[i])})`).join(" + ")}`,`<b>${N(d)}</b>`]); },
+ ()=>{ const [a,b,c,m]=pick(pyth); const k=R(1,5); const d=m*k*pick([1,2]); return PF("Distance to a plane",`Find the distance from the origin to ${a}x + ${b}y + ${c}z = ${d}.`,d,m,[N(d),F(d,m*m),F(m,d)],[`|n| = √(${a*a} + ${b*b} + ${c*c}) = ${m}`,`${d}/${m} = <b>${F(d,m)}</b>`]); },
+ ()=>{ const u=rv(),v=rv(); const c=cross(u,v); const A2=dot(c,c); return PSX("Area",`Find the area of the parallelogram spanned by ${V3(u)} and ${V3(v)}.`,`√${A2}`,[`${A2}`,`√${Math.abs(dot(u,v))||1}`,`½√${A2}`],[`u × v = ${V3(c)}`,`|u × v| = <b>√${A2}</b>`]); }],
+ chal:[
+ ()=>{ const u=rv(),v=rv(),w=rv(); const t=dot(u,cross(v,w)); return P("Triple product",`Find the volume of the parallelepiped spanned by ${V3(u)}, ${V3(v)}, ${V3(w)}.`,Math.abs(t),[t*2,Math.abs(t)+1,0].filter(x=>x!==Math.abs(t)),[`u · (v × w) = ${N(t)}`,`Volume |${N(t)}| = <b>${Math.abs(t)}</b>`]); },
+ ()=>{ const a=nz(-3,3),b=nz(-3,3); return P("Orthogonality",`For which k is ⟨${N(a)}, ${N(b)}, k⟩ ⟂ ⟨${N(b)}, ${N(a)}, 2⟩?`,-a*b,[a*b,-2*a*b,0].filter(x=>x!==-a*b),[`${N(a)}·${N(b)} + ${N(b)}·${N(a)} + 2k = 0`,`<b>k = ${N(-a*b)}</b>`]); }],
+ frq:[()=>{ const Pp=rv(),Q=rv(),Rr=rv(); const u=Pp.map((x,i)=>Q[i]-x),v=Pp.map((x,i)=>Rr[i]-x); const n=cross(u,v); if(!dot(n,n)) return null; const d=dot(n,Pp);
+  return {t:"Plane through three points",calc:false,stem:`P(${Pp.map(N).join(", ")}), Q(${Q.map(N).join(", ")}), R(${Rr.map(N).join(", ")}).`,parts:[
+   [`Find PQ and PR.`,[`PQ = ${V3(u)}, PR = ${V3(v)}`],"",1],
+   [`Find a normal vector to the plane.`,[`n = PQ × PR = ${V3(n)}`],V3(n),2],
+   [`Write the equation of the plane.`,[`${N(n[0])}x + ${N(n[1])}y + ${N(n[2])}z = ${N(d)}`],`${N(n[0])}x + ${N(n[1])}y + ${N(n[2])}z = ${N(d)}`,2],
+   [`Find the area of triangle PQR.`,[`½|n| = ½√${dot(n,n)}`],`½√${dot(n,n)}`,2]]}; }]
+};
+
+/* ===== U2 Vector functions ===== */
+const U2M={
+ b0:{grp:"Step 1",c:NAVY,name:"Differentiate Componentwise",hint:"r′(t)",when:"Any vector function.",rule:"r′(t) = ⟨x′, y′, z′⟩ (velocity), r″(t) (acceleration). Speed = |r′(t)|.",ex:[T("r = ⟨t, t"+sq+", t"+cu+"⟩",["r′ = ⟨1, 2t, 3t"+sq+"⟩"]),T("Speed at t = 1",["√14"])]},
+ btan:{grp:"Tangent",c:ORG,name:"Tangent Lines & Unit Tangent",hint:"T = r′/|r′|",when:"Tangent line to a space curve.",rule:"Tangent line at t₀: r(t₀) + s r′(t₀). Unit tangent T = r′/|r′|.",ex:[T("Helix ⟨cos t, sin t, t⟩ at t = 0",["(1, 0, 0) + s⟨0, 1, 1⟩"]),T("|T| = 1",["Always"])]},
+ barc:{grp:"Length",c:RED,name:"Arc Length",hint:"∫|r′(t)| dt",when:"Length of a curve.",rule:"L = ∫<sub>a</sub><sup>b</sup> |r′(t)| dt. Pick parametrizations whose speed simplifies.",ex:[T("⟨3 cos t, 3 sin t, 4t⟩, 0 ≤ t ≤ 2π",["Speed 5: L = 10π"]),T("Line segment",["Length = distance"])]},
+ bk:{grp:"Bending",c:PURP,name:"Curvature",hint:"κ = |r′ × r″|/|r′|³",when:"How sharply a curve turns.",rule:"κ = |r′ × r″|/|r′|"+cu+". Plane curve y = f(x): κ = |f″|/(1 + f′"+sq+")<sup>3/2</sup>. Circle of radius a: κ = 1/a.",ex:[T("Circle radius 4",["κ = 1/4"]),T("y = x"+sq+" at 0",["κ = 2"])]},
+ bend:{grp:"Last step",c:GRN,name:"Units & Sense",hint:"speed &gt; 0",when:"Every answer.",rule:"Speed and length are nonnegative; curvature has units 1/length.",ex:[T("Check",["Straight line: κ = 0"]),T("Helix",["Constant speed and curvature"])]}
+};
+const U2={id:"u2",num:2,short:"Vector Functions",name:"Unit 2: Vector Functions and Space Curves",sub:"Derivatives and integrals of vector functions, tangent lines, arc length, curvature, motion in space",c:ORG,
+ flow:{M:U2M,label:"Vector functions flowchart",lead:"Differentiate componentwise, then choose what you need.",start:"Space curve r(t)",top:["b0"],q:"What is asked?",cols:[["Tangent","",ORG,["btan"]],["Length","",RED,["barc"]],["Curvature","",PURP,["bk"]]],end:"bend"},
+ sheet:[[NAVY,"Motion",["v = r′, a = r″","Speed |r′|"],""],[RED,"Arc length",["L = ∫|r′(t)| dt"],""],[PURP,"Curvature",["κ = |r′ × r″|/|r′|"+cu,"y = f(x): κ = |f″|/(1 + f′"+sq+")<sup>3/2</sup>"],""]],
+ gen:[
+ ()=>{ const a=nz(-3,3),b=nz(-3,3),t=R(-2,2); const v=[a,2*b*t,3*t*t]; return P("Velocity",`r(t) = ⟨${X(a,"t")}, ${X(b,"t")}${sq}, t${cu}⟩. Find the y-component of r′(${N(t)}).`,2*b*t,[b*t*t,2*b,3*t*t].filter(x=>x!==2*b*t),[`r′ = ⟨${N(a)}, ${N(2*b)}t, 3t${sq}⟩`,`<b>${N(2*b*t)}</b>`]); },
+ ()=>{ const [a,b,c]=pick([[3,4,5],[5,12,13],[6,8,10],[8,15,17]]),T2=R(1,4); return PSX("Arc length",`Find the length of r(t) = ⟨${a} cos t, ${a} sin t, ${b}t⟩ for 0 ≤ t ≤ ${T2===1?"":T2}π.`,`${c*T2}π`,[`${c}π`,`${(a+b)*T2}π`,`${c*T2*2}π`],[`|r′| = √(${a*a} + ${b*b}) = ${c}`,`L = ${c}·${T2===1?"":T2}π = <b>${c*T2}π</b>`]); },
+ ()=>{ const a=R(1,9); return PF("Curvature",`Find the curvature of a circle of radius ${a}.`,1,a,[N(a),F(1,a*a),N(a*a)],[`κ = 1/a`,`<b>${F(1,a)}</b>`]); },
+ ()=>{ const k=nz(-4,4); return P("Curvature",`Find the curvature of y = ${X(k)}${sq} at x = 0.`,2*Math.abs(k),[Math.abs(k),2*k*k,1].filter(x=>x!==2*Math.abs(k)),[`κ = |y″|/(1 + y′${sq})<sup>3/2</sup>; at 0: y′ = 0, y″ = ${N(2*k)}`,`<b>${2*Math.abs(k)}</b>`]); },
+ ()=>{ const [a,b,c,m]=pick(pyth),t=R(1,3); return P("Speed",`r(t) = ⟨${a}t, ${b}t, ${c}t⟩. What is the speed?`,m,[a+b+c,m*m,m*t],[`|r′| = √(${a*a} + ${b*b} + ${c*c})`,`<b>${m}</b>`]); }],
+ chal:[
+ ()=>{ const T2=R(1,3); return PF("Arc length",`Find the length of r(t) = ⟨t${sq}, (4/3)t<sup>3/2</sup>... ⟩`.replace("⟨t<sup>2</sup>, (4/3)t<sup>3/2</sup>... ⟩","⟨2t, t"+sq+", (1/3)t"+cu+"⟩")+` for 0 ≤ t ≤ ${T2}.`,3*(2*T2)+T2**3,3,[F(2*T2+T2**3,3),N(T2**3),N(2*T2)],[`r′ = ⟨2, 2t, t${sq}⟩, |r′| = √(4 + 4t${sq} + t<sup>4</sup>) = t${sq} + 2`,`${ig(0,T2)} (t${sq} + 2) dt = ${F(T2**3,3)} + ${2*T2} = <b>${F(T2**3+6*T2,3)}</b>`]); },
+ ()=>{ return PF("Curvature of a helix",`Find the curvature of ⟨3 cos t, 3 sin t, 4t⟩.`,3,25,[F(1,3),F(3,5),F(4,25)],[`|r′| = 5, |r′ × r″| = 15`,`κ = 15/125 = <b>${F(3,25)}</b>`]); }],
+ frq:[()=>{ const [a,b,c]=pick([[3,4,5],[5,12,13],[6,8,10]]);
+  return {t:"Motion on a helix",calc:false,stem:`A particle moves along r(t) = ⟨${a} cos t, ${a} sin t, ${b}t⟩.`,parts:[
+   [`Find the velocity and acceleration.`,[`v = ⟨−${a} sin t, ${a} cos t, ${b}⟩, a = ⟨−${a} cos t, −${a} sin t, 0⟩`],"",2],
+   [`Show the speed is constant and find it.`,[`|v| = √(${a*a}(sin${sq}t + cos${sq}t) + ${b*b}) = ${c}`],N(c),1],
+   [`Find the distance traveled for 0 ≤ t ≤ 2π.`,[`${c}·2π`],`${2*c}π`,1],
+   [`Find the curvature.`,[`|v × a| = ${a}·${c}, so κ = ${a*c}/${c**3} = ${F(a,c*c)}`],FF(a,c*c),2]]}; }]
+};
+
+/* ===== U3 Partial derivatives ===== */
+const U3M={
+ c0:{grp:"Step 1",c:NAVY,name:"Hold the Other Variables Fixed",hint:"∂f/∂x",when:"Every partial derivative.",rule:"f<sub>x</sub>: differentiate in x treating y (and z) as constants. Mixed partials are equal for nice functions (Clairaut).",ex:[T("f = x"+sq+"y"+cu,["f<sub>x</sub> = 2xy"+cu+", f<sub>y</sub> = 3x"+sq+"y"+sq]),T("f<sub>xy</sub> = f<sub>yx</sub>",["6xy"+sq])]},
+ cgrad:{grp:"Direction",c:ORG,name:"Gradient & Directional Derivative",hint:"D<sub>u</sub>f = ∇f · u",when:"Rate of change in a direction; steepest ascent.",rule:"∇f = ⟨f<sub>x</sub>, f<sub>y</sub>⟩. D<sub>u</sub>f = ∇f · u with |u| = 1. Max rate |∇f| in the direction of ∇f.",ex:[T("f = x"+sq+" + y"+sq+" at (1, 2), u = ⟨3/5, 4/5⟩",["∇f = ⟨2, 4⟩, D = 6/5 + 16/5 = 22/5"]),T("Normal to a level curve",["∇f"])]},
+ ctp:{grp:"Approximation",c:RED,name:"Tangent Plane & Linearization",hint:"z = f + f<sub>x</sub>Δx + f<sub>y</sub>Δy",when:"Tangent plane or estimating f near a point.",rule:"z = f(a, b) + f<sub>x</sub>(a, b)(x − a) + f<sub>y</sub>(a, b)(y − b). For F(x, y, z) = 0: ∇F is normal.",ex:[T("f = xy at (2, 3)",["z = 6 + 3(x − 2) + 2(y − 3)"]),T("Sphere x"+sq+" + y"+sq+" + z"+sq+" = 9 at (1, 2, 2)",["x + 2y + 2z = 9"])]},
+ cch:{grp:"Composition",c:PURP,name:"Multivariable Chain Rule",hint:"tree diagram",when:"f(x(t), y(t)) or f(x(s, t), y(s, t)).",rule:"dz/dt = f<sub>x</sub>x′ + f<sub>y</sub>y′. Implicit: dy/dx = −F<sub>x</sub>/F<sub>y</sub>.",ex:[T("z = x"+sq+"y, x = t, y = t"+sq,["dz/dt = 2xy + x"+sq+"·2t = 4t"+cu]),T("x"+sq+" + y"+sq+" = 25",["dy/dx = −x/y"])]},
+ cend:{grp:"Last step",c:GRN,name:"Evaluate at the Point",hint:"last",when:"Every answer.",rule:"Differentiate first, substitute last. Check that u is a unit vector.",ex:[T("u = ⟨1, 1⟩",["Normalize: ⟨1/√2, 1/√2⟩"]),T("Units",["Rate per unit distance"])]}
+};
+const U3={id:"u3",num:3,short:"Partial Derivatives",name:"Unit 3: Partial Derivatives",sub:"Partials, gradients, directional derivatives, tangent planes, linearization, chain rule",c:RED,
+ flow:{M:U3M,label:"Partial derivatives flowchart",lead:"Partials first, then gradient, plane or chain rule.",start:"f(x, y)",top:["c0"],q:"What is asked?",cols:[["Direction / steepest","",ORG,["cgrad"]],["Plane / estimate","",RED,["ctp"]],["Composition","",PURP,["cch"]]],end:"cend"},
+ sheet:[[ORG,"Gradient",["∇f = ⟨f<sub>x</sub>, f<sub>y</sub>, f<sub>z</sub>⟩","D<sub>u</sub>f = ∇f · u","Max rate |∇f|"],""],[RED,"Tangent plane",["z − z₀ = f<sub>x</sub>(x − x₀) + f<sub>y</sub>(y − y₀)","∇F normal to F = c"],""],[PURP,"Chain rule",["dz/dt = f<sub>x</sub>x′ + f<sub>y</sub>y′","dy/dx = −F<sub>x</sub>/F<sub>y</sub>"],""]],
+ gen:[
+ ()=>{ const a=nz(-4,4),m=R(1,3),n=R(1,3),x=R(-2,2),y=R(-2,2); const v=a*m*x**(m-1)*y**n; return P("Partials",`f(x, y) = ${X(a)}${m>1?`<sup>${m}</sup>`:""}y${n>1?`<sup>${n}</sup>`:""}. Find f<sub>x</sub>(${N(x)}, ${N(y)}).`,v,[a*n*x**m*y**(n-1),a*x**m*y**n,v+1].filter(z=>z!==v),[`f<sub>x</sub> = ${N(a*m)}${m-1?`x${m-1>1?`<sup>${m-1}</sup>`:""}`:""}y${n>1?`<sup>${n}</sup>`:""}`,`<b>${N(v)}</b>`]); },
+ ()=>{ const a=R(-3,3),b=R(-3,3),x=R(-2,2),y=R(-2,2); const gx=2*x+a*y, gy=a*x+2*b*y; const u=pick([[3,4,5],[4,3,5],[-3,4,5],[0,1,1],[1,0,1]]); return PF("Directional derivative",`f = x${sq}${a?sg(a).replace(/(\d+)$/,"$1xy").replace(/ 1xy$/," xy"):""}${b?sg(b).replace(/(\d+)$/,"$1y"+sq).replace(" 1y"," y"):""}. Find D<sub>u</sub>f at (${N(x)}, ${N(y)}) with u = ⟨${F(u[0],u[2])}, ${F(u[1],u[2])}⟩.`,gx*u[0]+gy*u[1],u[2],[F(gx+gy,1),F(gx*u[1]+gy*u[0],u[2]),N(gx)],[`∇f = ⟨2x${a?sg(a)+"y":""}, ${a?N(a)+"x":""}${b?sg(2*b)+"y":""}⟩ = ⟨${N(gx)}, ${N(gy)}⟩`,`∇f · u = <b>${F(gx*u[0]+gy*u[1],u[2])}</b>`]); },
+ ()=>{ const [a,b,c,m]=pick(pyth); return P("Steepest ascent",`∇f(P) = ⟨${a}, ${b}, ${c}⟩. What is the maximum rate of change of f at P?`,m,[a+b+c,m*m,c],[`|∇f| = √(${a*a} + ${b*b} + ${c*c})`,`<b>${m}</b>`]); },
+ ()=>{ const a=R(1,4),b=R(1,4); const f=a*b; return P("Tangent planes",`The tangent plane to z = xy at (${a}, ${b}) is z = ${X(b)} + ${X(a,"y")} + c. Find c.`,-a*b,[a*b,a+b,0],[`z = ${f} + ${b}(x − ${a}) + ${a}(y − ${b})`,`c = ${f} − ${a*b} − ${a*b} = <b>${N(-a*b)}</b>`]); },
+ ()=>{ const t=R(1,3); return P("Chain rule",`z = x${sq}y, x = t, y = t${sq}. Find dz/dt at t = ${t}.`,4*t**3,[t**4,2*t**3,3*t**2],[`z = t<sup>4</sup> ⇒ dz/dt = 4t${cu} (or chain rule: 2xy·1 + x${sq}·2t)`,`<b>${4*t**3}</b>`]); },
+ ()=>{ const a=nz(-4,4),b=nz(-4,4); return P("Mixed partials",`f = ${X(a)}${sq}y${cu}${sg(b)}x. Find f<sub>xy</sub>.`.replace(/f<sub>xy<\/sub>\.$/,"f<sub>xy</sub> at (1, 1)."),6*a,[3*a,2*a,6*a+b].filter(x=>x!==6*a),[`f<sub>x</sub> = ${N(2*a)}xy${cu}${sg(b)}, f<sub>xy</sub> = ${N(6*a)}xy${sq}`,`At (1, 1): <b>${N(6*a)}</b>`]); }],
+ chal:[
+ ()=>{ const [a,b,c,m]=pick(pyth); return PSX("Tangent plane to a sphere",`Find the tangent plane to x${sq} + y${sq} + z${sq} = ${m*m} at (${a}, ${b}, ${c}).`,`${a}x + ${b}y + ${c}z = ${m*m}`,[`${a}x + ${b}y + ${c}z = ${m}`,`x + y + z = ${a+b+c}`,`${2*a}x + ${2*b}y + ${2*c}z = ${m*m}`],[`∇F = ⟨2x, 2y, 2z⟩ ∝ ⟨${a}, ${b}, ${c}⟩`,`${a}(x − ${a}) + ${b}(y − ${b}) + ${c}(z − ${c}) = 0`]); },
+ ()=>{ const x=R(1,4),y=R(1,4); return PF("Implicit",`x${sq}y + y${cu} = ${x*x*y+y**3}. Find dy/dx at (${x}, ${y}).`,-2*x*y,x*x+3*y*y,[F(2*x*y,x*x+3*y*y),F(-x*x,2*x*y),F(-2*x,3*y)],[`F<sub>x</sub> = 2xy, F<sub>y</sub> = x${sq} + 3y${sq}`,`dy/dx = −F<sub>x</sub>/F<sub>y</sub> = <b>${F(-2*x*y,x*x+3*y*y)}</b>`]); }],
+ frq:[()=>{ const a=R(1,3),b=R(1,3); const x0=R(1,2),y0=R(1,2); const f=(x,y)=>a*x*x+b*x*y+y*y; const fx=2*a*x0+b*y0, fy=b*x0+2*y0, z0=f(x0,y0);
+  return {t:"Gradient and tangent plane",calc:false,stem:`f(x, y) = ${a===1?"":a}x${sq} + ${b===1?"":b}xy + y${sq}, P = (${x0}, ${y0}).`,parts:[
+   [`Find ∇f(P).`,[`f<sub>x</sub> = ${2*a}x + ${b}y, f<sub>y</sub> = ${b}x + 2y`,`∇f(P) = ⟨${fx}, ${fy}⟩`],`⟨${fx}, ${fy}⟩`,2],
+   [`Find the directional derivative toward ⟨3, 4⟩.`,[`u = ⟨3/5, 4/5⟩`,`∇f · u = ${FF(3*fx+4*fy,5)}`],FF(3*fx+4*fy,5),2],
+   [`In which direction does f increase fastest, and at what rate?`,[`Direction ⟨${fx}, ${fy}⟩, rate √${fx*fx+fy*fy}`],`√${fx*fx+fy*fy}`,1],
+   [`Write the tangent plane at P and estimate f(${x0}.1, ${y0}.1).`,[`z = ${z0} + ${fx}(x − ${x0}) + ${fy}(y − ${y0})`,`≈ ${z0} + ${fx}(0.1) + ${fy}(0.1) = ${N(r3(z0+0.1*(fx+fy)))}`],N(r3(z0+0.1*(fx+fy))),2]]}; }]
+};
+
+/* ===== U4 Optimization ===== */
+const U4M={
+ o0:{grp:"Step 1",c:NAVY,name:"Constraint or Not?",hint:"free vs. constrained",when:"Max/min problems.",rule:"No constraint: critical points where ∇f = 0. A constraint g = c: Lagrange multipliers. A closed region: interior critical points + the boundary.",ex:[T("Max of xy on x + y = 10",["Constrained: Lagrange"]),T("Local extrema of f",["Free: ∇f = 0"])]},
+ ocp:{grp:"Free",c:ORG,name:"Second Derivative Test",hint:"D = f<sub>xx</sub>f<sub>yy</sub> − f<sub>xy</sub>"+sq,when:"Classifying critical points.",rule:"D &gt; 0, f<sub>xx</sub> &gt; 0: local min; D &gt; 0, f<sub>xx</sub> &lt; 0: local max; D &lt; 0: saddle; D = 0: inconclusive.",ex:[T("f = x"+sq+" − y"+sq,["D = −4: saddle at 0"]),T("f = x"+sq+" + xy + y"+sq,["D = 3 &gt; 0, f<sub>xx</sub> &gt; 0: min"])]},
+ olag:{grp:"Constrained",c:RED,name:"Lagrange Multipliers",hint:"∇f = λ∇g",when:"Optimize f subject to g = c.",rule:"Solve ∇f = λ∇g together with g = c. Evaluate f at every solution; compare.",ex:[T("Max xy on x + y = 10",["y = λ, x = λ ⇒ x = y = 5, max 25"]),T("Closest point on a plane",["Minimize distance"+sq])]},
+ oreg:{grp:"Closed region",c:PURP,name:"Absolute Extrema on a Region",hint:"interior + boundary",when:"Closed, bounded region.",rule:"Find interior critical points, then optimize on each boundary piece (one-variable problems or Lagrange). Compare all values.",ex:[T("f = x"+sq+" + y"+sq+" on the unit disk",["Min 0 at origin, max 1 on the circle"]),T("Corners",["Always check them"])]},
+ oend:{grp:"Last step",c:GRN,name:"Compare Values",hint:"largest and smallest",when:"Every answer.",rule:"List all candidates with their f-values and pick.",ex:[T("Table of candidates",["Point | f"]),T("Saddle",["Not an extremum"])]}
+};
+const U4={id:"u4",num:4,short:"Optimization",name:"Unit 4: Optimization in Several Variables",sub:"Critical points, second derivative test, absolute extrema, Lagrange multipliers",c:PURP,
+ flow:{M:U4M,label:"Optimization flowchart",lead:"Free, constrained, or on a region?",start:"Max / min of f",top:["o0"],q:"Which kind?",cols:[["No constraint","",ORG,["ocp"]],["Constraint g = c","",RED,["olag"]],["Closed region","",PURP,["oreg"]]],end:"oend"},
+ sheet:[[ORG,"Second derivative test",["D = f<sub>xx</sub>f<sub>yy</sub> − (f<sub>xy</sub>)"+sq,"D &gt; 0: min (f<sub>xx</sub> &gt; 0) or max","D &lt; 0: saddle"],""],[RED,"Lagrange",["∇f = λ∇g, g = c"],""],[PURP,"Regions",["Interior + boundary + corners"],""]],
+ gen:[
+ ()=>{ const a=nz(-3,3),b=nz(-3,3),c=R(-2,2); const D=4*a*b-c*c; const ans=D>0?(a>0?"Local minimum":"Local maximum"):D<0?"Saddle point":"Inconclusive"; return PSX("Second derivative test",`f = ${X(a)}${sq}${c?sg(c).replace(/(\d+)$/,"$1xy").replace(" 1xy"," xy"):""}${sg(b).replace(/(\d+)$/,"$1y"+sq).replace(" 1y"," y")}. Classify the critical point (0, 0).`,ans,["Local minimum","Local maximum","Saddle point","Inconclusive"].filter(x=>x!==ans),[`f<sub>xx</sub> = ${N(2*a)}, f<sub>yy</sub> = ${N(2*b)}, f<sub>xy</sub> = ${N(c)}`,`D = ${N(D)}`,`<b>${ans}</b>`]); },
+ ()=>{ const s=R(4,20); return P("Lagrange",`Maximize xy subject to x + y = ${2*s}.`,s*s,[2*s*s,s,4*s*s],[`y = λ, x = λ ⇒ x = y = ${s}`,`<b>${s*s}</b>`]); },
+ ()=>{ const a=nz(-5,5),b=nz(-5,5); return P("Critical points",`Find the x-coordinate of the critical point of f = x${sq}${sg(-2*a)}x + y${sq}${sg(-2*b)}y.`,a,[b,-a,2*a],[`f<sub>x</sub> = 2x${sg(-2*a)} = 0`,`<b>x = ${N(a)}</b>`]); },
+ ()=>{ const p=R(1,5),q=R(1,5); return P("Critical points",`f = x${sq} − ${2*p}x + y${sq} − ${2*q}y. Find the minimum value of f.`,-(p*p+q*q),[p*p+q*q,-(p+q),0],[`Complete squares: (x − ${p})${sq} + (y − ${q})${sq} − ${p*p+q*q}`,`<b>${N(-(p*p+q*q))}</b>`]); },
+ ()=>{ const [a,b,c,m]=pick(pyth); return P("Lagrange on a sphere",`Maximize ${a}x + ${b}y + ${c}z on x${sq} + y${sq} + z${sq} = 1.`,m,[a+b+c,m*m,1],[`∇f = λ∇g ⇒ (x, y, z) ∝ ⟨${a}, ${b}, ${c}⟩`,`Max = |⟨${a}, ${b}, ${c}⟩| = <b>${m}</b>`]); }],
+ chal:[
+ ()=>{ const s=R(2,6)*3; return P("Box",`A box has x + y + z = ${s}. Maximize the volume xyz.`,(s/3)**3,[s**3/9,(s/3)**2,s*s],[`Lagrange: x = y = z = ${s/3}`,`<b>${(s/3)**3}</b>`]); },
+ ()=>{ const [a,b,c,m]=pick(pyth),d=m*R(1,4); return PF("Closest point",`Distance from the origin to ${a}x + ${b}y + ${c}z = ${d}?`,d,m,[N(d),F(d,m*m),F(m,d)],[`Lagrange (or formula): |d|/|n|`,`<b>${F(d,m)}</b>`]); }],
+ frq:[()=>{ const a=R(1,3);
+  return {t:"Critical points and classification",calc:false,stem:`f(x, y) = x${cu} − ${3*a*a}x + y${sq}.`,parts:[
+   [`Find all critical points.`,[`f<sub>x</sub> = 3x${sq} − ${3*a*a} = 0 ⇒ x = ±${a}; f<sub>y</sub> = 2y = 0`],`(${a}, 0), (−${a}, 0)`,2],
+   [`Classify each critical point.`,[`D = 6x·2 − 0 = 12x`,`(${a}, 0): D &gt; 0, f<sub>xx</sub> &gt; 0 ⇒ local min`,`(−${a}, 0): D &lt; 0 ⇒ saddle`],"",3],
+   [`Find the local minimum value.`,[`f(${a}, 0) = ${a**3} − ${3*a**3}`],N(-2*a**3),1],
+   [`Does f have an absolute minimum on ℝ${sq}? Explain.`,[`No: f → −∞ as x → −∞ (with y = 0).`],"No",1]]}; }]
+};
+
+/* ===== U5 Multiple integrals ===== */
+const U5M={
+ m0:{grp:"Step 1",c:NAVY,name:"Sketch the Region",hint:"bounds first",when:"Every multiple integral.",rule:"Draw the region, decide the order (dx dy or dy dx), and read off the bounds. Circles/disks: polar. Cylinders: cylindrical. Spheres/cones: spherical.",ex:[T("Region under y = x on [0, 1]",["0 ≤ y ≤ x, 0 ≤ x ≤ 1"]),T("Disk x"+sq+" + y"+sq+" ≤ 4",["Polar: 0 ≤ r ≤ 2"])]},
+ mrec:{grp:"Rectangles / simple regions",c:ORG,name:"Iterated Integrals",hint:"inside out",when:"Rectangles or regions between curves.",rule:"Integrate the inner variable first, treating the outer as constant. Fubini: on rectangles the order doesn't matter. Swap order to make an integral doable.",ex:[T(ig(0,1)+ig(0,2)+" xy dy dx",["∫ 2x dx = 1"]),T("Area of a region",["∬ 1 dA"])]},
+ mpol:{grp:"Circles",c:RED,name:"Polar Coordinates",hint:"dA = r dr dθ",when:"Disks, annuli, x"+sq+" + y"+sq+" in the integrand.",rule:"x = r cos θ, y = r sin θ, dA = r dr dθ. Don't forget the r!",ex:[T("∬<sub>disk r ≤ 2</sub> 1 dA",["∫∫ r dr dθ = 4π"]),T("∬ e<sup>−(x"+sq+"+y"+sq+")</sup> over ℝ"+sq,["π"])]},
+ mtri:{grp:"3D",c:PURP,name:"Triple Integrals: Cylindrical & Spherical",hint:"r dz dr dθ, ρ"+sq+"sin φ",when:"Volumes, mass in 3D.",rule:"Cylindrical: dV = r dz dr dθ. Spherical: dV = ρ"+sq+"sin φ dρ dφ dθ. Volume = ∭ 1 dV.",ex:[T("Ball of radius a",["(4/3)πa"+cu]),T("Cylinder r ≤ 2, 0 ≤ z ≤ 3",["12π"])]},
+ mend:{grp:"Last step",c:GRN,name:"Sanity-Check the Answer",hint:"positive volume",when:"Every answer.",rule:"Volumes and areas are positive; compare with a known shape.",ex:[T("Hemisphere",["Half of (4/3)πa"+cu]),T("Forgot r",["Answer off by a factor"])]}
+};
+const U5={id:"u5",num:5,short:"Multiple Integrals",name:"Unit 5: Multiple Integrals",sub:"Double and triple integrals, changing order, polar, cylindrical and spherical coordinates, applications",c:TEAL,
+ flow:{M:U5M,label:"Multiple integrals flowchart",lead:"The shape of the region picks the coordinates.",start:"∬ or ∭",top:["m0"],q:"What shape?",cols:[["Rectangle / between curves","",ORG,["mrec"]],["Disk / annulus","",RED,["mpol"]],["Solid in 3D","",PURP,["mtri"]]],end:"mend"},
+ sheet:[[ORG,"Double integrals",["Inner first","Fubini on rectangles","Area = ∬ dA"],""],[RED,"Polar",["dA = r dr dθ","x"+sq+" + y"+sq+" = r"+sq],""],[PURP,"3D",["Cylindrical: r dz dr dθ","Spherical: ρ"+sq+"sin φ dρ dφ dθ","Ball: (4/3)πa"+cu],""]],
+ gen:[
+ ()=>{ const a=R(1,4),b=R(1,4),m=R(1,3),n=R(1,3); return PF("Iterated integrals",`${ig(0,a)}${ig(0,b)} x${m>1?`<sup>${m}</sup>`:""}y${n>1?`<sup>${n}</sup>`:""} dy dx`,a**(m+1)*b**(n+1),(m+1)*(n+1),[F(a**(m+1)*b**(n+1),m*n||1),N(a*b),F(a**m*b**n,(m+1)*(n+1))],[`Separates: (${ig(0,a)} x${m>1?`<sup>${m}</sup>`:""} dx)(${ig(0,b)} y${n>1?`<sup>${n}</sup>`:""} dy)`,`= ${FF(a**(m+1),m+1)}·${FF(b**(n+1),n+1)} = <b>${F(a**(m+1)*b**(n+1),(m+1)*(n+1))}</b>`]); },
+ ()=>{ const a=R(1,5); return PF("Regions between curves",`${ig(0,a)}${ig(0,"x")} y dy dx`,a**3,6,[F(a**3,3),F(a*a,2),F(a**3,2)],[`Inner: y${sq}/2 from 0 to x = x${sq}/2`,`${ig(0,a)} x${sq}/2 dx = <b>${F(a**3,6)}</b>`]); },
+ ()=>{ const a=R(1,6); return PSX("Polar",`Find ∬ (x${sq} + y${sq}) dA over the disk x${sq} + y${sq} ≤ ${a*a}.`,`${FF(a**4,2)}π`,[`${a**4}π`,`${FF(a**3,3)}π`,`${a*a}π`],[`∫<sub>0</sub><sup>2π</sup>∫<sub>0</sub><sup>${a}</sup> r${sq}·r dr dθ = 2π·${a**4}/4`,`<b>${FF(a**4,2)}π</b>`]); },
+ ()=>{ const a=R(1,5),h=R(1,6); return PSX("Cylindrical",`Find the volume of the cylinder r ≤ ${a}, 0 ≤ z ≤ ${h}.`,`${a*a*h}π`,[`${2*a*h}π`,`${a*h}π`,`${FF(a*a*h,3)}π`],[`∫∫∫ r dz dr dθ = π·${a*a}·${h}`,`<b>${a*a*h}π</b>`]); },
+ ()=>{ const a=R(1,4); return PSX("Spherical",`Find the volume of the ball ρ ≤ ${a}.`,`${FF(4*a**3,3)}π`,[`${4*a*a}π`,`${a**3}π`,`${FF(2*a**3,3)}π`],[`∫<sub>0</sub><sup>2π</sup>∫<sub>0</sub><sup>π</sup>∫<sub>0</sub><sup>${a}</sup> ρ${sq}sin φ dρ dφ dθ = 2π·2·${a**3}/3`,`<b>${FF(4*a**3,3)}π</b>`]); },
+ ()=>{ const a=R(1,4),b=R(1,4); return P("Area",`Find 6 × the area of the region between y = x${sq} and y = ${X(a)} using ∬ dA.`,a**3,[a**2,2*a**3,a**3*3],[`${ig(0,a)}${ig("x"+sq,X(a))} dy dx = ${FF(a**3,6)}`,`6 × area = <b>${a**3}</b>`]); }],
+ chal:[
+ ()=>{ return PSX("Changing order",`Evaluate ${ig(0,1)}${ig("x",1)} e<sup>y"+sq+"</sup> dy dx.`.replace('"+sq+"',"²"),`${FR("e − 1",2)}`,["e − 1",`${FR("e",2)}`,"1"],[`Swap: 0 ≤ x ≤ y, 0 ≤ y ≤ 1`,`${ig(0,1)} y e<sup>y²</sup> dy = (e − 1)/2`]); },
+ ()=>{ return PSX("Gaussian integral",`Evaluate ∬<sub>ℝ²</sub> e<sup>−(x²+y²)</sup> dA.`,"π",["2π","√π","1"],[`Polar: ∫<sub>0</sub><sup>2π</sup>∫<sub>0</sub><sup>∞</sup> e<sup>−r²</sup>r dr dθ = 2π·½`,`<b>π</b>`]); }],
+ frq:[()=>{ const a=R(1,3);
+  return {t:"Volume three ways",calc:false,stem:`Let E be the solid inside the sphere x${sq} + y${sq} + z${sq} = ${4*a*a} and above the cone z = √(x${sq} + y${sq}).`,parts:[
+   [`Describe E in spherical coordinates.`,[`0 ≤ ρ ≤ ${2*a}, 0 ≤ φ ≤ π/4, 0 ≤ θ ≤ 2π`],"",2],
+   [`Set up the volume integral.`,[`∫<sub>0</sub><sup>2π</sup>∫<sub>0</sub><sup>π/4</sup>∫<sub>0</sub><sup>${2*a}</sup> ρ${sq}sin φ dρ dφ dθ`],"",2],
+   [`Evaluate it.`,[`2π·(1 − √2/2)·${FF(8*a**3,3)}`],`${FF(16*a**3,3)}π(1 − ${FR("√2",2)})`,3]]}; }]
+};
+
+/* ===== U6 Vector calculus ===== */
+const U6M={
+ v0:{grp:"Step 1",c:NAVY,name:"What Are You Integrating Over?",hint:"curve or surface?",when:"Every vector calculus problem.",rule:"Over a curve: line integral ∫F · dr. Over a surface: flux ∬F · n dS. Closed curve/surface: think Green / Stokes / Divergence.",ex:[T("Work along a path",["Line integral"]),T("Flux through a closed surface",["Divergence theorem"])]},
+ vcons:{grp:"Line integrals",c:ORG,name:"Conservative Fields",hint:"curl F = 0",when:"∫F · dr with F = ∇f.",rule:"F = ⟨P, Q⟩ is conservative (on a simply connected region) ⇔ P<sub>y</sub> = Q<sub>x</sub>. Then ∫<sub>C</sub>F · dr = f(end) − f(start); closed loops give 0.",ex:[T("F = ⟨2xy, x"+sq+"⟩",["f = x"+sq+"y"]),T("Closed loop",["0"])]},
+ vline:{grp:"Line integrals",c:ORG,name:"Parametrize the Curve",hint:"∫F(r(t)) · r′(t) dt",when:"Non-conservative F.",rule:"Write r(t), substitute, dot with r′(t), integrate in t.",ex:[T("F = ⟨−y, x⟩ on the unit circle",["∫(sin"+sq+" + cos"+sq+") dt = 2π"]),T("Segment",["r = P + t(Q − P)"])]},
+ vgreen:{grp:"Closed curve in the plane",c:RED,name:"Green's Theorem",hint:"∬(Q<sub>x</sub> − P<sub>y</sub>) dA",when:"∮ around a closed plane curve (counterclockwise).",rule:"∮<sub>C</sub> P dx + Q dy = ∬<sub>D</sub>(Q<sub>x</sub> − P<sub>y</sub>) dA. Area = ½∮(x dy − y dx).",ex:[T("F = ⟨−y, x⟩ around a region",["2·Area"]),T("Circle radius 3",["2·9π = 18π"])]},
+ vdiv:{grp:"Closed surface",c:PURP,name:"Divergence Theorem",hint:"∭ div F dV",when:"Flux out of a closed surface.",rule:"∯<sub>S</sub> F · n dS = ∭<sub>E</sub> div F dV, div F = P<sub>x</sub> + Q<sub>y</sub> + R<sub>z</sub>.",ex:[T("F = ⟨x, y, z⟩, ball radius a",["div 3: 4πa"+cu]),T("div F = 0",["Zero net flux"])]},
+ vstk:{grp:"Surface with boundary",c:TEAL,name:"Stokes' Theorem",hint:"∬ curl F · n dS",when:"Circulation around a space curve.",rule:"∮<sub>C</sub>F · dr = ∬<sub>S</sub>(curl F) · n dS. Pick the easiest surface with boundary C.",ex:[T("Curl constant",["(curl F · n)·Area"]),T("Orientation",["Right-hand rule"])]},
+ vend:{grp:"Last step",c:GRN,name:"Orientation & Sign",hint:"counterclockwise, outward",when:"Every answer.",rule:"Green: counterclockwise. Divergence: outward normal. A sign flip usually means orientation.",ex:[T("Clockwise curve",["Negate Green's result"]),T("Inward flux",["Negative of outward"])]}
+};
+const U6={id:"u6",num:6,short:"Vector Calculus",name:"Unit 6: Vector Calculus",sub:"Vector fields, line integrals, conservative fields, Green's theorem, surface integrals, Stokes and divergence theorems",c:BLU,
+ flow:{M:U6M,label:"Vector calculus flowchart",lead:"Curve or surface? Closed or not? That picks the theorem.",start:"Integrate a vector field",top:["v0"],q:"Over what?",cols:[["A curve","",ORG,["vcons","vline"]],["Closed plane curve","",RED,["vgreen"]],["Closed surface","",PURP,["vdiv"]],["Surface with edge","",TEAL,["vstk"]]],end:"vend"},
+ sheet:[[ORG,"Line integrals",["∫F · dr = ∫F(r(t)) · r′(t) dt","Conservative: P<sub>y</sub> = Q<sub>x</sub>","FTC: f(B) − f(A)"],""],[RED,"Green",["∮P dx + Q dy = ∬(Q<sub>x</sub> − P<sub>y</sub>) dA"],""],[PURP,"Divergence",["div F = ∇ · F","∯F · n dS = ∭div F dV"],""],[TEAL,"Stokes",["curl F = ∇ × F","∮F · dr = ∬curl F · n dS"],""]],
+ gen:[
+ ()=>{ const a=nz(-3,3),b=nz(-3,3),c=nz(-3,3); return P("Divergence",`Find div F for F = ⟨${X(a)}${sq}, ${X(b,"y")}z, ${X(c,"z")}⟩ at (1, 1, 1).`,2*a+b+c,[a+b+c,2*a+b*1+c+1,0].filter(x=>x!==2*a+b+c),[`div F = ${N(2*a)}x${sg(b).replace(/ (\d+)$/,m=>m)}z${sg(c)}`,`At (1, 1, 1): <b>${N(2*a+b+c)}</b>`]); },
+ ()=>{ const S=pick([["⟨2xy, x"+sq+"⟩","Yes"],["⟨y, x⟩","Yes"],["⟨−y, x⟩","No"],["⟨x"+sq+", xy⟩","No"],["⟨e<sup>x</sup>y, e<sup>x</sup>⟩","Yes"],["⟨y"+sq+", x⟩","No"]]); return PSX("Conservative fields",`Is F = ${S[0]} conservative?`,S[1],[S[1]==="Yes"?"No":"Yes","Only on the unit circle","Cannot tell"],[`Compare P<sub>y</sub> and Q<sub>x</sub>`,`<b>${S[1]}</b>`]); },
+ ()=>{ const a=R(-3,3),b=R(-3,3),c=R(-3,3),d=R(-3,3); return P("Fundamental theorem for line integrals",`F = ∇(x${sq}y). Find ∫<sub>C</sub> F · dr from (${N(a)}, ${N(b)}) to (${N(c)}, ${N(d)}).`,c*c*d-a*a*b,[a*a*b-c*c*d,c*c*d,c*d-a*b].filter(x=>x!==c*c*d-a*a*b),[`f(end) − f(start) = (${N(c)})${sq}(${N(d)}) − (${N(a)})${sq}(${N(b)})`,`<b>${N(c*c*d-a*a*b)}</b>`]); },
+ ()=>{ const r=R(1,5),k=R(1,3); return PSX("Green's theorem",`Find ∮<sub>C</sub> (−${k===1?"":k}y dx + ${k===1?"":k}x dy) around the circle of radius ${r} (counterclockwise).`,`${2*k*r*r}π`,[`${k*r*r}π`,`${2*k*r}π`,"0"],[`Q<sub>x</sub> − P<sub>y</sub> = ${2*k}`,`${2*k}·π·${r*r} = <b>${2*k*r*r}π</b>`]); },
+ ()=>{ const a=R(1,4); return PSX("Divergence theorem",`Find the outward flux of F = ⟨x, y, z⟩ through the sphere of radius ${a}.`,`${4*a**3}π`,[`${FF(4*a**3,3)}π`,`${4*a*a}π`,`${12*a**3}π`],[`div F = 3`,`3·(4/3)π·${a}${cu} = <b>${4*a**3}π</b>`]); }],
+ chal:[
+ ()=>{ const a=R(1,4); return PSX("Line integral",`Find ∫<sub>C</sub> x ds where C is the segment from (0, 0) to (${3*a}, ${4*a}).`,`${FF(15*a*a,2)}`,[`${9*a*a}`,`${5*a}`,`${FF(9*a*a,2)}`],[`r(t) = ⟨${3*a}t, ${4*a}t⟩, ds = ${5*a} dt`,`${ig(0,1)} ${3*a}t·${5*a} dt = <b>${F(15*a*a,2)}</b>`]); },
+ ()=>{ const a=R(1,4),h=R(1,4); return PSX("Divergence theorem",`F = ⟨x, y, 0⟩. Outward flux through the closed cylinder r ≤ ${a}, 0 ≤ z ≤ ${h}?`,`${2*a*a*h}π`,[`${a*a*h}π`,`${3*a*a*h}π`,"0"],[`div F = 2`,`2·π·${a*a}·${h} = <b>${2*a*a*h}π</b>`]); }],
+ frq:[()=>{ const a=nz(-3,3),b=nz(-3,3);
+  return {t:"Conservative field",calc:false,stem:`F(x, y) = ⟨2xy${sg(a)}, x${sq}${sg(b)}⟩.`,parts:[
+   [`Show F is conservative.`,[`P<sub>y</sub> = 2x = Q<sub>x</sub>`],"",1],
+   [`Find a potential function f.`,[`f = x${sq}y${sg(a)}x${sg(b)}y (+ C)`],`x${sq}y${sg(a)}x${sg(b)}y`,2],
+   [`Evaluate ∫<sub>C</sub> F · dr for any path from (0, 0) to (1, 2).`,[`f(1, 2) − f(0, 0) = 2${sg(a)}${sg(2*b)}`],N(2+a+2*b),2],
+   [`What is ∮F · dr around the unit circle?`,[`Conservative ⇒ 0`],"0",1]]}; }]
+};
+
+const units=[U1,U2,U3,U4,U5,U6];
+const wrap=g=>()=>{ for(let i=0;i<20;i++){ const p=g(); if(p) return p; } return g(); };
+units.forEach(u=>{ ["gen","chal","frq"].forEach(k=>u[k]=(u[k]||[]).map(wrap)); });
+units.push({id:"review",num:7,label:"Final review",short:"Final Review",name:"Final Review: Mixed Practice",sub:"Mixed questions and free response from every unit, like a final exam. New each time.",c:"#111",
+  sheet:units.map(u=>[u.c,u.short,u.sheet[0][2],""]),gen:units.flatMap(u=>u.gen),chal:units.flatMap(u=>u.chal),frq:units.flatMap(u=>u.frq)});
+units.push({id:"exams",num:0,label:"University exams",short:"University Exams",name:"Real University Exams with Solutions",sub:"Free exams and solutions from MIT 18.02 Multivariable Calculus (MIT OpenCourseWare), matched to the units of this book",c:"#7a5a12",gen:[],chal:[],frq:[],sheet:[["#1d4e89", "MIT 18.02, Fall 2007 (OpenCourseWare)", ["<a href=\"https://www.ocw.mit.edu/courses/18-02-multivariable-calculus-fall-2007/pages/exams\" target=\"_blank\" rel=\"noopener\">Exams and practice exams A and B, with solutions</a>"], "Practice exams and the real exams, each with solutions."], ["#0f7a6c", "MIT 18.02SC, Fall 2010 (OpenCourseWare)", ["<a href=\"https://ocw.mit.edu/courses/18-02sc-multivariable-calculus-fall-2010/resources/mit18_02sc_finalexamsol/\" target=\"_blank\" rel=\"noopener\">Final exam solutions</a>"], "All units."], ["#6a3d9a", "MIT 18.02, Spring 2006 (OpenCourseWare)", ["<a href=\"https://ocw.mit.edu/courses/18-02-multivariable-calculus-spring-2006/resources/pracfinalbsol\" target=\"_blank\" rel=\"noopener\">Practice final B solutions</a>"], "Cross product, Lagrange multipliers, double integrals, line integrals, spherical coordinates, conservative fields."]]});
+
+window.ZC={units,strands:[["Space & curves",NAVY,["u1","u2"]],["Differential calculus",RED,["u3","u4"]],["Integral & vector calculus",TEAL,["u5","u6"]],["Exam prep","#111",["review","exams"]]],mapNote:"Calculus III in course order.",frqLead:"Free-response questions in university exam format."};
+})();
