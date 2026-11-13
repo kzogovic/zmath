@@ -104,6 +104,40 @@ const FM={
   ex:[["2x"+S3+" − 18x",["GCF: 2x(x"+S2+" − 9). Not done yet!","x"+S2+" − 9 = (x − 3)(x + 3).","<b>2x(x − 3)(x + 3)</b>"]],
       ["Check (3x + 2)(2x − 1)",["3x · 2x = 6x"+S2+", 3x · (−1) = −3x, 2 · 2x = 4x, 2 · (−1) = −2.","6x"+S2+" + x − 2 ✓ matches."]]]}
 };
+
+/* ---------- fresh examples for the method flowchart ("New examples" button) ---------- */
+const sq=k=>k*k, X=(p,n)=>(p===1?"":num(p))+(n===1?"x":"x<sup>"+n+"</sup>");
+const lin=(p,q)=>bin(p,q), pw=(p)=>p===1?"x":"("+tx(p)+")";
+const sqFac=m=>{ const k=Math.round(Math.sqrt(-m)); return (m<0&&k*k===-m)?`(x − ${k})(x + ${k})`:`(${poly([1,0,m])})`; };
+const FGEN={
+ gcf:()=>{ const g=rnd(2,7), k=rnd(0,2); let a,b,c; do{ a=rnd(1,6); b=rnd(-9,9); c=nz(-9,9); }while(gcd(gcd(a,b),c)!==1);
+   const inner=[a,b,c], full=inner.map(t=>t*g).concat(Array(k).fill(0)); const mono=g+(k===0?"":k===1?"x":"x<sup>"+k+"</sup>");
+   return [poly(full),[`GCF of the numbers: ${g}${k?`; lowest power of x: ${k===1?"x":"x<sup>"+k+"</sup>"}`:""}.`,`Divide every term by ${mono}.`,`<b>${mono}(${poly(inner)})</b>`]]; },
+ dos:()=>{ const p=pick([1,1,2,3,4,5]), q=rnd(1,9); if(gcd(p,q)!==1) return FGEN.dos();
+   return [poly([p*p,0,-q*q]),[`Both terms are squares: ${pw(p)}<sup>2</sup> − ${q}<sup>2</sup>.`,`a<sup>2</sup> − b<sup>2</sup> = (a − b)(a + b) with a = ${tx(p)}, b = ${q}.`,`<b>${lin(p,-q)}${lin(p,q)}</b>`]]; },
+ soc:()=>{ const p=pick([1,1,2,3]), q=rnd(1,5); if(gcd(p,q)!==1) return FGEN.soc();
+   return [poly([p**3,0,0,q**3]),[`Both terms are cubes: ${pw(p)}<sup>3</sup> + ${q}<sup>3</sup>.`,`a<sup>3</sup> + b<sup>3</sup> = (a + b)(a<sup>2</sup> − ab + b<sup>2</sup>).`,`<b>${lin(p,q)}(${poly([p*p,-p*q,q*q])})</b>`]]; },
+ doc:()=>{ const p=pick([1,1,2,3]), q=rnd(1,5); if(gcd(p,q)!==1) return FGEN.doc();
+   return [poly([p**3,0,0,-(q**3)]),[`Both terms are cubes: ${pw(p)}<sup>3</sup> − ${q}<sup>3</sup>.`,`a<sup>3</sup> − b<sup>3</sup> = (a − b)(a<sup>2</sup> + ab + b<sup>2</sup>).`,`<b>${lin(p,-q)}(${poly([p*p,p*q,q*q])})</b>`]]; },
+ pst:()=>{ const p=pick([1,1,2,3,4,5]), q=rnd(1,9), s=pick([1,-1]); if(gcd(p,q)!==1) return FGEN.pst();
+   return [poly([p*p,2*p*q*s,q*q]),[`First and last terms are squares: ${pw(p)}<sup>2</sup> and ${q}<sup>2</sup>.`,`Middle term check: 2 · ${tx(p)} · ${q} = ${tx(2*p*q)} ✓`,`<b>${lin(p,s*q)}<sup>2</sup></b>`]]; },
+ sp:()=>{ const m=nz(-9,9), n=nz(-9,9); if(m+n===0) return FGEN.sp();
+   return [poly([1,m+n,m*n]),[`Find two numbers with product ${num(m*n)} and sum ${num(m+n)}.`,`They are ${num(m)} and ${num(n)}.`,`<b>${joinFactors([[1,m],[1,n]])}</b>`]]; },
+ cross:()=>{ const a1=pick([2,3,1,5]), a2=pick([1,2,3]), c1=nz(-7,7), c2=nz(-7,7); const a=a1*a2;
+   if(a<2||gcd(a1,c1)!==1||gcd(a2,c2)!==1||a1*c2+a2*c1===0) return FGEN.cross();
+   return [poly([a,a1*c2+a2*c1,c1*c2]),[`Left: ${tx(a1)}, ${tx(a2)}. Right: ${num(c1)}, ${num(c2)}.`,`Cross: ${tx(a1)}·(${num(c2)}) + ${tx(a2)}·(${num(c1)}) = ${tx(a1*c2+a2*c1)} ✓`,`<b>${joinFactors([[a1,c1],[a2,c2]])}</b>`]]; },
+ qf:()=>{ const opts=[-1,-4,-9,-16,1,2,3,4,5,-2,-3,-5,-7]; const m=pick(opts), n=pick(opts); if(m===n||m+n===0) return FGEN.qf();
+   return [poly([1,0,m+n,0,m*n]),[`Let u = x<sup>2</sup>: u<sup>2</sup> ${(m+n)<0?"−":"+"} ${Math.abs(m+n)===1?"":Math.abs(m+n)}u ${m*n<0?"−":"+"} ${Math.abs(m*n)} = (u ${m<0?"−":"+"} ${Math.abs(m)})(u ${n<0?"−":"+"} ${Math.abs(n)}).`,`Back to x: (${poly([1,0,m])})(${poly([1,0,n])}).`,`Factor again where possible: <b>${sqFac(m)}${sqFac(n)}</b>`]]; },
+ grp:()=>{ const a=pick([1,1,2,3]), b=nz(-6,6), m=pick([-1,-4,-9,-16,1,2,3,4,5,-2,-3,-5]); if(gcd(a,b)!==1) return FGEN.grp();
+   const c=[a,b,a*m,b*m];
+   return [poly(c),[`Group in pairs: (${poly([a,b,0,0])}) ${a*m<0?"−":"+"} (${poly([Math.abs(a*m),(a*m<0?-1:1)*b*m])}).`,
+     `x<sup>2</sup>${lin(a,b)} ${m<0?"−":"+"} ${Math.abs(m)===1?"":Math.abs(m)}${lin(a,b)}`,`Factor out ${lin(a,b)}: ${lin(a,b)}(${poly([1,0,m])})`,`Factor completely: <b>${lin(a,b)}${sqFac(m)}</b>`]]; },
+ ruf:()=>{ const r=[nz(-4,4),nz(-4,4),nz(-4,4)]; if(new Set(r).size<3) return FGEN.ruf();
+   const c=r.reduce((p,x)=>mul(p,[1,-x]),[1]); const r0=intCands(c).find(t=>ev(c,t)===0); const q=synth(c,r0).s.slice(0,3); const rest=r.filter(x=>x!==r0);
+   return [poly(c),[`Test divisors of ${num(c[3])}: P(${num(r0)}) = 0 ✓, so ${lin(1,-r0)} is a factor.`,`Ruffini with ${num(r0)}: quotient ${poly(q)} = ${joinFactors(rest.map(x=>[1,-x]))}.`,`<b>${joinFactors(r.slice().sort((x,y)=>y-x).map(x=>[1,-x]))}</b>`]]; },
+ chk:()=>{ const g=rnd(2,6), q=rnd(1,8);
+   return [poly([g,0,-g*q*q,0]),[`GCF: ${g}x(${poly([1,0,-q*q])}). Not done yet!`,`x<sup>2</sup> − ${q*q} = (x − ${q})(x + ${q}).`,`<b>${g}x(x − ${q})(x + ${q})</b>`]]; }
+};
 const fv=()=>`<i class="mf-v" aria-hidden="true"></i>`;
 const FLOWS={};
 function flowHTML(id,F){ FLOWS[id]=F;
@@ -123,13 +157,14 @@ function mfDetail(m){
   return `<div class="mf-dc" style="--c:${m.c}"><div class="mf-dk">${m.grp}</div><h4>${m.name}</h4><p class="mf-when"><b>When:</b> ${m.when}</p><p class="mf-rule">${m.rule}</p>${m.why?`<p class="mf-why"><b>Why this method:</b> ${m.why}</p>`:""}
    <div class="mf-exs">${m.ex.map(([q,st],i)=>`<div class="mf-ex"><div class="fx-k">Example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(s=>`<li>${s}</li>`).join("")}</ol></div>`).join("")}</div>
    ${m.tip?`<p class="mf-tip"><b>⚠ Watch out:</b> ${m.tip}</p>`:""}
-   ${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
+   ${m.gen?`<button type="button" class="fx-go" data-mgen="1">↻ New examples</button>`:""}${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
 function bindFlow(root){ root.querySelectorAll(".mf").forEach(mf=>{ if(mf.dataset.bound) return; mf.dataset.bound=1; const d=mf.nextElementSibling, F=FLOWS[mf.dataset.flow]; if(!F) return;
-  const pickK=(k,scroll)=>{ mf.querySelectorAll(".mf-n").forEach(b=>b.classList.toggle("on",b.dataset.fm===k)); d.innerHTML=mfDetail(F.M[k]); if(scroll) d.scrollIntoView({behavior:"smooth",block:"nearest"}); };
+  const pickK=(k,scroll)=>{ mf.querySelectorAll(".mf-n").forEach(b=>b.classList.toggle("on",b.dataset.fm===k)); d.dataset.k=k; d.innerHTML=mfDetail(F.M[k]); if(scroll) d.scrollIntoView({behavior:"smooth",block:"nearest"}); };
   mf.querySelectorAll(".mf-n").forEach(b=>b.onclick=()=>pickK(b.dataset.fm,true)); pickK(F.top[0],false);
-  d.addEventListener("click",e=>{ const o=e.target.closest("[data-mopen]"); if(o){ location.hash=o.dataset.mopen; return; }
+  d.addEventListener("click",e=>{ const g=e.target.closest("[data-mgen]"); if(g){ const m=F.M[d.dataset.k]; if(m&&m.gen){ const box=d.querySelector(".mf-exs"); box.innerHTML=[m.gen(),m.gen()].map(([q,st],i)=>`<div class="mf-ex"><div class="fx-k">New example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(x=>`<li>${x}</li>`).join("")}</ol></div>`).join(""); } return; } const o=e.target.closest("[data-mopen]"); if(o){ location.hash=o.dataset.mopen; return; }
     const j=e.target.closest("[data-mjump]"); if(!j) return; const sec=mf.closest("section.unit"), node=sec&&sec.querySelector(`.pm-node[data-pk="${j.dataset.mjump.replace(/^sub-[^-]+-/,"")}"]`);
     if(node) node.click(); const t=document.getElementById(j.dataset.mjump); if(!t) return; if(t.tagName==="DETAILS") t.open=true; setTimeout(()=>window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-130,behavior:"smooth"}),40); }); }); }
+Object.keys(FGEN).forEach(k=>{ if(FM[k]) FM[k].gen=FGEN[k]; });
 const START=flowHTML("factor",{M:FM,label:"Factoring method flowchart",lead:"Follow the arrows from the top. Tap any method to see its rule and solved examples below the chart.",start:"Factor P(x)",top:["gcf"],q:"How many terms?",
   cols:[["2 terms","Binomial",ORG,["dos","soc","doc"]],["3 terms","Trinomial",RED,["pst","sp","cross","qf"]],["4 terms","Polynomial",PURP,["grp"]],["Degree 3+","None of these work?",TEAL,["ruf"]]],end:"chk"});
 
