@@ -12,7 +12,17 @@ const sq="<sup>2</sup>", cu="<sup>3</sup>";
 const X=(k,v="x")=>k===1?v:k===-1?"−"+v:N(k)+v;
 const sg=n=>n<0?" − "+N(-n):" + "+N(n);
 const poly=c=>{ const n=c.length-1; let s=""; c.forEach((a,i)=>{ if(!a) return; const p=n-i, m=Math.abs(a); const co=(m===1&&p>0)?"":String(m); const v=p===0?"":p===1?"x":"x<sup>"+p+"</sup>"; s+=s?(a<0?" − ":" + "):(a<0?"−":""); s+=co+v; }); return s||"0"; };
-const P=(t,q,v,w,s,o={})=>({t,q,v,a:o.a!=null?o.a:N(v),w:w.map(x=>typeof x==="number"?N(x):x),s,tol:o.tol,mc:o.mc});
+/* tidy: cleans generated math text: 1x → x, −1x → −x, x<sup>1</sup> → x, e<sup>1</sup> → e, "+ 0" terms dropped, (x) → x */
+const tidy=h=>typeof h!=="string"?h:h
+  .replace(/(^|\(|[=−+,] )-(?=\d)|<sup>-/g,m=>m.replace("-","−"))
+  .replace(/ \+ −(?=[\w(π√])/g," − ").replace(/ − −(?=[\w(π√])/g," + ")
+  .replace(/(^|[^\d.,\w])([−-]?)1(?=[xyztuvwirθλ](?![a-z])|[ab](?=<sub>)|e(?=<sup>)|f\()/g,(m,a,b)=>a+(b?"−":""))
+  .replace(/([A-Za-zθ)])<sup>1<\/sup>/g,"$1")
+  .replace(/(?<=[A-Za-zθλ>]|\([^()]*[a-zθ][^()]*\)) [+−] 0(?![\d.,])(?=\s*(?:[)|<,;=?]|for\b|and\b|on\b|in\b|$))/g,"")
+  .replace(/(?<=[\w>]) [+−] 0[a-zθλ](?![\w(])/g,"")
+  .replace(/(?<![A-Za-z])(\([^()<>]*[a-zθ][^()<>]*\))\(([a-zθ])\)/g,"$2$1")
+  .replace(/(^|[\s(=−+|√]|(?<!<\/su[pb])>)\(([a-zθ])\)(?=[(<\s|ⁿ]|$)/g,"$1$2");
+const P=(t,q,v,w,s,o={})=>({t,q:tidy(q),v,a:tidy(o.a!=null?o.a:N(v)),w:w.map(x=>tidy(typeof x==="number"?N(x):x)),s:(s||[]).map(tidy),tol:o.tol,mc:o.mc});
 const PF=(t,q,n,d,w,s,o={})=>P(t,q,n/d,w,s,{...o,a:F(n,d)});   // fraction answer
 const PS=(t,q,a,w,s)=>P(t,q,undefined,w,s,{a,mc:true});        // answer is text: MCQ and Deck only
 const money=x=>"$"+(Math.round(x*100)/100).toFixed(Number.isInteger(x)?0:2);
@@ -61,7 +71,15 @@ function parseAns(s){ s=String(s||"").trim().toLowerCase().replace(/[−–—]/
   if(!s) return null; let m=s.match(/^(-?\d*\.?\d+)\/(-?\d*\.?\d+)$/); if(m) return +m[1]/+m[2]; if(/^-?\d*\.?\d+(e-?\d+)?$/.test(s)) return +s; return NaN; }
 function gen(g){ for(let i=0;i<30;i++){ try{ const p=g(); if(p&&p.q&&p.a!=null) return p; }catch(e){} } return null; }
 function options(p){ const seen=new Set([String(p.a)]), o=[String(p.a)]; for(const w of p.w){ const s=String(w); if(!seen.has(s)&&s!=="NaN"){ seen.add(s); o.push(s); } if(o.length===4) break; }
-  let k=1; while(o.length<4&&typeof p.v==="number"){ const c=N(p.v+(k%2?k:-k)); if(!seen.has(c)){ seen.add(c); o.push(c); } k++; } return shuffle(o); }
+  const fm=String(p.a).match(/^(−?)(\d+)\/(\d+)$/), fn=fm?(fm[1]?-1:1)*fm[2]:0, fd=fm?+fm[3]:1;
+  let k=1; while(o.length<4&&typeof p.v==="number"){ const c=fm?(k>8?N(p.v+k):F(fn+(k%2?1:-1)*Math.ceil(k/2)*(k>4?fd:1),fd)):N(p.v+(k%2?k:-k)); if(!seen.has(c)){ seen.add(c); o.push(c); } k++; }
+  for(let j=0;o.length<4&&j<24;j++){ const c=vary(String(p.a),j); if(c&&!seen.has(c)){ seen.add(c); o.push(c); } } return shuffle(o); }
+/* vary: a near-miss of a text answer (one number nudged or its sign flipped), used only when the written distractors run out */
+function vary(a,j){ const parts=a.split(/(<[^>]*>)/), spots=[]; parts.forEach((t,i)=>{ if(i%2) return; const re=/(−?)(\d+)(?![\d.\/])/g; let m; while((m=re.exec(t))) spots.push([i,m.index,m[0],m[1],+m[2]]); });
+  if(!spots.length){ const alt=[["π","2π"],["π","π/2"],["π","3π/2"],["e","e<sup>2</sup>"],["e","1/e"]].filter(([x])=>a.includes(x)); return alt.length&&j<alt.length?a.replace(alt[j][0],alt[j][1]):null; }
+  const [i,at,str,neg,n]=spots[j%spots.length], mode=Math.floor(j/spots.length)%3;
+  const v=mode===0?(n?(neg?"":"−")+n:null):mode===1?neg+(n+1):(n?neg+(n-1):"−1"); if(v==null) return null;
+  parts[i]=parts[i].slice(0,at)+v+parts[i].slice(at+str.length); return parts.join(""); }
 const esc=s=>String(s).replace(/"/g,"&quot;");
 function setOf(u,kind,tp,n,typeOnly){ const L=G[u][kind].filter(g=>!tp||(g._t||"")===tp); const out=[], seen=new Set(); let tries=0;
   while(out.length<n&&tries++<n*25){ const g=L[out.length%L.length], p=gen(g); if(!p) continue; if(typeOnly&&(p.mc||typeof p.v!=="number")) continue; if(seen.has(p.q)) continue; seen.add(p.q); out.push(p); } return out; }
