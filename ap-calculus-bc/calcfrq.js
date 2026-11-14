@@ -187,6 +187,8 @@ const rev={id:"review",num:units.length+1,label:"Exam review",short:"AP Exam Rev
   sheet:units.map(u=>u.sheet[0]?[u.c,u.short,u.sheet[0][2].slice(0,3),""]:null).filter(Boolean),
   gen:units.flatMap(u=>u.gen.map(g=>{ const h=()=>g(); return h; })),
   chal:units.flatMap(u=>u.chal.map(g=>()=>g())),
+  med:units.flatMap(u=>(u.med||[]).map(g=>()=>g())),
+  adv:units.flatMap(u=>(u.adv||[]).map(g=>()=>g())),
   frq:units.flatMap(u=>u.frq)};
 units.push(rev);
 window.ZC.strands.push(["Exam prep","#111",["review"]]);
