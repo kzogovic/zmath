@@ -73,7 +73,7 @@ const FM={
   rule:"a"+S2+" + 2ab + b"+S2+" = (a + b)"+S2+" and a"+S2+" − 2ab + b"+S2+" = (a − b)"+S2+".",
   ex:[["x"+S2+" + 10x + 25",["a = x and b = 5. Check the middle: 2 · x · 5 = 10x ✓","<b>(x + 5)"+S2+"</b>"]],
       ["4x"+S2+" − 12x + 9",["a = 2x and b = 3. Check: 2 · 2x · 3 = 12x ✓, and the sign is minus.","<b>(2x − 3)"+S2+"</b>"]]]},
- sp:{grp:"3 terms",c:RED,name:"a = 1: Product & Sum",hint:"m · n = c, m + n = b",
+ sp:{grp:"3 terms",c:RED,name:"a = 1: Product & Sum (AC method)",hint:"m · n = c, m + n = b",
   when:"x"+S2+" + bx + c, where the leading coefficient is 1.",
   rule:"Find two numbers m and n with m · n = c and m + n = b. Then x"+S2+" + bx + c = (x + m)(x + n).",
   ex:[["x"+S2+" + 7x + 12",["Pairs that multiply to 12: 1·12, 2·6, 3·4. Only 3 + 4 = 7.","<b>(x + 3)(x + 4)</b>"]],
