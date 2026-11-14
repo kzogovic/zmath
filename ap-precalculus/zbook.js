@@ -47,13 +47,13 @@ function bindFlow(root){ root.querySelectorAll(".mf").forEach(mf=>{ if(mf.datase
     if(node) node.click(); const t=document.getElementById(j.dataset.mjump); if(!t) return; if(t.tagName==="DETAILS") t.open=true; setTimeout(()=>window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-130,behavior:"smooth"}),40); }); }); }
 
 const zU=flow=>String(flow||"").replace(/^f-/,"");
-const zHas=flow=>{ const u=zU(flow); return !!(typeof G!=="undefined"&&G[u]&&(G[u].sat.length||G[u].chal.length)); };
+const zHas=flow=>{ const u=zU(flow); return !!(typeof G!=="undefined"&&G[u]&&(G[u].sat.length||G[u].med.length||G[u].adv.length)); };
 const zTok=s=>new Set(String(s||"").replace(/<[^>]+>/g," ").toLowerCase().split(/[^a-z]+/).filter(w=>w.length>3&&!/^(with|from|that|this|then|when|each|into|than|only|both|have|uses|use|find|your|what|which|value|values)$/.test(w)).map(w=>w.replace(/(ies|es|s|ing|ed)$/,"")));
 function zPick(u,kind,m){ const L=G[u][kind]; if(!L.length) return null; topicsOf(u,kind); const T=zTok(m.name+" "+m.hint+" "+(m.when||""));
   const sc=L.map(g=>{ let n=0; zTok(g._t).forEach(w=>{ if(T.has(w)) n++; }); return n; }); const best=Math.max(...sc); const pool=best>0?L.filter((g,i)=>sc[i]===best):L;
   return gen(pick(pool)); }
-function zFresh(flow,m){ const u=zU(flow); if(!zHas(flow)||!m) return null; const out=[]; const a=zPick(u,"sat",m), b=zPick(u,"sat",m), c=zPick(u,"chal",m);
-  if(a) out.push(["New example",a]); if(c) out.push(["Harder example",c]); else if(b&&b.q!==(a&&a.q)) out.push(["New example",b]);
+function zFresh(flow,m){ const u=zU(flow); if(!zHas(flow)||!m) return null; const out=[]; for(const [k,lab] of LVL){ if(!G[u][k]||!G[u][k].length) continue; const p=zPick(u,k,m); if(p) out.push([lab,p]); }
+  if(out.length<2){ const b=zPick(u,"sat",m); if(b&&(!out[0]||b.q!==out[0][1].q)) out.push(["Easy",b]); }
   return out.map(([lab,p])=>`<div class="mf-ex"><div class="fx-k">${lab} · ${p.t}</div><p class="mf-eq">${p.q}</p><p><b>Answer:</b> ${p.a}</p>${solHtml(p)}</div>`).join(""); }
 /* ===================== engine ===================== */
 const has=(u,kind)=>!!(G[u]&&G[u][kind]&&G[u][kind].length);
@@ -67,14 +67,17 @@ function setOf(u,kind,tp,n,typeOnly){ const L=G[u][kind].filter(g=>!tp||(g._t||"
   while(out.length<n&&tries++<n*25){ const g=L[out.length%L.length], p=gen(g); if(!p) continue; if(typeOnly&&(p.mc||typeof p.v!=="number")) continue; if(seen.has(p.q)) continue; seen.add(p.q); out.push(p); } return out; }
 function topicsOf(u,kind){ G[u][kind].forEach(g=>{ if(g._t===undefined){ const p=gen(g); g._t=p?p.t:""; } }); return [...new Set(G[u][kind].map(g=>g._t))]; }
 const solHtml=p=>`<ol class="pr-st">${p.s.map(x=>`<li>${x}</li>`).join("")}</ol>`;
+const lvls=u=>LVL.filter(([k])=>has(u,k));
+const lvlRow=(u,kind,attr)=>{ const L=lvls(u); return L.length>1?`<div class="pr-tp pr-lv"><span class="gl">Level</span>${L.map(([k,v])=>`<button type="button" ${attr}="${k}"${k===kind?' class="on"':""}>${v}</button>`).join("")}</div>`:""; };
+const tpRow=(u,kind)=>`<span class="gl">Topic</span>${["All",...topicsOf(u,kind)].map((t,i)=>`<button type="button" data-prt="${i?esc(t):""}"${i?"":' class="on"'}>${t}</button>`).join("")}`;
 function boxHTML(u,kind){ const tps=topicsOf(u,kind);
   return `<div class="pr" data-pr="${u}|${kind}">
-   <p class="lead2">${LEAD[kind]||""}</p>
-   <div class="pr-tp"><span class="gl">Topic</span>${["All",...tps].map((t,i)=>`<button type="button" data-prt="${i?esc(t):""}"${i?"":' class="on"'}>${t}</button>`).join("")}</div>
+   ${kind==="sat"?lvlRow(u,kind,"data-prl"):""}<p class="lead2">${LEAD[kind]||""}</p>
+   <div class="pr-tp pr-tps"><span class="gl">Topic</span>${["All",...tps].map((t,i)=>`<button type="button" data-prt="${i?esc(t):""}"${i?"":' class="on"'}>${t}</button>`).join("")}</div>
    <div class="pr-md">${[["mcq","Multiple choice"],["deck","Deck"],["type","Type the answer"]].filter(m=>m[0]!=="type"||!NOTYPE[kind]).map(([k,v],i)=>`<button type="button" data-prm="${k}"${i?"":' class="on"'}>${v}</button>`).join("")}<button type="button" class="pr-new" data-prn>↻ New</button></div>
    <div class="pr-sc"></div><div class="pr-o"></div></div>`; }
 function bind(root){ root.querySelectorAll(".pr").forEach(box=>{ if(box.dataset.bound) return; box.dataset.bound=1;
-  const [u,kind]=box.dataset.pr.split("|"), out=box.querySelector(".pr-o"), sc=box.querySelector(".pr-sc"); let mode="mcq", tp="";
+  let [u,kind]=box.dataset.pr.split("|"); const out=box.querySelector(".pr-o"), sc=box.querySelector(".pr-sc"); let mode="mcq", tp="";
   const score=(r,d,n)=>{ sc.innerHTML=`<b>${r}</b> correct · ${d} of ${n} answered`; };
   const render=()=>{ sc.innerHTML="";
    if(mode==="mcq"){ const ps=setOf(u,kind,tp,8); let r=0,d=0; score(0,0,ps.length);
@@ -94,7 +97,8 @@ function bind(root){ root.querySelectorAll(".pr").forEach(box=>{ if(box.dataset.
          if(!q.dataset.done){ q.dataset.done=1; d++; if(ok) r++; score(r,d,ps.length); } fb.innerHTML=ok?`<p class="yes">Correct! ${p.a}</p>${solHtml(p)}`:`<p class="no">${isNaN(x)?"Type a number, like 12, −3, 5/6 or 2.5.":"Not yet. Try again or open the solution."}</p>`; };
        q.querySelector("[data-chk]").onclick=chk; inp.addEventListener("keydown",e=>{ if(e.key==="Enter") chk(); });
        q.querySelector("[data-sol]").onclick=()=>{ if(!q.dataset.done){ q.dataset.done=1; d++; score(r,d,ps.length); } fb.innerHTML=`<p class="pr-ans">Answer: ${p.a}</p>${solHtml(p)}`; }; }); } };
-  box.querySelectorAll("[data-prt]").forEach(b=>b.onclick=()=>{ tp=b.dataset.prt; box.querySelectorAll("[data-prt]").forEach(x=>x.classList.toggle("on",x===b)); render(); });
+  const bindTp=()=>box.querySelectorAll("[data-prt]").forEach(b=>b.onclick=()=>{ tp=b.dataset.prt; box.querySelectorAll("[data-prt]").forEach(x=>x.classList.toggle("on",x===b)); render(); }); bindTp();
+  box.querySelectorAll("[data-prl]").forEach(b=>b.onclick=()=>{ kind=b.dataset.prl; tp=""; box.querySelectorAll("[data-prl]").forEach(x=>x.classList.toggle("on",x===b)); box.querySelector(".lead2").textContent=LEAD[kind]; box.querySelector(".pr-tps").innerHTML=tpRow(u,kind); bindTp(); render(); });
   box.querySelectorAll("[data-prm]").forEach(b=>b.onclick=()=>{ mode=b.dataset.prm; box.querySelectorAll("[data-prm]").forEach(x=>x.classList.toggle("on",x===b)); render(); });
   box.querySelector("[data-prn]").onclick=render; render(); }); }
 
@@ -205,17 +209,20 @@ const st=document.createElement('style'); st.textContent=CSS+`.ps-sheet{border:1
 
 /* ===================== course shell ===================== */
 let ZC, U; const G={};
-function initData(){ ZC=window.ZC; U=ZC.units; U.forEach(u=>{ G[u.id]={sat:u.gen||[],chal:u.chal||[]}; }); }
-const LEAD={sat:"Practice for this unit, new every time, with full solutions.",chal:"Harder, multi-step problems for advanced learners. New every time, with full solutions."};
+function initData(){ ZC=window.ZC; U=ZC.units; U.forEach(u=>{ G[u.id]={sat:u.gen||[],med:[...(u.med||[]),...(u.chal||[])],adv:u.adv||[],chal:(u.adv&&u.adv.length)?u.adv:(u.chal||[])}; }); }
+const LVL=[["sat","Easy"],["med","Medium"],["adv","Advanced"]];
+const LEAD={sat:"Practice for this unit, new every time, with full solutions.",med:"Medium: two-step problems that combine ideas. New every time, with full solutions.",adv:"Advanced: multi-step, exam-level problems. New every time, with full solutions.",chal:"Harder, multi-step problems for advanced learners. New every time, with full solutions."};
 const NOTYPE={};
 const esc2=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function exHTML(u,tp){ const L=(G[u].sat).filter(g=>!tp||g._t===tp); const out=[], seen=new Set(); let k=0;
+function exHTML(u,tp,kind="sat"){ const L=(G[u][kind]).filter(g=>!tp||g._t===tp); const out=[], seen=new Set(); let k=0;
   while(out.length<Math.min(6,L.length*2)&&k++<80){ const p=gen(L[out.length%L.length]); if(!p||seen.has(p.q)) continue; seen.add(p.q); out.push(p); }
   return out.map((p,i)=>`<article class="zx-card"><div class="zx-k">${p.t}</div><p class="zx-q"><b>Example ${i+1}.</b> ${p.q}</p><ol class="zx-st">${p.s.map(x=>`<li>${x}</li>`).join("")}</ol><p class="zx-a">Answer: ${p.a}</p></article>`).join(""); }
-function exBox(u){ const tps=topicsOf(u,"sat"); return `<div class="zx" data-zx="${u}"><p class="lead2">Step-by-step solved examples, new every time. Pick a topic or see them all.</p>
-  <div class="pr-tp"><span class="gl">Topic</span>${["All",...tps].map((t,i)=>`<button type="button" data-zt="${i?esc2(t):""}"${i?"":' class="on"'}>${t}</button>`).join("")}<button type="button" class="pr-new" data-zn>↻ New examples</button></div><div class="zx-o"></div></div>`; }
-function bindEx(root){ root.querySelectorAll(".zx").forEach(b=>{ if(b.dataset.bound) return; b.dataset.bound=1; const u=b.dataset.zx, o=b.querySelector(".zx-o"); let tp="";
-  const r=()=>{ o.innerHTML=exHTML(u,tp); }; b.querySelectorAll("[data-zt]").forEach(x=>x.onclick=()=>{ tp=x.dataset.zt; b.querySelectorAll("[data-zt]").forEach(y=>y.classList.toggle("on",y===x)); r(); }); b.querySelector("[data-zn]").onclick=r; r(); }); }
+const zxTp=(u,kind)=>`<span class="gl">Topic</span>${["All",...topicsOf(u,kind)].map((t,i)=>`<button type="button" data-zt="${i?esc2(t):""}"${i?"":' class="on"'}>${t}</button>`).join("")}`;
+function exBox(u){ return `<div class="zx" data-zx="${u}">${lvlRow(u,"sat","data-zl")}<p class="lead2">Step-by-step solved examples, new every time. Pick a level and a topic, or see them all.</p>
+  <div class="pr-tp"><span class="zx-tps">${zxTp(u,"sat")}</span><button type="button" class="pr-new" data-zn>↻ New examples</button></div><div class="zx-o"></div></div>`; }
+function bindEx(root){ root.querySelectorAll(".zx").forEach(b=>{ if(b.dataset.bound) return; b.dataset.bound=1; const u=b.dataset.zx, o=b.querySelector(".zx-o"); let tp="", kind="sat";
+  const r=()=>{ o.innerHTML=exHTML(u,tp,kind); }; const bt=()=>b.querySelectorAll("[data-zt]").forEach(x=>x.onclick=()=>{ tp=x.dataset.zt; b.querySelectorAll("[data-zt]").forEach(y=>y.classList.toggle("on",y===x)); r(); }); bt();
+  b.querySelectorAll("[data-zl]").forEach(x=>x.onclick=()=>{ kind=x.dataset.zl; tp=""; b.querySelectorAll("[data-zl]").forEach(y=>y.classList.toggle("on",y===x)); b.querySelector(".zx-tps").innerHTML=zxTp(u,kind); bt(); r(); }); b.querySelector("[data-zn]").onclick=r; r(); }); }
 /* ---------- FRQs: multi-part, AP style, new numbers every time ---------- */
 function frqGen(u,tp){ const L=(U.find(x=>x.id===u).frq||[]).filter(g=>!tp||g._t===tp); const out=[], seen=new Set(); let k=0;
   while(out.length<Math.min(2,L.length)&&k++<60){ let p=null; try{ p=L[(out.length+Math.floor(Math.random()*L.length))%L.length](); }catch(e){} if(!p||seen.has(p.t)) continue; seen.add(p.t); out.push(p); } return out; }
@@ -264,7 +271,7 @@ function posterHTML(u){ const sh=u.sheet||[]; const fl=u.flow? (u.flow.cols||[])
   <div class="ksheet">${sh.map(x=>ks2(...x)).join("")}</div></div>`; }
 function bindPoster(root){ root.querySelectorAll("[data-pp]").forEach(b=>{ b.onclick=()=>printEl(b.closest(".zp").querySelector(".pst")); }); }
 const ks2=(c,h,items,ex)=>`<div class="ks" style="--c:${c}"><h4>${h}</h4><ul>${items.map(i=>`<li>${i}</li>`).join("")}</ul>${ex?`<p class="ex">${ex}</p>`:""}</div>`;
-const SECS=[["flow","Method flowchart","which method, when","#1d4e89"],["sheet","Key formulas","rules on one page","#c2571a"],["ex","Solved examples","step by step, new each time","#2a7a46"],["prac","Practice","MCQ · deck · type","#0f7a6c"],["sets","Practice sets","fixed, printable","#1f4fd1"],["chal","Challenge Lab","advanced, new each time","#6a3d9a"],["frq","FRQs","AP-style, with scoring","#c23a52"],["rel","Released FRQs","official, by unit","#7a5a12"]];
+const SECS=[["flow","Method flowchart","which method, when","#1d4e89"],["sheet","Key formulas","rules on one page","#c2571a"],["ex","Solved examples","step by step, new each time","#2a7a46"],["prac","Practice","MCQ · deck · type","#0f7a6c"],["sets","Practice sets","fixed, printable","#1f4fd1"],["chal","Challenge Lab","hardest, new each time","#6a3d9a"],["frq","FRQs","AP-style, with scoring","#c23a52"],["rel","Released FRQs","official, by unit","#7a5a12"]];
 function unitHTML(u){ const secs=SECS.filter(s=>s[0]!=="flow"||u.flow).filter(s=>s[0]!=="chal"||(u.chal&&u.chal.length)).filter(s=>s[0]!=="frq"||(u.frq&&u.frq.length)).filter(s=>s[0]!=="rel"||relList(u).length).filter(s=>!["ex","prac","sets"].includes(s[0])||(u.gen&&u.gen.length)).filter(s=>s[0]!=="sheet"||(u.sheet&&u.sheet.length));
   const N=secs.length, pos=secs.map((_,i)=>{ const a=-Math.PI/2+2*Math.PI*i/N; return [50+38*Math.cos(a),50+35*Math.sin(a)]; });
   const body=k=>k==="flow"?flowHTML("f-"+u.id,u.flow):k==="ex"?exBox(u.id):k==="prac"?boxHTML(u.id,"sat"):k==="frq"?frqBox(u.id):k==="rel"?relHTML(u):k==="sets"?setsBox(u):k==="sheet"?posterHTML(u):boxHTML(u.id,"chal");
