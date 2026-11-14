@@ -181,9 +181,9 @@ const U6={id:"u6",num:6,short:"Laplace Equation",name:"Unit 6: Laplace's Equatio
 
 const units=[U1,U2,U3,U4,U5,U6];
 const wrap=g=>()=>{ for(let i=0;i<20;i++){ const p=g(); if(p) return p; } return g(); };
-units.forEach(u=>{ ["gen","chal","frq"].forEach(k=>u[k]=(u[k]||[]).map(wrap)); });
+units.forEach(u=>{ ["gen","chal","frq","med","adv"].forEach(k=>u[k]=(u[k]||[]).map(wrap)); });
 units.push({id:"review",num:7,label:"Final review",short:"Final Review",name:"Final Review: Mixed Practice",sub:"Mixed questions and free response from every unit, like a final exam. New each time.",c:"#111",
-  sheet:units.map(u=>[u.c,u.short,u.sheet[0][2],""]),gen:units.flatMap(u=>u.gen),chal:units.flatMap(u=>u.chal),frq:units.flatMap(u=>u.frq)});
+  sheet:units.map(u=>[u.c,u.short,u.sheet[0][2],""]),gen:units.flatMap(u=>u.gen),chal:units.flatMap(u=>u.chal),med:units.flatMap(u=>u.med||[]),adv:units.flatMap(u=>u.adv||[]),frq:units.flatMap(u=>u.frq)});
 units.push({id:"exams",num:0,label:"University exams",short:"University Exams",name:"Real University Exams with Solutions",sub:"Free exams and solutions from MIT 18.303 Linear Partial Differential Equations (MIT OpenCourseWare), matched to the units of this book",c:"#7a5a12",gen:[],chal:[],frq:[],sheet:[["#1d4e89", "MIT 18.303, Fall 2006 (OpenCourseWare)", ["<a href=\"https://ocw.mit.edu/courses/18-303-linear-partial-differential-equations-fall-2006/pages/exams\" target=\"_blank\" rel=\"noopener\">All tests, practice tests and solutions</a>"], "Tests 1–2 and final exam prep, each with full solutions."]]});
 
 window.ZC={units,strands:[["Foundations",NAVY,["u1","u2","u3"]],["The big three",PURP,["u4","u5","u6"]],["Exam prep","#111",["review","exams"]]],mapNote:"An introductory PDE course in order.",frqLead:"Free-response questions in university exam format."};
