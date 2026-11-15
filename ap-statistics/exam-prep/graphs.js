@@ -37,7 +37,7 @@ function box(groups,o){ const W=o.W||360,rowH=o.rowH||46,L=o.L||70,R=W-14,T=10,B
 function dot(values,o){ const W=o.W||360,L=20,R=W-20; const cnt={}; values.forEach(v=>{ const k=Math.round(v/(o.unit||1))*(o.unit||1); cnt[k]=(cnt[k]||0)+1; });
  const mx=Math.max(...Object.values(cnt)), r=o.r||(mx<=4?5.5:4), gap=2*r+1, T=14, B=T+mx*gap+6, H=B+44; const X=v=>L+(v-o.min)/(o.max-o.min)*(R-L); let s="";
  Object.entries(cnt).forEach(([k,c])=>{ for(let j=0;j<c;j++) s+=`<circle cx="${X(+k)}" cy="${B-r-2-j*gap}" r="${r}" fill="${INK}"/>`; });
- if(o.mark!=null) s+=`<line x1="${X(o.mark)}" y1="${T-6}" x2="${X(o.mark)}" y2="${B}" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 3"/><text x="${X(o.mark)+4}" y="${T}" fill="#dc2626" font-weight="700">${o.markLab||""}</text>`;
+ if(o.mark!=null) s+=`<line x1="${X(o.mark)}" y1="${T-6}" x2="${X(o.mark)}" y2="${B}" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 3"/><text x="${X(o.mark)>R-70?X(o.mark)-4:X(o.mark)+4}" text-anchor="${X(o.mark)>R-70?"end":"start"}" y="${T}" fill="#dc2626" font-weight="700">${o.markLab||""}</text>`;
  s+=xaxis(X,B,L,R,{min:o.min,max:o.max,step:o.step,xlab:o.xlab,lab:o.lab}); return frame(W,H,s); }
 
 /* Stemplot (HTML). rows=[[stem,"leaves"],...]; back-to-back if rows=[[leftLeaves,stem,rightLeaves]] */
@@ -82,5 +82,14 @@ function errs(o){ const W=o.W||360,H=210,L=14,R=W-14,T=22,B=H-46; const X=v=>L+(
 /* Normal curve with a shaded region and labels: o={mu,sd,a,b,xmin,xmax,step,xlab} */
 function normal(o){ return errs({m0:o.mu,m1:1e9,sd:o.sd,crit:o.b,xmin:o.xmin,xmax:o.xmax,step:o.step,xlab:o.xlab,lab0:"",lab1:"",critLab:"",regions:[[o.mu,o.a,o.b,"#c7d2fe"]]}); }
 
-window.ZG={hist,box,dot,stem,scatter,resid,segbar,errs,normal};
+
+/* Mosaic plot: bar widths proportional to group size. groups=[{lab,n,parts:[...]}], cats=[...] */
+function mosaic(groups,cats,o){ const W=o&&o.W||360,H=240,L=48,R=W-112,T=12,B=H-44; const fills=["#c7d2fe","#fde68a","#bbf7d0","#fecaca","#e9d5ff"];
+ const tot=groups.reduce((s,g)=>s+g.n,0), gap=4, usable=R-L-gap*(groups.length-1); const Y=v=>B-v*(B-T);
+ let s=yaxis(Y,L,B,T,{ymin:0,ymax:1,ystep:0.2,ylab:(o&&o.ylab)||"Proportion"}); let x=L;
+ groups.forEach(g=>{ const w=usable*g.n/tot; let acc=0; g.parts.forEach((p,j)=>{ s+=`<rect x="${x}" y="${Y(acc+p)}" width="${w}" height="${Y(acc)-Y(acc+p)}" fill="${fills[j]}" stroke="${INK}"/>`; if(p>0.07&&w>34) s+=`<text x="${x+w/2}" y="${(Y(acc)+Y(acc+p))/2+4}" text-anchor="middle" font-size="10.5">${Math.round(p*100)}%</text>`; acc+=p; });
+  s+=`<text x="${x+w/2}" y="${B+15}" text-anchor="middle" font-weight="600" font-size="11">${g.lab}</text>`; x+=w+gap; });
+ cats.slice().reverse().forEach((c,k)=>{ const j=cats.length-1-k; s+=`<rect x="${R+12}" y="${T+k*22}" width="14" height="14" fill="${fills[j]}" stroke="${INK}"/><text x="${R+32}" y="${T+k*22+12}" font-size="11">${c}</text>`; });
+ if(o&&o.xlab) s+=`<text x="${(L+R)/2}" y="${B+32}" text-anchor="middle" font-weight="600">${o.xlab} (bar width ∝ group size)</text>`; return frame(W,H,s); }
+window.ZG={hist,box,dot,stem,scatter,resid,segbar,mosaic,errs,normal};
 })();
