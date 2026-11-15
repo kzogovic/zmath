@@ -28,7 +28,7 @@ function chime(){ try{ unlockAudio(); if(!AC) return; [0,0.35,0.7].forEach((t,i)
 const CALC={rec:["Calculator recommended","cr"],help:["Calculator helpful","chp"],no:["No calculator needed","cn"]};
 const calcTag=c=>c&&CALC[c]?`<span class="ctag ${CALC[c][1]}">${CALC[c][0]}</span>`:"";
 const L=["A","B","C","D"];
-function header(title,timer){ return `<div class="bar"><div class="bt"><b>Test ${T.n}</b> · ${esc(title)}</div>${timer?`<div class="timer" id="timer">--:--</div>`:""}<button class="pill" data-open="ref">Reference sheet</button></div>`; }
+function header(title,timer){ return `<div class="bar"><div class="bt"><b>Test ${T.n}</b><span> · ${esc(title)}</span></div>${timer?`<div class="timer" id="timer">--:--</div>`:""}<button class="pill" data-open="ref">Formulas</button><button class="pill" data-open="calc">Calculators</button></div>`; }
 function remaining(startKey,min){ if(!S.timed) return Infinity; return Math.max(0,min*60-(Date.now()-S[startKey])/1000); }
 const fmt=s=>s===Infinity?"untimed":`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,"0")}`;
 let tick=null;
@@ -38,35 +38,71 @@ function startTick(startKey,min,onEnd){ clearInterval(tick); const run=()=>{ con
 function modal(html,buttons){ const m=document.createElement("div"); m.className="modal"; m.innerHTML=`<div class="mbox">${html}<div class="mbtn">${buttons.map((b,i)=>`<button class="pill ${b.primary?"dark":""}" data-i="${i}">${b.t}</button>`).join("")}</div></div>`; document.body.appendChild(m); m.querySelectorAll("[data-i]").forEach(x=>x.onclick=()=>{ m.remove(); const f=buttons[+x.dataset.i].f; f&&f(); }); }
 
 /* ---------------- reference sheet ---------------- */
+/* MathML helpers for the reference sheet */
+const mi=x=>`<mi>${x}</mi>`, mo=x=>/^[()|]$/.test(x)?`<mo stretchy="false" lspace="0" rspace="0">${x}</mo>`:`<mo>${x}</mo>`, mn=x=>`<mn>${x}</mn>`, row=(...a)=>`<mrow>${a.join("")}</mrow>`;
+const fr=(a,b)=>`<mfrac>${row(a)}${row(b)}</mfrac>`, sq=x=>`<msqrt>${x}</msqrt>`, sb=(a,b)=>`<msub>${row(a)}${row(b)}</msub>`, sp=(a,b)=>`<msup>${row(a)}${row(b)}</msup>`;
+const bar=v=>`<mover accent="true">${mi(v)}<mo>‾</mo></mover>`, hat=v=>`<mover accent="true">${mi(v)}<mo>^</mo></mover>`;
+const M=(...a)=>`<math display="block">${a.join("")}</math>`, Mi=(...a)=>`<math displaystyle="true">${a.join("")}</math>`;
+const P=x=>mo("(")+x+mo(")"), xb=bar("x"), ph=hat("p"), yh=hat("y"), SUM=mo("∑"), PR=x=>mi("P")+P(x);
+const xi=sb(mi("x"),mi("i")), muX=sb(mi("μ"),mi("X")), sgX=sb(mi("σ"),mi("X")), om=row(mn(1),mo("−"),mi("p"));
+function tfig(kind){ /* small shaded-area figures like the official tables */
+ const curve="M5,52 C40,52 55,6 80,6 C105,6 120,52 155,52";
+ const shade=kind==="z"?"M5,52 C40,52 55,6 80,6 C88,6 96,12 104,22 L104,52 Z":kind==="t"?"M110,30 C120,44 135,52 155,52 L110,52 Z":"";
+ if(kind==="c") return `<svg viewBox="0 0 160 58" class="fig"><path d="M5,52 C20,52 30,4 50,10 C75,18 110,50 155,52" fill="none" stroke="#16181d" stroke-width="1.6"/><path d="M100,40 C120,48 135,51 155,52 L100,52 Z" fill="#9ca3af"/><line x1="0" y1="52" x2="160" y2="52" stroke="#16181d"/><text x="100" y="35" font-size="9">p</text></svg>`;
+ return `<svg viewBox="0 0 160 68" class="fig"><path d="${shade}" fill="#9ca3af"/><path d="${curve}" fill="none" stroke="#16181d" stroke-width="1.6"/><line x1="0" y1="52" x2="160" y2="52" stroke="#16181d"/>${kind==="z"?`<line x1="104" y1="52" x2="104" y2="57" stroke="#16181d"/><text x="101" y="66" font-size="9">z</text>`:`<text x="112" y="24" font-size="9">p</text>`}</svg>`; }
 function refHTML(){
- const zrow=z=>`<tr><td>${z.toFixed(1)}</td>${[0,1,2,3,4,5,6,7,8,9].map(h=>{const zz=z<0?z-h/100:z+h/100;return `<td>${Phi(zz).toFixed(4)}</td>`;}).join("")}</tr>`;
- let zt=`<table class="tb"><tr><th>z</th>${[0,1,2,3,4,5,6,7,8,9].map(h=>`<th>.0${h}</th>`).join("")}</tr>`; for(let z=-3.4;z<3.45;z+=0.1){ const zz=Math.round(z*10)/10; zt+=zrow(zz===0&&z<0?-0:zz); } zt+="</table>";
+ const zt=neg=>{ let s=`<table class="tb"><tr><th>z</th>${[0,1,2,3,4,5,6,7,8,9].map(h=>`<th>.0${h}</th>`).join("")}</tr>`;
+  const zs=neg?[...Array(35).keys()].map(k=>-(3.4-k/10)):[...Array(35).keys()].map(k=>k/10);
+  zs.forEach(z0=>{ const z=Math.round(z0*10)/10; s+=`<tr><th>${neg&&z===0?"−0.0":z.toFixed(1).replace("-","−")}</th>${[0,1,2,3,4,5,6,7,8,9].map(h=>{const zz=neg?z-h/100:z+h/100;return `<td>${Phi(zz).toFixed(4)}</td>`;}).join("")}</tr>`; });
+  return s+"</table>"; };
  const tails=[.25,.2,.15,.1,.05,.025,.02,.01,.005,.0025,.001,.0005], dfs=[...Array(30).keys()].map(i=>i+1).concat([40,50,60,80,100,1000]);
- let tt=`<table class="tb"><tr><th>df \\ tail p</th>${tails.map(p=>`<th>${p}</th>`).join("")}</tr>`; dfs.forEach(df=>{ tt+=`<tr><td>${df}</td>${tails.map(p=>`<td>${inv(t=>tcdf(t,df),1-p,0,200).toFixed(3)}</td>`).join("")}</tr>`; });
- tt+=`<tr><td>∞</td>${tails.map(p=>`<td>${inv(Phi,1-p,0,10).toFixed(3)}</td>`).join("")}</tr><tr><th>Confidence level C</th>${tails.map(p=>`<th>${Math.round((1-2*p)*1000)/10}%</th>`).join("")}</tr></table>`;
- const ctails=[.25,.2,.15,.1,.05,.025,.02,.01,.005,.0025,.001,.0005];
- let ct=`<table class="tb"><tr><th>df \\ tail p</th>${ctails.map(p=>`<th>${p}</th>`).join("")}</tr>`; for(let df=1;df<=30;df++){ ct+=`<tr><td>${df}</td>${ctails.map(p=>`<td>${inv(x=>gammp(df/2,x/2),1-p,0,300).toFixed(2)}</td>`).join("")}</tr>`; } ct+="</table>";
- return `<h2>Formulas and Tables</h2><p class="note">Provided on the AP Statistics Exam for both sections (2026–27 course). Tables here are computed to the same precision as the official tables.</p>
- <h3>I. Descriptive Statistics</h3><p>x̄ = Σxᵢ / n &nbsp; · &nbsp; s = √[ Σ(xᵢ − x̄)² / (n − 1) ] &nbsp; · &nbsp; ŷ = a + bx</p>
- <h3>II. Probability and Distributions</h3><p>P(A ∪ B) = P(A) + P(B) − P(A ∩ B) &nbsp; · &nbsp; P(A | B) = P(A ∩ B) / P(B)</p>
- <p>Discrete random variable X: μ<sub>X</sub> = E(X) = Σ xᵢ·P(xᵢ) &nbsp; · &nbsp; σ<sub>X</sub> = √[ Σ(xᵢ − μ<sub>X</sub>)²·P(xᵢ) ]</p>
- <p>Binomial: P(X = x) = C(n, x)·pˣ(1 − p)ⁿ⁻ˣ, x = 0, 1, …, n &nbsp; · &nbsp; μ<sub>X</sub> = np &nbsp; · &nbsp; σ<sub>X</sub> = √[np(1 − p)]</p>
- <h3>III. Sampling Distributions and Inferential Statistics</h3>
- <p>Standardized test statistic = (statistic − parameter) / (standard error of the statistic)</p><p>Confidence interval: statistic ± (critical value)·(standard error of the statistic)</p><p>Chi-square statistic: χ² = Σ (observed − expected)² / expected</p>
- <table class="tb wide"><tr><th>Statistic</th><th>Mean</th><th>Standard deviation</th><th>Standard error</th></tr>
- <tr><td>p̂ (one sample)</td><td>p</td><td>√[p(1 − p)/n]</td><td>√[p̂(1 − p̂)/n]</td></tr>
- <tr><td>p̂₁ − p̂₂</td><td>p₁ − p₂</td><td>√[p₁(1 − p₁)/n₁ + p₂(1 − p₂)/n₂]</td><td>√[p̂₁(1 − p̂₁)/n₁ + p̂₂(1 − p̂₂)/n₂]; if p₁ = p₂ is assumed: √[p̂c(1 − p̂c)(1/n₁ + 1/n₂)], p̂c = (X₁ + X₂)/(n₁ + n₂)</td></tr>
- <tr><td>x̄ (one sample)</td><td>μ</td><td>σ/√n</td><td>s/√n</td></tr>
- <tr><td>x̄₁ − x̄₂</td><td>μ₁ − μ₂</td><td>√(σ₁²/n₁ + σ₂²/n₂)</td><td>√(s₁²/n₁ + s₂²/n₂)</td></tr></table>
- <h3>Table A: Standard normal probabilities (area to the LEFT of z)</h3><div class="tw">${zt}</div>
- <h3>Table B: t-distribution critical values (upper-tail probability p)</h3><div class="tw">${tt}</div>
- <h3>Table C: χ² critical values (upper-tail probability p)</h3><div class="tw">${ct}</div>`; }
-function calcHTML(){ return `<h2>Calculator use</h2><p>A graphing calculator with statistical capabilities is expected for <b>both sections</b> of the real exam. Each question here is tagged <span class="ctag cr">Calculator recommended</span>, <span class="ctag chp">Calculator helpful</span> or <span class="ctag cn">No calculator needed</span>.</p>
- <ul><li><b>Use it for:</b> normal and binomial probabilities, critical values (invNorm, invT), test statistics and p-values (1-PropZTest, 2-PropZTest, T-Test, 2-SampTTest, χ²-Test), intervals (1-PropZInt, TInterval, 2-SampTInt), and regression (LinReg a+bx).</li>
- <li><b>On free-response questions,</b> calculator syntax alone (like normalcdf(…)) does <b>not</b> earn credit. Name the procedure or distribution, give its parameters, and report the result: e.g. “X ~ Binomial(n = 10, p = 0.2); P(X = 2) = 0.302”.</li>
- <li><b>Use enough decimals:</b> keep at least 3–4 decimal places in intermediate steps.</li>
- <li>Commands for TI-84, TI-Nspire and Desmos: <a href="../../distributions/" target="_blank" rel="noopener">Distribution Map &amp; Calculator Commands</a>.</li></ul>`; }
-document.addEventListener("click",e=>{ const b=e.target.closest("[data-open]"); if(!b) return; const k=b.dataset.open; const d=document.createElement("div"); d.className="sheet"; d.innerHTML=`<div class="sbox"><button class="pill dark close">Close ✕</button>${k==="ref"?refHTML():calcHTML()}<button class="pill dark close">Close ✕</button></div>`; document.body.appendChild(d); d.querySelectorAll(".close").forEach(c=>c.onclick=()=>d.remove()); });
+ let tt=`<table class="tb"><tr><th>df</th>${tails.map(p=>`<th>${p}</th>`).join("")}</tr>`; dfs.forEach(df=>{ tt+=`<tr><th>${df}</th>${tails.map(p=>`<td>${inv(t=>tcdf(t,df),1-p,0,200).toFixed(3)}</td>`).join("")}</tr>`; });
+ tt+=`<tr><th>∞</th>${tails.map(p=>`<td>${inv(Phi,1-p,0,10).toFixed(3)}</td>`).join("")}</tr><tr><th>C</th>${tails.map(p=>`<th>${Math.round((1-2*p)*1000)/10}%</th>`).join("")}</tr></table>`;
+ let ct=`<table class="tb"><tr><th>df</th>${tails.map(p=>`<th>${p}</th>`).join("")}</tr>`; [...Array(30).keys()].map(i=>i+1).concat([40,50,60,80,100]).forEach(df=>{ ct+=`<tr><th>${df}</th>${tails.map(p=>`<td>${inv(x=>gammp(df/2,x/2),1-p,0,400).toFixed(2)}</td>`).join("")}</tr>`; }); ct+="</table>";
+ const S1=sb(ph,mn(1)), S2=sb(ph,mn(2)), n1=sb(mi("n"),mn(1)), n2=sb(mi("n"),mn(2)), p1=sb(mi("p"),mn(1)), p2=sb(mi("p"),mn(2)), pc=sb(ph,mi("c"));
+ return `<div class="ref"><h2>Formulas and Tables</h2><p class="note">The formulas and tables provided on both sections of the AP Statistics Exam (2026–27 course). The table values are computed to the same precision as the official tables.</p>
+ <h3>I. Descriptive Statistics</h3><div class="fg">
+  <div class="f">${M(xb,mo("="),fr(row(SUM,xi),mi("n")))}</div>
+  <div class="f">${M(mi("s"),mo("="),sq(fr(row(SUM,sp(P(row(xi,mo("−"),xb)),mn(2))),row(mi("n"),mo("−"),mn(1)))))}</div>
+  <div class="f">${M(yh,mo("="),mi("a"),mo("+"),mi("b"),mi("x"))}</div></div>
+ <h3>II. Probability and Distributions</h3><div class="fg">
+  <div class="f">${M(PR(row(mi("A"),mo("∪"),mi("B"))),mo("="),PR(mi("A")),mo("+"),PR(mi("B")),mo("−"),PR(row(mi("A"),mo("∩"),mi("B"))))}</div>
+  <div class="f">${M(PR(row(mi("A"),mo("|"),mi("B"))),mo("="),fr(PR(row(mi("A"),mo("∩"),mi("B"))),PR(mi("B"))))}</div></div>
+ <div class="cards">
+  <div class="dc"><div class="dh">Discrete random variable X</div><div class="dr"><span>Mean</span>${Mi(muX,mo("="),mi("E"),P(mi("X")),mo("="),SUM,xi,mo("·"),PR(xi))}</div><div class="dr"><span>Standard deviation</span>${Mi(sgX,mo("="),sq(row(SUM,sp(P(row(xi,mo("−"),muX)),mn(2)),mo("·"),PR(xi))))}</div></div>
+  <div class="dc"><div class="dh">Binomial distribution with parameters n and p</div><div class="dr"><span>Probability</span>${Mi(PR(row(mi("X"),mo("="),mi("x"))),mo("="),P(`<mfrac linethickness="0">${row(mi("n"))}${row(mi("x"))}</mfrac>`),sp(mi("p"),mi("x")),sp(P(om),row(mi("n"),mo("−"),mi("x"))))}<div class="note">where x = 0, 1, 2, 3, …, n</div></div><div class="dr"><span>Mean</span>${Mi(muX,mo("="),mi("n"),mi("p"))}</div><div class="dr"><span>Standard deviation</span>${Mi(sgX,mo("="),sq(row(mi("n"),mi("p"),P(om))))}</div></div></div>
+ <h3>III. Sampling Distributions and Inferential Statistics</h3><div class="fg">
+  <div class="f"><div class="fl">Standardized test statistic</div>${M(fr(row(mi("statistic"),mo("−"),mi("parameter")),row(mi("standard error of statistic"))))}</div>
+  <div class="f sm"><div class="fl">Confidence interval</div>${M(mi("statistic"),mo("±"),P(mi("critical value")),P(mi("standard error of statistic")))}</div>
+  <div class="f"><div class="fl">Chi-square statistic</div>${M(sp(mi("χ"),mn(2)),mo("="),SUM,fr(sp(P(row(mi("observed"),mo("−"),mi("expected"))),mn(2)),mi("expected")))}</div></div>
+ <p class="note">Sampling distributions of statistics:</p><div class="cards"><div class="dc"><div class="dh">Statistic: ${Mi(ph)} (one sample)</div><div class="dr"><span>Mean</span>${Mi(mi("p"))}</div><div class="dr"><span>Standard deviation</span>${Mi(sq(fr(row(mi("p"),P(om)),mi("n"))))}</div><div class="dr"><span>Standard error*</span>${Mi(sq(fr(row(ph,P(row(mn(1),mo("−"),ph))),mi("n"))))}</div></div><div class="dc"><div class="dh">Statistic: ${Mi(S1,mo("−"),S2)}</div><div class="dr"><span>Mean</span>${Mi(p1,mo("−"),p2)}</div><div class="dr"><span>Standard deviation</span>${Mi(sq(row(fr(row(p1,P(row(mn(1),mo("−"),p1))),n1),mo("+"),fr(row(p2,P(row(mn(1),mo("−"),p2))),n2))))}</div><div class="dr"><span>Standard error*</span>${Mi(sq(row(fr(row(S1,P(row(mn(1),mo("−"),S1))),n1),mo("+"),fr(row(S2,P(row(mn(1),mo("−"),S2))),n2))))}<div class="note">If p₁ = p₂ is assumed:</div>${Mi(sq(row(pc,P(row(mn(1),mo("−"),pc)),P(row(fr(mn(1),n1),mo("+"),fr(mn(1),n2))))))}<div class="note">where</div>${Mi(pc,mo("="),fr(row(sb(mi("X"),mn(1)),mo("+"),sb(mi("X"),mn(2))),row(n1,mo("+"),n2)))}</div></div><div class="dc"><div class="dh">Statistic: ${Mi(xb)} (one sample)</div><div class="dr"><span>Mean</span>${Mi(mi("μ"))}</div><div class="dr"><span>Standard deviation</span>${Mi(fr(mi("σ"),sq(mi("n"))))}</div><div class="dr"><span>Standard error*</span>${Mi(fr(mi("s"),sq(mi("n"))))}</div></div><div class="dc"><div class="dh">Statistic: ${Mi(sb(xb,mn(1)),mo("−"),sb(xb,mn(2)))}</div><div class="dr"><span>Mean</span>${Mi(sb(mi("μ"),mn(1)),mo("−"),sb(mi("μ"),mn(2)))}</div><div class="dr"><span>Standard deviation</span>${Mi(sq(row(fr(sp(sb(mi("σ"),mn(1)),mn(2)),n1),mo("+"),fr(sp(sb(mi("σ"),mn(2)),mn(2)),n2))))}</div><div class="dr"><span>Standard error*</span>${Mi(sq(row(fr(sp(sb(mi("s"),mn(1)),mn(2)),n1),mo("+"),fr(sp(sb(mi("s"),mn(2)),mn(2)),n2))))}</div></div></div>
+ <p class="note">*Standard deviation is a measurement of variability from the theoretical population. Standard error is the estimate of the standard deviation. If the standard deviation of the statistic is assumed to be known, then the standard deviation should be used instead of the standard error.</p>
+ <h3>Table A: Standard normal probabilities</h3><div class="th">${tfig("z")}<p>Table entry for z is the probability lying <b>below</b> z.</p></div>
+ <div class="tabs"><button class="pill dark" data-zt="n">Negative z</button><button class="pill" data-zt="p">Positive z</button></div>
+ <div class="tw" data-ztab="n">${zt(true)}</div><div class="tw" data-ztab="p" hidden>${zt(false)}</div>
+ <h3>Table B: t distribution critical values</h3><div class="th">${tfig("t")}<p>Table entry for p and C is the point t* with probability p lying <b>above</b> it and probability C lying between −t* and t*.</p></div><p class="note">Columns: upper-tail probability p. Bottom row: confidence level C.</p><div class="tw">${tt}</div>
+ <h3>Table C: χ² critical values</h3><div class="th">${tfig("c")}<p>Table entry for p is the point χ² with probability p lying <b>above</b> it.</p></div><p class="note">Columns: upper-tail probability p.</p><div class="tw">${ct}</div><div class="row"><button class="pill dark" data-open="calc">Approved calculators &amp; calculator policy →</button></div></div>`; }
+function calcHTML(){ return `<div class="ref"><h2>Calculators for the AP Statistics Exam</h2>
+ <div class="card"><h3>College Board policy for May 2027</h3><ul>
+ <li>A <b>graphing calculator with statistical capabilities</b> is <b>expected</b> on both Section I and Section II.</li>
+ <li>Students may use an <b>approved handheld graphing calculator</b> and/or the <b>Desmos graphing calculator built into Bluebook</b>. Only the Bluebook version of Desmos is allowed during the exam, not the website or app.</li>
+ <li><b>New for 2027:</b> nongraphing (scientific) calculators are <b>not allowed</b> on AP Statistics, even ones with statistics functions.</li>
+ <li>Only models on the list below may be used; the proctor checks calculators before the exam. Any model within a listed series is acceptable.</li></ul>
+ <p class="note">Source: College Board, AP Exams Calculator Policy (<a href="https://apstudents.collegeboard.org/exam-policies-guidelines/calculator-policies" target="_blank" rel="noopener">apstudents.collegeboard.org</a>). The list is updated during the year, so check it again before exam day.</p></div>
+ <h3>Approved handheld graphing calculators</h3><div class="cards calc">
+ <div class="dc"><div class="dh">Texas Instruments</div><ul><li>TI-73</li><li>TI-80</li><li>TI-81</li><li>TI-82</li><li>TI-83 / TI-83 Plus</li><li>TI-83 Plus Silver</li><li>TI-84 Plus / TI-84 Plus CE</li><li>TI-84 Plus CE Python</li><li>TI-84 Plus Silver</li><li>TI-84 Plus C Silver</li><li>TI-84 Plus T</li><li>TI-84 Plus CE-T</li><li>TI-84 Plus CE-T Python Edition</li><li>TI-84 Evo (new)</li><li>TI-84 Evo-T (new)</li><li>TI-85</li><li>TI-86</li><li>TI-89</li><li>TI-89 Titanium</li><li>TI-Nspire / TI-Nspire CX</li><li>TI-Nspire CX II</li><li>TI-Nspire CX II-T</li><li>TI-Nspire CAS</li><li>TI-Nspire CX CAS</li><li>TI-Nspire CM-C</li><li>TI-Nspire CM-C CAS</li><li>TI-Nspire CX-C CAS</li><li>TI-Nspire CX II CAS</li><li>TI-Nspire CX II-T CAS</li><li>TI-Nspire CX II-C CAS</li></ul></div>
+ <div class="dc"><div class="dh">Casio</div><ul><li>FX-6000 Series</li><li>FX-6200 Series</li><li>FX-6300 Series</li><li>FX-6500 Series</li><li>FX-7000 Series</li><li>FX-7300 Series</li><li>FX-7400 Series</li><li>FX-7500 Series</li><li>FX-7700 Series</li><li>FX-7800 Series</li><li>FX-8000 Series</li><li>FX-8500 Series</li><li>FX-8700 Series</li><li>FX-8800 Series</li><li>Graph25 Series</li><li>FX-9700 Series</li><li>FX-9750 Series</li><li>FX-9860 Series</li><li>CFX-9800 Series</li><li>CFX-9850 Series</li><li>CFX-9950 Series</li><li>CFX-9970 Series</li><li>FX 1.0 Series</li><li>Algebra FX 2.0 Series</li><li>FX-CG-10</li><li>FX-CG-20 Series</li><li>FX-CG-50</li><li>Graph35 Series</li><li>Graph75 Series</li><li>Graph95 Series</li><li>Graph100 Series</li><li>FX-CG500 (stylus not permitted)</li><li>FX-CG-100</li></ul></div>
+ <div class="dc"><div class="dh">Hewlett-Packard</div><ul><li>HP-9G</li><li>HP-28 Series</li><li>HP-38G</li><li>HP-39 Series</li><li>HP-40 Series</li><li>HP-48 Series</li><li>HP-49 Series</li><li>HP-50 Series</li><li>HP Prime</li></ul></div>
+ <div class="dc"><div class="dh">Sharp</div><ul><li>EL-5200</li><li>EL-9200 Series</li><li>EL-9300 Series</li><li>EL-9600 Series (stylus not permitted)</li><li>EL-9900 Series</li></ul></div>
+ <div class="dc"><div class="dh">Radio Shack</div><ul><li>EC-4033</li><li>EC-4034</li><li>EC-4037</li></ul></div>
+ <div class="dc"><div class="dh">Other</div><ul><li>Datexx DS-883</li><li>Micronta</li><li>NumWorks</li><li>Smart2</li><li>Zero ZGC4 (new)</li></ul></div></div>
+ <h3>Not allowed</h3><ul><li>Phones, smartwatches, smart glasses or other wearables; laptops, tablets or electronic writing pads</li><li>QWERTY-keypad models (e.g., TI-92 Plus, Voyage 200); pen/stylus models (e.g., Casio ClassPad)</li><li>Models with wireless, Bluetooth, cellular or internet access, a camera or scanning, audio/video recording, a paper tape, or that need an outlet or make noise</li><li>Touch-screen models not on the approved list; peripherals such as a stylus, keyboard or wireless adapter</li></ul>
+ <p class="note">Exceptions only with an accommodation approved by the College Board SSD Office.</p>
+ <h3>Tips for this practice exam</h3><ul><li>Each question is tagged <span class="ctag cr">Calculator recommended</span>, <span class="ctag chp">Calculator helpful</span> or <span class="ctag cn">No calculator needed</span>.</li>
+ <li><b>Use it for:</b> normal and binomial probabilities, critical values (invNorm, invT), test statistics and p-values (1-PropZTest, 2-PropZTest, T-Test, 2-SampTTest, χ²-Test), intervals (1-PropZInt, TInterval, 2-SampTInt) and regression (LinReg a+bx).</li>
+ <li><b>On free-response questions,</b> calculator syntax alone (like normalcdf(…)) does <b>not</b> earn credit. Name the distribution or procedure, give its parameters and report the result: e.g., “X ~ Binomial(n = 10, p = 0.2); P(X = 2) = 0.302”.</li>
+ <li>Commands for TI-84, TI-Nspire and Desmos: <a href="../../distributions/" target="_blank" rel="noopener">Distribution Map &amp; Calculator Commands</a>.</li></ul></div>`; }
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-open]"); if(!b) return; const k=b.dataset.open; document.querySelectorAll(".sheet").forEach(x=>x.remove()); const d=document.createElement("div"); d.className="sheet"; d.innerHTML=`<div class="sbox"><button class="pill dark close">Close ✕</button>${k==="ref"?refHTML():calcHTML()}<button class="pill dark close">Close ✕</button></div>`; document.body.appendChild(d); d.querySelectorAll(".close").forEach(c=>c.onclick=()=>d.remove()); d.querySelectorAll("[data-zt]").forEach(b=>b.onclick=()=>{ d.querySelectorAll("[data-zt]").forEach(x=>x.classList.toggle("dark",x===b)); d.querySelectorAll("[data-ztab]").forEach(t=>t.hidden=t.dataset.ztab!==b.dataset.zt); }); });
 
 /* ---------------- intro ---------------- */
 function intro(){
@@ -76,7 +112,7 @@ function intro(){
  <div class="card"><h3>How it works</h3><ol><li>Section I: 90 minutes. A chime sounds when time is up.</li><li>5-minute break, then a chime.</li><li>Section II: 90 minutes, then a chime and automatic submission.</li><li>After you submit you see: your multiple-choice score with an explanation for every question; each free-response answer next to the official-style rubric, with mistakes the page caught highlighted; then you score yourself point by point; and your predicted AP score.</li></ol>
  <p class="note">Predicted AP score: 91–100% → 5 · 70–90% → 4 · 50–69% → 3 · 30–49% → 2 · below 30% → 1. Sections count equally.</p>
  <p>Your answers save on this device as you go, so you can close the page and come back.</p>
- <div class="row"><button class="pill" data-open="ref">Reference sheet (formulas &amp; tables)</button><button class="pill" data-open="calc">Calculator advice</button></div></div>
+ <div class="row"><button class="pill" data-open="ref">Reference sheet (formulas &amp; tables)</button><button class="pill" data-open="calc">Approved calculators</button></div></div>
  <div class="card"><label class="lab">Your name (appears on your results page)<input id="nm" value="${esc(S.name)}" placeholder="First and last name"></label>
  <label class="chk"><input type="checkbox" id="tm" ${S.timed?"checked":""}> Timed, like the real exam (recommended)</label>
  <p class="note">Turn your sound on so you hear the chimes.</p><button class="pill dark big" id="go">Start Section I</button></div></div>`;
