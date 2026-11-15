@@ -67,3 +67,12 @@ details summary{cursor:pointer;font-weight:600;color:#1d4ed8;margin:6px 0}.model
 .f.sm math{font-size:.82em}.calc ul{margin:6px 0;padding-left:30px;font-size:.9rem}.calc .dc{align-self:start}
 .calc ul{columns:2;column-gap:18px}.calc li{break-inside:avoid}
 @media(max-width:640px){.bar .bt{font-size:.78rem;line-height:1.25}.bar .bt span{display:none}.bar .pill{padding:5px 8px;font-size:.75rem}}
+.awaywarn{position:fixed;left:10px;right:10px;bottom:14px;z-index:40;background:#b91c1c;color:#fff;font-weight:600;border-radius:12px;padding:12px 14px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.rules{background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:10px 12px;margin:10px 0}.rules ul{margin:6px 0;padding-left:20px}
+.integ{border-radius:12px;padding:10px 14px;margin:12px 0}.integ.ok{background:#f0fdf4;border:1.5px solid #86efac}.integ.flag{background:#fef2f2;border:1.5px solid #fca5a5}.integ h3{margin:.2em 0}
+.qt,.stem,.chs,.pq{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.zg{width:100%;max-width:440px;display:block;margin:8px auto;background:#fff}
+.gpair{display:grid;grid-template-columns:1fr 1fr;gap:6px}@media(max-width:560px){.gpair{grid-template-columns:1fr}}
+.stemp{border-collapse:collapse;margin:8px auto;font:15px ui-monospace,Menlo,monospace}.stemp td{padding:1px 6px}.stemp .st{border-left:2px solid #16181d;border-right:2px solid #16181d;text-align:center;font-weight:700}.stemp td.st:first-child{border-left:none}.stemp .l{text-align:right}.stemp th{font:600 .8rem system-ui;padding:2px 8px}.skey{text-align:center;font-size:.85rem;color:#555}
+.out{font:14px ui-monospace,Menlo,monospace;border-collapse:collapse;margin:8px auto}.out td,.out th{border:1px solid #d6d1c4;padding:3px 10px;text-align:right}.out th{background:#f1efe9}
+.stemp{font-size:13px;white-space:nowrap}.stemp td{white-space:nowrap;padding:1px 4px}

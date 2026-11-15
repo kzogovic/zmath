@@ -7,6 +7,7 @@ const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelect
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 let S; try{ S=JSON.parse(localStorage.getItem(KEY))||null; }catch(e){ S=null; }
 if(!S) S={phase:"intro",name:"",timed:true,mcAns:{},flag:{},fr:{},self:{},cur:0};
+S.away=S.away||[]; S.paste=S.paste||0; S.fsx=S.fsx||0;
 const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} };
 const app=$("#app");
 
@@ -104,6 +105,27 @@ function calcHTML(){ return `<div class="ref"><h2>Calculators for the AP Statist
  <li>Commands for TI-84, TI-Nspire and Desmos: <a href="../../distributions/" target="_blank" rel="noopener">Distribution Map &amp; Calculator Commands</a>.</li></ul></div>`; }
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-open]"); if(!b) return; const k=b.dataset.open; document.querySelectorAll(".sheet").forEach(x=>x.remove()); const d=document.createElement("div"); d.className="sheet"; d.innerHTML=`<div class="sbox"><button class="pill dark close">Close ✕</button>${k==="ref"?refHTML():calcHTML()}<button class="pill dark close">Close ✕</button></div>`; document.body.appendChild(d); d.querySelectorAll(".close").forEach(c=>c.onclick=()=>d.remove()); d.querySelectorAll("[data-zt]").forEach(b=>b.onclick=()=>{ d.querySelectorAll("[data-zt]").forEach(x=>x.classList.toggle("dark",x===b)); d.querySelectorAll("[data-ztab]").forEach(t=>t.hidden=t.dataset.ztab!==b.dataset.zt); }); });
 
+
+/* ---------------- integrity monitor ---------------- */
+const live=()=>S.phase==="mc"||S.phase==="frq";
+let awayAt=null;
+function goneAway(){ if(!live()||awayAt) return; awayAt=Date.now(); }
+function cameBack(){ if(!awayAt) return; const d=Math.round((Date.now()-awayAt)/1000); if(d>=1){ S.away.push({t:awayAt,d,ph:S.phase}); save(); showWarn(d); } awayAt=null; }
+document.addEventListener("visibilitychange",()=>document.hidden?goneAway():cameBack());
+window.addEventListener("blur",goneAway); window.addEventListener("focus",cameBack); window.addEventListener("pagehide",goneAway);
+function showWarn(d){ const w=document.createElement("div"); w.className="awaywarn"; w.innerHTML=`⚠ You left the test for ${d} s. This has been recorded and will appear on your results page.`; document.body.appendChild(w); setTimeout(()=>w.remove(),5000); }
+["copy","cut","contextmenu","dragstart"].forEach(ev=>document.addEventListener(ev,e=>{ if(live()&&!e.target.closest("textarea")) e.preventDefault(); }));
+document.addEventListener("paste",e=>{ if(live()&&e.target.closest("textarea")){ e.preventDefault(); S.paste++; save(); const w=document.createElement("div"); w.className="awaywarn"; w.textContent="⚠ Pasting is turned off during the test. The attempt was recorded."; document.body.appendChild(w); setTimeout(()=>w.remove(),4000); } });
+function goFull(){ try{ const el=document.documentElement; (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); }catch(e){} }
+document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElement&&live()){ S.fsx++; save(); } });
+function integrityHTML(){ const a=S.away, tot=a.reduce((x,y)=>x+y.d,0), byPh=ph=>a.filter(x=>x.ph===ph);
+ const fmtd=d=>d>=60?`${Math.floor(d/60)} min ${d%60} s`:`${d} s`;
+ const clean=!a.length&&!S.paste;
+ return `<div class="integ ${clean?"ok":"flag"}"><h3>${clean?"✓ Test integrity: no time away from the test recorded":"⚠ Test integrity report"}</h3>
+ ${clean?"<p>The student stayed on the test page for the whole exam and made no paste attempts.</p>":`<p><b>Left the test ${a.length} time${a.length===1?"":"s"}, ${fmtd(tot)} in total</b> (Section I: ${byPh("mc").length}×, ${fmtd(byPh("mc").reduce((x,y)=>x+y.d,0))}; Section II: ${byPh("frq").length}×, ${fmtd(byPh("frq").reduce((x,y)=>x+y.d,0))}). Paste attempts: ${S.paste}. Exits from full screen: ${S.fsx}.</p>
+ ${a.length?`<details><summary>Show each time away</summary><ul>${a.map(x=>`<li>${new Date(x.t).toLocaleTimeString()}: ${fmtd(x.d)} (${x.ph==="mc"?"Section I":"Section II"})</li>`).join("")}</ul></details>`:""}`}
+ <p class="note">“Time away” means the test page was hidden or lost focus: another app, tab, notification or call was opened.</p></div>`; }
+
 /* ---------------- intro ---------------- */
 function intro(){
  app.innerHTML=`<div class="wrap"><p class="kick">Z-AP Statistics · Exam Prep</p><h1>Practice Exam ${T.n}</h1><p class="lead">${esc(T.title||"Full-length practice exam")} · Based on the 2026–27 AP Statistics Course and Exam Description</p>
@@ -115,8 +137,9 @@ function intro(){
  <div class="row"><button class="pill" data-open="ref">Reference sheet (formulas &amp; tables)</button><button class="pill" data-open="calc">Approved calculators</button></div></div>
  <div class="card"><label class="lab">Your name (appears on your results page)<input id="nm" value="${esc(S.name)}" placeholder="First and last name"></label>
  <label class="chk"><input type="checkbox" id="tm" ${S.timed?"checked":""}> Timed, like the real exam (recommended)</label>
+ <div class="rules"><b>Test rules</b><ul><li>Stay on this page for the whole test. Every time you switch apps or tabs, or a call or notification takes you away, it is <b>recorded with the time and length</b>, and it appears on the results page your teacher sees.</li><li>Copying questions and pasting answers are turned off.</li><li>The test opens in full screen when possible. Turn on <b>Do Not Disturb</b> before you start.</li><li>Use only an approved graphing calculator and the reference sheet.</li></ul><label class="chk"><input type="checkbox" id="agree"> I will follow these rules and do my own work.</label></div>
  <p class="note">Turn your sound on so you hear the chimes.</p><button class="pill dark big" id="go">Start Section I</button></div></div>`;
- $("#go").onclick=()=>{ unlockAudio(); S.name=$("#nm").value.trim(); S.timed=$("#tm").checked; S.phase="mc"; S.mcStart=Date.now(); S.cur=0; save(); render(); };
+ $("#go").onclick=()=>{ if(!$("#agree").checked){ modal("<h3>Please read the test rules</h3><p>Tick the box to agree to the test rules before you start.</p>",[{t:"OK",primary:1}]); return; } if(!$("#nm").value.trim()){ modal("<h3>Enter your name</h3><p>Your name appears on your results page.</p>",[{t:"OK",primary:1}]); return; } goFull(); unlockAudio(); S.name=$("#nm").value.trim(); S.timed=$("#tm").checked; S.phase="mc"; S.mcStart=Date.now(); S.cur=0; save(); render(); };
 }
 
 /* ---------------- Section I ---------------- */
@@ -143,7 +166,7 @@ function endMC(){ S.phase="brk"; S.brStart=Date.now(); save(); render(); }
 /* ---------------- break ---------------- */
 function brk(){
  app.innerHTML=`${header("Break",true)}<div class="wrap center"><h1>Section I is complete</h1><p class="lead">Take a 5-minute break. A chime will sound when it's over.</p><p>Section II has 4 free-response questions in 90 minutes, about 22 minutes each. Show all your work and explain your reasoning in context.</p><button class="pill dark big" id="go">Start Section II now</button></div>`;
- $("#go").onclick=()=>{ unlockAudio(); startFR(); };
+ $("#go").onclick=()=>{ goFull(); unlockAudio(); startFR(); };
  if(S.timed) startTick("brStart",BR_MIN,startFR); else { const el=$("#timer"); if(el) el.textContent="untimed"; }
 }
 function startFR(){ S.phase="frq"; S.frStart=Date.now(); S.fcur=0; save(); render(); }
@@ -155,7 +178,7 @@ function frq(){
  app.innerHTML=`${header("Section II: Free Response",true)}<div class="wrap">
  <div class="qnav">${F.map((x,k)=>`<button class="qn wide${k===i?" on":""}" data-f="${k}">Q${k+1}</button>`).join("")}</div>
  <div class="q"><div class="qh"><b>Question ${i+1}</b> · ${esc(f.type)} · 10 points ${calcTag(f.calc)}</div><div class="qt">${f.stem}</div>
- ${f.parts.map(p=>`<div class="part"><div class="pq"><b>(${p.id})</b> ${p.q}</div><div class="sym" data-for="${f.id}-${p.id}">${SYM.map(s=>`<button type="button" data-s="${s}">${s}</button>`).join("")}</div><textarea data-k="${f.id}-${p.id}" rows="5" placeholder="Type your answer. Show work and explain in context.">${esc(S.fr[f.id+"-"+p.id]||"")}</textarea></div>`).join("")}
+ ${f.parts.map(p=>`<div class="part"><div class="pq"><b>(${p.id})</b> ${p.q}</div><div class="sym" data-for="${f.id}-${p.id}">${SYM.map(s=>`<button type="button" data-s="${s}">${s}</button>`).join("")}</div><textarea autocomplete="off" autocorrect="off" spellcheck="false" data-k="${f.id}-${p.id}" rows="5" placeholder="Type your answer. Show work and explain in context.">${esc(S.fr[f.id+"-"+p.id]||"")}</textarea></div>`).join("")}
  <div class="row sp"><button class="pill" id="pv" ${i===0?"disabled":""}>← Previous question</button><button class="pill dark" id="nx">${i===F.length-1?"Submit test":"Next question →"}</button></div></div></div>`;
  $$("textarea").forEach(t=>t.oninput=()=>{ S.fr[t.dataset.k]=t.value; save(); });
  let last=null; $$("textarea").forEach(t=>t.onfocus=()=>last=t);
@@ -185,6 +208,7 @@ function done(){
  <div class="score"><div><span>Multiple choice</span><b>${mcRight} / ${Q.length}</b></div><div><span>Free response (self-scored)</span><b id="frs">${frPts} / 40</b></div><div><span>Composite</span><b id="pc">${pct}%</b></div><div class="ap"><span>Predicted AP score</span><b id="ap">${ap}</b></div></div>
  <p class="note">Composite = (MC correct ÷ 42) × 50 + (FRQ points ÷ 40) × 50. Predicted score: 91–100% → 5 · 70–90% → 4 · 50–69% → 3 · 30–49% → 2 · below 30% → 1. Score the free-response section below to finish your composite.</p>
  <div class="row"><button class="pill dark" onclick="window.print()">Print / save as PDF for your teacher</button><button class="pill" data-open="ref">Reference sheet</button></div>
+ ${integrityHTML()}
  <h2>Multiple choice by unit</h2><table class="tb wide"><tr><th>Unit</th><th>Correct</th></tr>${Object.entries(byUnit).sort().map(([u,[a,b]])=>`<tr><td>${u}: ${esc(T.units[u.slice(5)]||"")}</td><td>${a} / ${b}</td></tr>`).join("")}</table>
  <h2>Section II: score yourself, point by point</h2><p>For each point, read <b>what earns it</b> and <b>what does not</b>, compare with your answer, and tick the box only if your answer meets the standard exactly. Points marked <span class="bad">✕ Not earned</span> were caught automatically (for example s instead of σ, a sample statistic in a hypothesis, “accept H₀”, a missing population): they stay at 0.</p>
  ${F.map(f=>`<div class="fr"><h3>Question ${f.id}: ${esc(f.title)} <span class="fq" data-fq="${f.id}">0 / 10</span></h3><details><summary>Show the question</summary><div class="qt">${f.stem}</div></details>
