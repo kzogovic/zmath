@@ -19,7 +19,7 @@ window.ZF_COURSES = {
 };
 
 window.ZF_TOPICS = [
-{id:"ml", name:"Machine Learning", icon:"📈", color:"#1f5fa8",
+{id:"ml",langs:["python", "sql", "r"], name:"Machine Learning", icon:"📈", color:"#1f5fa8",
  hook:"Teaching computers to find patterns in data and make predictions.",
  what:"Instead of writing every rule by hand, you show the computer thousands of examples. The computer adjusts the numbers inside a model until its predictions match the examples as closely as possible. Spam filters, movie suggestions and face unlock all work this way. A regression line from AP Statistics is already a tiny machine-learning model.",
  see:["Spam filters and fraud alerts","Music, video and shopping recommendations","Medical images checked for disease","Weather, traffic and sales forecasts","Self-driving cars recognizing stop signs"],
@@ -51,7 +51,7 @@ window.ZF_TOPICS = [
   {k:"journal",l:3,t:"arXiv: Machine Learning (cs.LG)",u:"https://arxiv.org/list/cs.LG/recent",d:"Where new ML research appears first, every day, free."}
  ]},
 
-{id:"ai", name:"Neural Networks & AI", icon:"🧠", color:"#6b3fa0",
+{id:"ai",langs:["python", "cpp"], name:"Neural Networks & AI", icon:"🧠", color:"#6b3fa0",
  hook:"Layers of simple math units that, together, recognize images, translate languages and write text.",
  what:"A neural network is built from “neurons”. Each neuron multiplies its inputs by weights, adds them up and passes the result through a simple function. Stack millions or billions of these in layers, train them with gradient descent and the chain rule (called backpropagation), and you get chatbots, image generators and voice assistants. The math inside is mostly linear algebra, calculus and probability.",
  see:["Chatbots and large language models","Image and video generators","Voice assistants and live captions","Language translation","Protein-structure prediction for new medicines"],
@@ -85,7 +85,7 @@ window.ZF_TOPICS = [
   {k:"journal",l:3,t:"arXiv: Artificial Intelligence (cs.AI)",u:"https://arxiv.org/list/cs.AI/recent",d:"New AI papers every day."}
  ]},
 
-{id:"game", name:"Game Theory", icon:"♟️", color:"#b03a2e",
+{id:"game",langs:["python", "java"], name:"Game Theory", icon:"♟️", color:"#b03a2e",
  hook:"The math of strategy: what to do when your best move depends on what everyone else does.",
  what:"Game theory models players, their choices and their payoffs. A Nash equilibrium is a set of choices where nobody can do better by changing only their own move. It explains why people cooperate or cheat, how auctions should be designed, how to take a penalty kick, and how evolution can produce cooperation. Two Nobel Prizes in economics (1994 and 2012) went to game theory.",
  see:["Online ad auctions behind every web search","Matching students to schools and kidney donors to patients","Penalty kicks, pitch choice and play calling","Traffic jams and Braess's paradox","Cooperation in biology and evolution","AI that plays poker and Go"],
@@ -112,11 +112,11 @@ window.ZF_TOPICS = [
   {k:"book",l:2,t:"The Evolution of Cooperation",by:"Robert Axelrod",d:"The computer tournaments that showed why “copycat” (tit-for-tat) does so well."},
   {k:"read",l:1,t:"The 2012 Nobel Prize: Stable matching",by:"NobelPrize.org",u:"https://www.nobelprize.org/prizes/economic-sciences/2012/popular-information/",d:"How math matches students to schools and donors to patients, explained for everyone."},
   {k:"read",l:1,t:"The 1994 Nobel Prize: John Nash and game theory",by:"NobelPrize.org",u:"https://www.nobelprize.org/prizes/economic-sciences/1994/summary/",d:"The prize for Nash, Harsanyi and Selten."},
-  {k:"journal",l:3,t:"Games and Economic Behavior",u:"https://www.sciencedirect.com/journal/games-and-economic-behavior",d:"A leading game-theory research journal."},
-  {k:"journal",l:3,t:"International Journal of Game Theory",u:"https://link.springer.com/journal/182",d:"Research journal of the Game Theory Society."}
+  {k:"journal",l:3,t:"Games and Economic Behavior",u:"https://www.sciencedirect.com/journal/games-and-economic-behavior",paid:1,d:"A leading game-theory research journal."},
+  {k:"journal",l:3,t:"International Journal of Game Theory",u:"https://link.springer.com/journal/182",paid:1,d:"Research journal of the Game Theory Society."}
  ]},
 
-{id:"data", name:"Data Science & Bayesian Thinking", icon:"🔍", color:"#0f7c7a",
+{id:"data",langs:["python", "r", "sql"], name:"Data Science & Bayesian Thinking", icon:"🔍", color:"#0f7c7a",
  hook:"Turning messy real data into honest answers, and updating what you believe when new evidence arrives.",
  what:"Data science combines statistics, programming and good questions. Bayesian thinking adds one powerful idea: start with a belief, look at the evidence, and update with Bayes' theorem. It explains why a positive test for a rare disease is often a false alarm, and it powers polling, sports analytics and the A/B tests behind every app.",
  see:["Reading medical test results correctly","Election polls and forecasts","Sports analytics and scouting","A/B tests of app and website designs","Public-health dashboards"],
@@ -142,11 +142,11 @@ window.ZF_TOPICS = [
   {k:"free",l:3,t:"Statistics 110: Probability",by:"Joe Blitzstein, Harvard",u:"https://stat110.net",d:"Harvard's famous probability course: free lectures, notes and problems."},
   {k:"book",l:1,t:"The Art of Statistics",by:"David Spiegelhalter",d:"How to learn from data, told through real stories."},
   {k:"book",l:1,t:"How Not to Be Wrong",by:"Jordan Ellenberg",d:"Mathematical thinking applied to lotteries, elections, health and more."},
-  {k:"journal",l:2,t:"CHANCE magazine",by:"American Statistical Association",u:"https://chance.amstat.org",d:"Statistics stories for a general audience."},
+  {k:"journal",l:2,t:"CHANCE magazine",by:"American Statistical Association",u:"https://chance.amstat.org",paid:1,d:"Statistics stories for a general audience."},
   {k:"journal",l:3,t:"arXiv: Statistics",u:"https://arxiv.org/archive/stat",d:"New statistics research, free."}
  ]},
 
-{id:"crypto", name:"Cryptography & Cybersecurity", icon:"🔐", color:"#7a5a12",
+{id:"crypto",langs:["python", "c", "rust"], name:"Cryptography & Cybersecurity", icon:"🔐", color:"#7a5a12",
  hook:"The math that keeps your messages, passwords and money safe.",
  what:"Modern cryptography uses problems that are easy in one direction but very hard to undo. Multiplying two huge prime numbers takes a computer a split second; factoring the product back could take longer than the age of the universe. RSA, digital signatures and the lock icon in your browser are built on modular arithmetic and prime numbers.",
  see:["The HTTPS lock in your browser","End-to-end encrypted messaging","Passwords stored as hashes","Digital signatures on software updates","Bank cards and contactless pay","New “quantum-safe” encryption"],
@@ -172,10 +172,10 @@ window.ZF_TOPICS = [
   {k:"book",l:3,t:"Serious Cryptography",by:"Jean-Philippe Aumasson",d:"A practical introduction to modern encryption."},
   {k:"read",l:2,t:"Post-Quantum Cryptography project",by:"NIST",u:"https://csrc.nist.gov/projects/post-quantum-cryptography",d:"The official U.S. effort to replace RSA before quantum computers can break it."},
   {k:"journal",l:3,t:"IACR Cryptology ePrint Archive",u:"https://eprint.iacr.org",d:"Where cryptographers post new research, free."},
-  {k:"journal",l:3,t:"Journal of Cryptology",u:"https://link.springer.com/journal/145",d:"The research journal of the International Association for Cryptologic Research."}
+  {k:"journal",l:3,t:"Journal of Cryptology",u:"https://link.springer.com/journal/145",paid:1,d:"The research journal of the International Association for Cryptologic Research."}
  ]},
 
-{id:"opt", name:"Optimization & Operations Research", icon:"🎯", color:"#2a7a46",
+{id:"opt",langs:["python", "julia", "cpp"], name:"Optimization & Operations Research", icon:"🎯", color:"#2a7a46",
  hook:"Finding the best possible choice: the shortest route, the lowest cost, the highest profit.",
  what:"Optimization is everywhere: delivery routes, airline schedules, sports schedules, hospital staffing, and training every AI model. Linear programming, the simplex method, graph algorithms and gradient methods find the best answer among millions or billions of options.",
  see:["GPS and map route planning","Package delivery and airline schedules","Factory and farm planning","Training every AI model","Sports league schedules"],
@@ -196,10 +196,10 @@ window.ZF_TOPICS = [
   {k:"watch",l:2,t:"Steve Brunton's YouTube channel",by:"University of Washington",u:"https://www.youtube.com/@Eigensteve",d:"Clear lectures on optimization, data-driven science and control."},
   {k:"free",l:3,t:"Convex Optimization",by:"Stephen Boyd & Lieven Vandenberghe, Stanford",u:"https://web.stanford.edu/~boyd/cvxbook/",d:"The standard university textbook, free as a PDF."},
   {k:"read",l:2,t:"INFORMS",u:"https://www.informs.org",d:"The professional society for operations research and analytics: careers, stories, student resources."},
-  {k:"journal",l:3,t:"Operations Research (journal)",u:"https://pubsonline.informs.org/journal/opre",d:"The flagship research journal of the field."}
+  {k:"journal",l:3,t:"Operations Research (journal)",u:"https://pubsonline.informs.org/journal/opre",paid:1,d:"The flagship research journal of the field."}
  ]},
 
-{id:"net", name:"Networks & Graphs", icon:"🕸️", color:"#3d4fb5",
+{id:"net",langs:["python", "javascript"], name:"Networks & Graphs", icon:"🕸️", color:"#3d4fb5",
  hook:"Everything is connected: friends, web pages, airports, brain cells.",
  what:"Network science studies graphs: dots (nodes) joined by links (edges). Google's original PageRank ranked web pages with an eigenvector of a gigantic matrix. Networks explain “six degrees of separation”, why some posts go viral, and how diseases spread.",
  see:["Search-engine ranking","Friend and follow suggestions","Disease spread and contact tracing","Airline routes and power grids","Maps of the brain"],
@@ -219,10 +219,10 @@ window.ZF_TOPICS = [
   {k:"free",l:2,t:"Networks, Crowds, and Markets",by:"David Easley & Jon Kleinberg",u:"https://www.cs.cornell.edu/home/kleinber/networks-book/",d:"Free textbook; Part I is graph theory and social networks, Part IV is the web and PageRank."},
   {k:"free",l:3,t:"Network Science",by:"Albert-László Barabási",u:"http://networksciencebook.com",d:"Free interactive textbook with animations."},
   {k:"book",l:1,t:"Linked",by:"Albert-László Barabási",d:"A popular-science tour of networks, from the web to cells."},
-  {k:"journal",l:3,t:"Network Science (journal)",u:"https://www.cambridge.org/core/journals/network-science",d:"Cambridge University Press research journal."}
+  {k:"journal",l:3,t:"Network Science (journal)",u:"https://www.cambridge.org/core/journals/network-science",paid:1,d:"Cambridge University Press research journal."}
  ]},
 
-{id:"chaos", name:"Chaos & Mathematical Modeling", icon:"🌪️", color:"#a8326e",
+{id:"chaos",langs:["python", "julia", "matlab"], name:"Chaos & Mathematical Modeling", icon:"🌪️", color:"#a8326e",
  hook:"Equations that describe change, from populations to pandemics to the weather.",
  what:"Differential equations describe how things change over time. Some very simple rules produce wildly unpredictable behavior, called chaos. That is why weather can't be forecast accurately more than a couple of weeks ahead. Models like SIR (Susceptible–Infected–Recovered) helped guide decisions during COVID-19.",
  see:["Epidemic forecasts","Weather and climate models","Fish, deer and insect populations","Heart rhythms","Orbits of planets and satellites"],
@@ -247,10 +247,10 @@ window.ZF_TOPICS = [
   {k:"book",l:1,t:"Chaos: Making a New Science",by:"James Gleick",d:"The classic story of the discovery of chaos and the butterfly effect."},
   {k:"book",l:3,t:"Nonlinear Dynamics and Chaos",by:"Steven Strogatz",d:"The standard university textbook, very readable after Calculus BC."},
   {k:"read",l:2,t:"Plus Magazine",by:"University of Cambridge",u:"https://plus.maths.org",d:"Free articles on math in the real world, including chaos and epidemics."},
-  {k:"journal",l:3,t:"Chaos: An Interdisciplinary Journal of Nonlinear Science",u:"https://pubs.aip.org/aip/cha",d:"Research journal from AIP Publishing."}
+  {k:"journal",l:3,t:"Chaos: An Interdisciplinary Journal of Nonlinear Science",u:"https://pubs.aip.org/aip/cha",paid:1,d:"Research journal from AIP Publishing."}
  ]},
 
-{id:"quantum", name:"Quantum Computing", icon:"⚛️", color:"#1d2b44",
+{id:"quantum",langs:["python"], name:"Quantum Computing", icon:"⚛️", color:"#1d2b44",
  hook:"Computers that use the strange rules of quantum physics.",
  what:"A qubit's state is a unit vector, and quantum gates are matrices, so quantum computing is linear algebra with complex numbers. Superposition and entanglement let quantum algorithms do some tasks much faster. Shor's algorithm could one day factor huge numbers and break RSA, which is why the world is switching to quantum-safe encryption.",
  see:["Quantum-safe encryption standards","Simulating molecules for new medicines and batteries","Optimization research","Ultra-precise quantum sensors"],
@@ -273,7 +273,7 @@ window.ZF_TOPICS = [
   {k:"journal",l:3,t:"Quantum (journal)",u:"https://quantum-journal.org",d:"Open-access journal for quantum science."}
  ]},
 
-{id:"graphics", name:"Graphics, Games & Robotics", icon:"🎮", color:"#c2571a",
+{id:"graphics",langs:["cpp", "csharp", "javascript"], name:"Graphics, Games & Robotics", icon:"🎮", color:"#c2571a",
  hook:"The math behind video games, animated movies, VR and robots.",
  what:"Every 3D object on a screen is a list of points moved around by matrices. Rotations use trigonometry, smooth curves use polynomials, and lighting uses vectors and dot products. Robots use the same math to know where their arms and wheels are.",
  see:["Video games and game engines","Animated movies","VR and AR headsets","Robot arms, drones and rovers","Movie special effects"],
@@ -298,7 +298,7 @@ window.ZF_TOPICS = [
   {k:"journal",l:3,t:"ACM SIGGRAPH",u:"https://www.siggraph.org",d:"The world's main computer-graphics research community and conference."}
  ]},
 
-{id:"signals", name:"Signals, Sound & Images (Fourier)", icon:"🎵", color:"#0b5d6b",
+{id:"signals",langs:["python", "matlab", "c"], name:"Signals, Sound & Images (Fourier)", icon:"🎵", color:"#0b5d6b",
  hook:"Every sound, picture and wireless signal is a mix of waves.",
  what:"Joseph Fourier showed that any signal can be written as a sum of sine waves. That idea is behind MP3 and JPEG compression, noise-canceling headphones, song-recognition apps, MRI scans and Wi-Fi.",
  see:["Song-recognition apps","MP3 and JPEG compression","Noise-canceling headphones","MRI and CT scans","Wi-Fi, 5G and earthquake detection"],
@@ -318,10 +318,10 @@ window.ZF_TOPICS = [
   {k:"read",l:1,t:"An Interactive Guide to the Fourier Transform",by:"BetterExplained",u:"https://betterexplained.com/articles/an-interactive-guide-to-the-fourier-transform/",d:"The “smoothie to recipe” explanation, with interactive graphs."},
   {k:"book",l:1,t:"Who Is Fourier? A Mathematical Adventure",by:"Transnational College of LEX",d:"A cartoon-style book written by students that teaches Fourier analysis from scratch."},
   {k:"free",l:3,t:"The Scientist and Engineer's Guide to Digital Signal Processing",by:"Steven W. Smith",u:"https://www.dspguide.com",d:"A free, practical textbook."},
-  {k:"journal",l:3,t:"IEEE Signal Processing Magazine",u:"https://signalprocessingsociety.org/publications-resources/ieee-signal-processing-magazine",d:"Tutorial-style articles on signal processing research."}
+  {k:"journal",l:3,t:"IEEE Signal Processing Magazine",u:"https://signalprocessingsociety.org/publications-resources/ieee-signal-processing-magazine",paid:1,d:"Tutorial-style articles on signal processing research."}
  ]},
 
-{id:"finance", name:"Financial Math & Risk", icon:"💹", color:"#4a4a8a",
+{id:"finance",langs:["python", "sql", "r"], name:"Financial Math & Risk", icon:"💹", color:"#4a4a8a",
  hook:"The math of money, risk and smart decisions.",
  what:"Compound interest is exponential growth. Risk is measured with the standard deviation, and stock prices are often modeled as random walks. Actuaries and quantitative analysts use statistics, probability and calculus to price insurance and options and to manage risk.",
  see:["Savings accounts, loans and mortgages","Retirement planning","Insurance prices","Stock options","Credit scores"],
@@ -360,4 +360,107 @@ window.ZF_GENERAL = [
  {k:"join",t:"USA Computing Olympiad (USACO)",u:"https://usaco.org",d:"Free online programming contests with training pages."},
  {k:"join",t:"Regeneron ISEF",by:"Society for Science",u:"https://www.societyforscience.org/isef/",d:"The world's largest high-school science and engineering fair. Many math and CS projects start here."},
  {k:"journal",t:"arXiv",u:"https://arxiv.org",d:"Free preprints of research in math, physics, computer science and statistics."}
+];
+
+/* The best free places to start (shown on the home page) */
+window.ZF_TOP = [
+ {t:"Teachable Machine",by:"Google",u:"https://teachablemachine.withgoogle.com",f:"ai",d:"Train an AI model with your webcam in two minutes. No code."},
+ {t:"Elements of AI",by:"University of Helsinki",u:"https://www.elementsofai.com",f:"ai",d:"Free beginner course on what AI can and can't do. No math or code needed."},
+ {t:"3Blue1Brown",by:"Grant Sanderson",u:"https://www.3blue1brown.com",f:"ai",d:"Animated videos: neural networks, linear algebra, calculus, probability."},
+ {t:"StatQuest",by:"Josh Starmer",u:"https://statquest.org",f:"ml",d:"Statistics and machine learning explained in short, friendly videos."},
+ {t:"Neural Networks: Zero to Hero",by:"Andrej Karpathy",u:"https://karpathy.ai/zero-to-hero.html",f:"ai",d:"Build neural networks from scratch in Python, up to a small GPT."},
+ {t:"The Evolution of Trust",by:"Nicky Case",u:"https://ncase.me/trust/",f:"game",d:"A 30-minute interactive game about the math of trust and cooperation."},
+ {t:"Game Theory (ECON 159)",by:"Open Yale Courses",u:"https://oyc.yale.edu/economics/econ-159",f:"game",d:"A complete Yale course, free online."},
+ {t:"An Introduction to Statistical Learning",by:"James, Witten, Hastie, Tibshirani, Taylor",u:"https://www.statlearning.com",f:"ml",d:"The classic first machine-learning textbook, free PDF."},
+ {t:"Mathematics for Machine Learning",by:"Deisenroth, Faisal, Ong",u:"https://mml-book.github.io",f:"ml",d:"Free book: exactly the math that machine learning needs."},
+ {t:"picoCTF",by:"Carnegie Mellon University",u:"https://picoctf.org",f:"crypto",d:"Free cybersecurity competition and practice for high-school students."},
+ {t:"M3 Challenge",by:"SIAM",u:"https://m3challenge.siam.org",f:"chaos",d:"Free math-modeling contest for high-school teams, with scholarships."},
+ {t:"JMLR and arXiv",by:"Research, free to read",u:"https://arxiv.org",f:"ml",d:"Where real research is published, free. Try the abstracts of papers in a field you like."}
+];
+
+/* Programming languages: what each one is for */
+window.ZF_LANGS = [
+ {id:"python",n:"Python",lvl:"Easy to start",c:"#2f6db3",
+  why:"Short, readable code and huge free libraries for math and data. The main language of AI, data science and science research.",
+  best:["Machine learning and AI","Data analysis and statistics","Science and math research","Automating boring tasks","Quantum computing (Qiskit)"],
+  sectors:"AI companies, tech, research labs, finance, biology and medicine, government data",
+  res:[{t:"CS50's Introduction to Programming with Python",by:"Harvard",u:"https://cs50.harvard.edu/python/"},{t:"Kaggle Learn: Python",u:"https://www.kaggle.com/learn/python"},{t:"Automate the Boring Stuff with Python",by:"Al Sweigart (free online book)",u:"https://automatetheboringstuff.com"},{t:"Think Python",by:"Allen Downey (free online book)",u:"https://allendowney.github.io/ThinkPython/"},{t:"Google Colab",by:"run Python in your browser, nothing to install",u:"https://colab.research.google.com"}]},
+ {id:"java",n:"Java",lvl:"Medium",c:"#b8650f",
+  why:"The language of AP Computer Science A. Strict rules (types, classes) teach good habits. Runs Android apps and large business systems.",
+  best:["AP Computer Science A","Android apps (with Kotlin)","Large business and banking software","Competitive programming"],
+  sectors:"Banks, big companies, Android, enterprise software",
+  res:[{t:"CSAwesome",by:"free AP CS A e-book (Runestone)",u:"https://runestone.academy/ns/books/published/csawesome/index.html"},{t:"CodingBat (Java)",by:"short practice problems",u:"https://codingbat.com/java"},{t:"Learn Java",by:"Oracle, dev.java",u:"https://dev.java/learn/"},{t:"Z-AP Computer Science A",by:"this website",u:"../ap-computer-science-a/"}]},
+ {id:"javascript",n:"JavaScript (+ HTML & CSS)",lvl:"Easy to start",c:"#a88a00",
+  why:"The language of every web page. Anything you build runs in a browser, so friends can use it right away.",
+  best:["Websites and web apps","Interactive math visualizations","Creative coding and art","Browser games"],
+  sectors:"Every company with a website, startups, media, education",
+  res:[{t:"MDN Learn Web Development",by:"Mozilla",u:"https://developer.mozilla.org/en-US/docs/Learn"},{t:"freeCodeCamp",by:"free full curriculum and certificates",u:"https://www.freecodecamp.org"},{t:"The Odin Project",u:"https://www.theodinproject.com"},{t:"Eloquent JavaScript",by:"Marijn Haverbeke (free online book)",u:"https://eloquentjavascript.net"},{t:"p5.js",by:"creative coding with math and graphics",u:"https://p5js.org"}]},
+ {id:"sql",n:"SQL",lvl:"Easy to start",c:"#0f7c7a",
+  why:"Not a general programming language: it asks questions of databases. Almost every data job uses it, often next to Python.",
+  best:["Getting data out of databases","Business and sports analytics","Any data-science job"],
+  sectors:"Every company that stores data: tech, retail, health, finance, government",
+  res:[{t:"SQLBolt",by:"interactive lessons",u:"https://sqlbolt.com"},{t:"SQL Murder Mystery",by:"Knight Lab, solve a crime with SQL",u:"https://mystery.knightlab.com"}]},
+ {id:"r",n:"R",lvl:"Medium",c:"#2a7a46",
+  why:"Built by statisticians for statistics. Excellent graphs and every statistical test you can name.",
+  best:["Statistics and data analysis","Biology, medicine, psychology research","Beautiful charts"],
+  sectors:"Universities, public health, pharmaceutical companies, research",
+  res:[{t:"R for Data Science",by:"Wickham, Çetinkaya-Rundel, Grolemund (free online book)",u:"https://r4ds.hadley.nz"},{t:"An Introduction to Statistical Learning (R edition)",u:"https://www.statlearning.com"}]},
+ {id:"cpp",n:"C++",lvl:"Harder",c:"#3d4fb5",
+  why:"Very fast and close to the hardware. Used where speed matters most.",
+  best:["Video-game engines and graphics","Competitive programming (USACO)","Robotics and self-driving cars","The fast core of AI libraries"],
+  sectors:"Game studios, robotics, trading firms, aerospace, systems software",
+  res:[{t:"LearnCpp.com",by:"free complete tutorial",u:"https://www.learncpp.com"},{t:"USACO Guide",by:"competitive programming in C++, Java or Python",u:"https://usaco.guide"}]},
+ {id:"c",n:"C",lvl:"Harder",c:"#5f6670",
+  why:"The classic low-level language behind operating systems, microcontrollers and cryptography libraries. Teaches how computers really work.",
+  best:["Operating systems and devices","Arduino and embedded electronics","Security and cryptography libraries","Signal processing hardware"],
+  sectors:"Hardware, cars, medical devices, cybersecurity",
+  res:[{t:"CS50x: Introduction to Computer Science",by:"Harvard (starts with C)",u:"https://cs50.harvard.edu/x/"},{t:"Arduino",by:"electronics projects",u:"https://www.arduino.cc"}]},
+ {id:"csharp",n:"C# (with Unity)",lvl:"Medium",c:"#6b3fa0",
+  why:"The language of the Unity game engine, used for a huge share of mobile, indie and VR games.",
+  best:["Games with Unity","VR and AR apps","Windows software"],
+  sectors:"Game studios, VR/AR, business software",
+  res:[{t:"Unity Learn",by:"free game-development courses",u:"https://learn.unity.com"},{t:"Learn C#",by:"Microsoft Learn",u:"https://learn.microsoft.com/en-us/dotnet/csharp/"}]},
+ {id:"swift",n:"Swift & Kotlin",lvl:"Medium",c:"#c2571a",
+  why:"Swift builds iPhone and iPad apps; Kotlin builds Android apps.",
+  best:["iPhone and Android apps"],
+  sectors:"App developers, startups, every company with a phone app",
+  res:[{t:"Swift Playgrounds",by:"Apple, learn on iPad or Mac",u:"https://www.apple.com/swift/playgrounds/"},{t:"Android Basics with Compose",by:"Google (Kotlin)",u:"https://developer.android.com/courses/android-basics-compose/course"}]},
+ {id:"rust",n:"Rust",lvl:"Harder",c:"#8a1c1c",
+  why:"As fast as C++ but prevents many security bugs. Growing fast in security and systems work.",
+  best:["Secure systems software","Cryptography and blockchain","Fast web servers and tools"],
+  sectors:"Cybersecurity, cloud companies, browsers, blockchain",
+  res:[{t:"The Rust Programming Language",by:"the official free book",u:"https://doc.rust-lang.org/book/"}]},
+ {id:"julia",n:"Julia",lvl:"Medium",c:"#7a3b12",
+  why:"Reads like math, runs fast. Popular for differential equations, optimization and scientific computing.",
+  best:["Differential equations and simulations","Optimization","Scientific computing"],
+  sectors:"Research labs, climate modeling, engineering, pharmaceuticals",
+  res:[{t:"Learning Julia",by:"julialang.org",u:"https://julialang.org/learning/"}]},
+ {id:"matlab",n:"MATLAB",lvl:"Medium",c:"#0b5d6b",
+  why:"Matrix-based language used across engineering and many university math courses.",
+  best:["Engineering and signal processing","Control systems and robotics","Linear algebra homework"],
+  sectors:"Engineering companies, aerospace, automotive, universities",
+  res:[{t:"MATLAB Onramp",by:"MathWorks, free 2-hour course",u:"https://matlabacademy.mathworks.com"}]},
+ {id:"scratch",n:"Scratch",lvl:"Very easy",c:"#d4881a",
+  why:"Drag-and-drop blocks. Perfect for a first taste of loops, conditions and variables.",
+  best:["First programs and games","Younger students"],
+  sectors:"Education",
+  res:[{t:"Scratch",by:"MIT",u:"https://scratch.mit.edu"},{t:"Code.org",u:"https://code.org"}]}
+];
+
+/* Pick by goal */
+window.ZF_GOALS = [
+ ["I'm in AP Computer Science A","java","Stick with Java for the exam; learn Python next. Most ideas transfer directly."],
+ ["My first language","python","Python (or Scratch for younger students). Readable, and useful in every field on this site."],
+ ["Machine learning / AI","python","Python, with NumPy, pandas, scikit-learn and PyTorch. Learn SQL to get data."],
+ ["Data science and statistics","python","Python or R, plus SQL."],
+ ["Websites and web apps","javascript","HTML, CSS and JavaScript."],
+ ["Math visualizations and interactive art","javascript","JavaScript with p5.js, or Desmos for quick graphs."],
+ ["Video games","csharp","C# with Unity, or C++ for big engines (Unreal). Godot is a free option."],
+ ["Phone apps","swift","Swift for iPhone, Kotlin for Android."],
+ ["Competitive programming (USACO)","cpp","C++ is fastest; Java and Python are allowed too."],
+ ["Cybersecurity and cryptography","python","Python for scripts and puzzles (picoCTF); C and Rust to understand real systems."],
+ ["Robotics and electronics","c","C/C++ (Arduino, FIRST robotics also uses Java), Python for Raspberry Pi."],
+ ["Physics, engineering, simulations","python","Python, Julia or MATLAB."],
+ ["Finance and business analytics","python","Python and SQL, plus spreadsheets."],
+ ["Quantum computing","python","Python with Qiskit (IBM)."]
 ];

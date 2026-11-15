@@ -92,6 +92,25 @@ table.map td a.course{font-weight:600;text-decoration:none}
 .demo svg{width:100%;max-width:520px;height:auto;display:block;background:#fff;border:1px solid #eee;border-radius:10px;margin-top:6px}
 .hist{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;line-height:1.6;word-break:break-all}
 .note{font-size:16px;background:#f6f6f6;border-left:4px solid var(--c,#111);padding:8px 10px;margin:8px 0;border-radius:0 8px 8px 0}
+.free{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.06em;background:#1e6236;color:#fff;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+.lib{display:inline-block;font-size:12.5px;font-weight:700;background:#eee;color:#555;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+.top12{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.tp{border:2px solid #1e6236;border-radius:12px;padding:10px 12px;background:#f6fbf7;text-decoration:none;display:block}
+.tp b{font-size:18px;display:block}.tp .by{font-size:14.5px;color:#555;font-style:italic}.tp p{margin:4px 0 0;font-size:16px}
+.tp .f{font-size:13.5px;margin-top:6px;color:#333}
+.langs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.lang{border:1px solid #ddd;border-top:6px solid var(--c);border-radius:14px;padding:12px 14px;scroll-margin-top:12px}
+.lang h3{margin:0;font-size:24px;color:var(--c)}
+.lang .lv{font-size:14px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.05em}
+.lang ul{margin:4px 0;padding-left:20px}.lang .sec{font-size:16px;color:#333}
+.lang .lr a{display:block;font-weight:600;margin:3px 0;text-decoration:none}.lang .lr a:hover{text-decoration:underline}
+.lang .lr span{font-weight:400;font-style:italic;color:#555;font-size:15px}
+.lang .ff{font-size:15px;margin-top:6px}
+.lang.hl{box-shadow:0 0 0 3px var(--c)}
+table.goals{width:100%;border-collapse:collapse;font-size:17px}
+table.goals td{border-top:1px solid #eee;padding:8px 6px;vertical-align:top}
+table.goals td:first-child{font-weight:600;width:34%}
+.lchip{display:inline-block;border:1.5px solid var(--c);color:var(--c);border-radius:999px;padding:2px 11px;font-weight:700;text-decoration:none;font-size:15.5px;margin:2px 4px 2px 0}
 footer{text-align:center;font-size:15px;color:#555;padding:20px 14px 40px;font-style:italic}
 </style>
 <script>(function(){ var NS="https://abacus.jasoncameron.dev/hit/kzogovic.github.io/", K="frontiers";
@@ -125,7 +144,9 @@ footer{text-align:center;font-size:15px;color:#555;padding:20px 14px 40px;font-s
 <footer>Made by Zogovic for Z-Math. Links go to free resources wherever possible; books without a link are available in libraries and bookstores. Levels: <b>Start here</b> = anyone, <b>Next step</b> = after Algebra 2 or AP courses, <b>Deep dive</b> = university level.</footer>
 
 <script>
-const C=window.ZF_COURSES, T=window.ZF_TOPICS, G=window.ZF_GENERAL;
+const C=window.ZF_COURSES, T=window.ZF_TOPICS, G=window.ZF_GENERAL, TOP=window.ZF_TOP, L=window.ZF_LANGS, GOALS=window.ZF_GOALS;
+const LB=Object.fromEntries(L.map(l=>[l.id,l]));
+const isFree=r=>r.k!=="book"&&!r.paid;
 const byId=Object.fromEntries(T.map(t=>[t.id,t]));
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const KIND={play:"Try it / interactive",watch:"Watch",free:"Free course or textbook",book:"Book",read:"Article, blog or magazine",journal:"Research & journals",join:"Compete & join"};
@@ -138,7 +159,9 @@ function home(){
  document.getElementById("homeLink").style.display="none";
  let h=`<h2>Start from your class</h2><p class="sub">Pick the course you're taking to see where its math is used.</p><div class="chips">`;
  for(const id in C) h+=`<a class="chip" href="#from-${id}">${esc(C[id].n)}</a>`;
- h+=`</div><h2>Pick a field</h2><p class="sub">Twelve fields where your math is used today.</p><div class="grid">`;
+ h+=`</div><h2>Best free places to start</h2><p class="sub">All free. Pick one tonight.</p><div class="top12">${TOP.map(x=>`<a class="tp" href="${esc(x.u)}" target="_blank" rel="noopener"><b>${esc(x.t)} ↗ <span class="free">FREE</span></b><div class="by">${esc(x.by)}</div><p>${esc(x.d)}</p><div class="f">Field: ${byId[x.f].icon} ${esc(byId[x.f].name)}</div></a>`).join("")}</div>
+ <h2>Which programming language should I learn?</h2><p class="sub">Python, Java, JavaScript, SQL, R, C++ and more: what each one is for, which careers use it, and free places to learn.</p><a class="pill" href="#coding" style="background:#111;color:#fff">Open the coding-language guide →</a>`;
+ h+=`<p class="sub">Twelve fields where your math is used today.</p><div class="grid">`;
  for(const t of T) h+=`<a class="card" href="#${t.id}" style="--c:${t.color}"><span class="ic">${t.icon}</span><b>${esc(t.name)}</b><p>${esc(t.hook)}</p><div class="from">Built on: ${coursesOf(t).map(c=>esc(C[c].n)).join(" · ")}</div></a>`;
  h+=`</div><h2>The map: which class leads to which field</h2><p class="sub">Each number counts the concepts from that class that the field uses. Tap a number to jump there.</p><div class="mapwrap"><table class="map"><tr><th>Your class ↓ &nbsp; Field →</th>`;
  for(const t of T) h+=`<th style="--c:${t.color}"><a href="#${t.id}">${t.icon}<br>${esc(t.name.replace(/ \(.*\)/,""))}</a></th>`;
@@ -156,7 +179,7 @@ function fromCourse(id){
  const c=C[id]; if(!c) return home();
  document.getElementById("homeLink").style.display="";
  let h=`<div class="thead" style="--c:#111"><h2>Where ${esc(c.n)} leads</h2><p>Every concept from ${esc(c.n)} that these fields use, and what it does there.</p></div>`;
- h+=`<p><a class="pill" href="${c.href}">Open ${esc(c.n)} →</a></p>`;
+ h+=`<p><a class="pill" href="${c.href}">Open ${esc(c.n)} →</a> <a class="pill" href="#coding">Which programming language? →</a></p>`;
  let any=false;
  for(const t of T){ const rows=t.path.filter(p=>p[0]===id); if(!rows.length) continue; any=true;
   h+=`<div class="box" style="--c:${t.color};border-left:6px solid ${t.color};margin-top:12px"><h3><a href="#${t.id}" style="color:${t.color};text-decoration:none">${t.icon} ${esc(t.name)} →</a></h3><table class="path">${rows.map(r=>`<tr><td class="cc">${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join("")}</table></div>`; }
@@ -169,9 +192,9 @@ function fromCourse(id){
 function resGrid(list,withFilters,tid){
  const kinds=[...new Set(list.map(r=>r.k))];
  let h="";
- if(withFilters){ h+=`<div class="filters" data-for="${tid}"><button aria-pressed="true" data-k="all">All</button>${kinds.map(k=>`<button aria-pressed="false" data-k="${k}">${esc(KIND[k])}</button>`).join("")}</div>`; }
+ if(withFilters){ h+=`<div class="filters" data-for="${tid}"><button aria-pressed="true" data-k="all">All</button><button aria-pressed="false" data-k="free">FREE only</button>${kinds.map(k=>`<button aria-pressed="false" data-k="${k}">${esc(KIND[k])}</button>`).join("")}</div>`; }
  const sorted=[...list].sort((a,b)=>(a.l||0)-(b.l||0));
- h+=`<div class="res">${sorted.map(r=>`<div class="r" data-k="${r.k}"><div class="k">${r.l?`<span class="lvl ${LVL[r.l][0]}">${LVL[r.l][1]}</span>`:""}${esc(KIND[r.k])}</div>${r.u?`<a class="t" href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)} ↗</a>`:`<span class="t">${esc(r.t)}</span>`}${r.by?`<div class="by">${esc(r.by)}</div>`:""}<p>${esc(r.d)}</p></div>`).join("")}</div>`;
+ h+=`<div class="res">${sorted.map(r=>`<div class="r" data-k="${r.k}" data-free="${isFree(r)?1:0}"><div class="k">${r.l?`<span class="lvl ${LVL[r.l][0]}">${LVL[r.l][1]}</span>`:""}${esc(KIND[r.k])}${isFree(r)?'<span class="free">FREE</span>':r.k==="book"?'<span class="lib">library or bookstore</span>':'<span class="lib">library access</span>'}</div>${r.u?`<a class="t" href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)} ↗</a>`:`<span class="t">${esc(r.t)}</span>`}${r.by?`<div class="by">${esc(r.by)}</div>`:""}<p>${esc(r.d)}</p></div>`).join("")}</div>`;
  return h;
 }
 function topic(id){
@@ -188,13 +211,36 @@ function topic(id){
  ${t.demo?`<div class="demo" id="demo"></div>`:""}
  <h2 style="color:${t.color}">Dig deeper</h2><p class="sub">Start with green, then move to orange and purple.</p>
  ${resGrid(t.res,true,t.id)}
+ ${t.langs?`<h2 style="color:${t.color}">Programming languages used here</h2><p class="sub">Start with the first one. Tap for free places to learn it.</p><div>${t.langs.map(x=>`<a class="lchip" style="--c:${LB[x].c}" href="#coding-${x}">${esc(LB[x].n)}</a>`).join("")}</div>`:""}
  <h2 style="color:${t.color}">Careers that use it</h2><div class="careers">${t.careers.map(c=>`<span>${esc(c)}</span>`).join("")}</div>
  <div class="nav2"><a class="pill" href="#${prev.id}">← ${prev.icon} ${esc(prev.name)}</a><a class="pill" href="#${next.id}">${next.icon} ${esc(next.name)} →</a></div></div>`;
  app.innerHTML=h; scrollTo(0,0);
  app.querySelectorAll(".filters button").forEach(b=>b.onclick=()=>{ const k=b.dataset.k;
   app.querySelectorAll(".filters button").forEach(x=>x.setAttribute("aria-pressed",x===b));
-  app.querySelectorAll(".res .r").forEach(r=>r.style.display=(k==="all"||r.dataset.k===k)?"":"none"); });
+  app.querySelectorAll(".res .r").forEach(r=>r.style.display=(k==="all"||r.dataset.k===k||(k==="free"&&r.dataset.free==="1"))?"":"none"); });
  if(t.demo) DEMOS[t.demo](document.getElementById("demo"));
+}
+
+/* ---------------- CODING ---------------- */
+function coding(sel){
+ document.getElementById("homeLink").style.display="";
+ const usedIn=id=>T.filter(t=>(t.langs||[]).includes(id));
+ let h=`<div class="thead" style="--c:#111"><h2>Which programming language for what?</h2><p>Every field on this site needs some coding. Here is which language to pick for which problems and careers, and where to learn it free.</p></div>
+ <div class="note" style="--c:#2a7a46"><b>Short answer:</b> if you're in AP CS A, master <b>Java</b> for the exam, then learn <b>Python</b>. It's the main language of AI, data science and research. Add <b>SQL</b> for data and <b>JavaScript</b> for the web. Once you know one language well, the next one takes weeks, not years: loops, conditions, arrays and functions are the same ideas everywhere.</div>
+ <h2>Pick by goal</h2><table class="goals">${GOALS.map(([g,l,a])=>`<tr><td>${esc(g)}</td><td><a class="lchip" style="--c:${LB[l].c}" href="#coding-${l}">${esc(LB[l].n)}</a> ${esc(a)}</td></tr>`).join("")}</table>
+ <h2>The languages</h2><p class="sub">All the learning links below are free.</p><div class="langs">`;
+ for(const l of L){ const u=usedIn(l.id);
+  h+=`<div class="lang${l.id===sel?" hl":""}" id="lang-${l.id}" style="--c:${l.c}"><h3>${esc(l.n)}</h3><div class="lv">${esc(l.lvl)}</div><p style="margin:6px 0">${esc(l.why)}</p>
+  <b>Best for</b><ul>${l.best.map(b=>`<li>${esc(b)}</li>`).join("")}</ul><div class="sec"><b>Sectors:</b> ${esc(l.sectors)}</div>
+  ${u.length?`<div class="ff"><b>Fields on this site:</b> ${u.map(t=>`<a href="#${t.id}" style="color:${t.color};text-decoration:none;font-weight:600">${t.icon} ${esc(t.name)}</a>`).join(" · ")}</div>`:""}
+  <div class="lr" style="margin-top:8px"><b>Learn it free</b>${l.res.map(r=>`<a href="${esc(r.u)}"${r.u.startsWith("http")?' target="_blank" rel="noopener"':""}>${esc(r.t)}${r.u.startsWith("http")?" ↗":" →"}${r.by?` <span>${esc(r.by)}</span>`:""}</a>`).join("")}</div></div>`; }
+ h+=`</div><h2>Practice in any language</h2>${resGrid([
+  {k:"play",t:"Exercism",u:"https://exercism.org",d:"Free coding exercises in 70+ languages, with mentors."},
+  {k:"play",t:"Project Euler",u:"https://projecteuler.net",d:"Math problems you solve by writing programs."},
+  {k:"join",t:"USA Computing Olympiad (USACO)",u:"https://usaco.org",d:"Free online contests; the USACO Guide teaches the algorithms."},
+  {k:"free",t:"CS50x",by:"Harvard",u:"https://cs50.harvard.edu/x/",d:"The famous free intro to computer science: C, Python, SQL, web."}],false)}`;
+ app.innerHTML=h;
+ if(sel){ const el=document.getElementById("lang-"+sel); if(el) setTimeout(()=>el.scrollIntoView({block:"start"}),30); } else scrollTo(0,0);
 }
 
 /* ---------------- DEMOS ---------------- */
@@ -295,7 +341,7 @@ const DEMOS={
 
 /* ---------------- ROUTER ---------------- */
 function route(){ const h=decodeURIComponent(location.hash.slice(1));
- if(h.startsWith("from-")) fromCourse(h.slice(5)); else if(byId[h]) topic(h); else home(); }
+ if(h==="coding") coding(); else if(h.startsWith("coding-")) coding(h.slice(7)); else if(h.startsWith("from-")) fromCourse(h.slice(5)); else if(byId[h]) topic(h); else home(); }
 document.getElementById("homeLink").onclick=e=>{ e.preventDefault(); location.hash=""; home(); scrollTo(0,0); };
 addEventListener("hashchange",route); route();
 </script>
