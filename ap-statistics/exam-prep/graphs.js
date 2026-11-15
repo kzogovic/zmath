@@ -35,7 +35,7 @@ function box(groups,o){ const W=o.W||360,rowH=o.rowH||46,L=o.L||70,R=W-14,T=10,B
 
 /* Dotplot: values (rounded to o.unit), o={min,max,step,xlab,mark:value,markLab} */
 function dot(values,o){ const W=o.W||360,L=20,R=W-20; const cnt={}; values.forEach(v=>{ const k=Math.round(v/(o.unit||1))*(o.unit||1); cnt[k]=(cnt[k]||0)+1; });
- const mx=Math.max(...Object.values(cnt)), r=o.r||4, gap=2*r+1, T=14, B=T+mx*gap+6, H=B+44; const X=v=>L+(v-o.min)/(o.max-o.min)*(R-L); let s="";
+ const mx=Math.max(...Object.values(cnt)), r=o.r||(mx<=4?5.5:4), gap=2*r+1, T=14, B=T+mx*gap+6, H=B+44; const X=v=>L+(v-o.min)/(o.max-o.min)*(R-L); let s="";
  Object.entries(cnt).forEach(([k,c])=>{ for(let j=0;j<c;j++) s+=`<circle cx="${X(+k)}" cy="${B-r-2-j*gap}" r="${r}" fill="${INK}"/>`; });
  if(o.mark!=null) s+=`<line x1="${X(o.mark)}" y1="${T-6}" x2="${X(o.mark)}" y2="${B}" stroke="#dc2626" stroke-width="2" stroke-dasharray="5 3"/><text x="${X(o.mark)+4}" y="${T}" fill="#dc2626" font-weight="700">${o.markLab||""}</text>`;
  s+=xaxis(X,B,L,R,{min:o.min,max:o.max,step:o.step,xlab:o.xlab,lab:o.lab}); return frame(W,H,s); }
