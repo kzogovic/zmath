@@ -259,7 +259,7 @@ const yKey=y=>(parseInt(y)*2+(/B$/.test(y)?0:1));
 function relList(u){ const R=window.ZREL, k=ZC&&ZC.relKey; if(!R||!k||!R[k]) return []; if(u.relAll) return R[k].slice(); return R[k].filter(x=>x.u.includes(u.num)); }
 const exLabel=y=>/B$/.test(y)?`${y.slice(0,-1)} Form B`:y;
 function relLinks(y,q){ const L=(window.ZREL.links[ZC.relKey]||{})[y]||{}; return Object.entries(L).filter(([t])=>!q||!/^Q\d/.test(t)||t.startsWith("Q"+q+" ")).map(([t,h])=>`<a class="rl-b" href="${h}" target="_blank" rel="noopener">${t}</a>`).join(""); }
-const OFFY=["2019","2021","2022","2023","2024","2025","2026"];
+const OFFY=["2023","2024","2025","2026"];
 const isCalcQ=(y,q)=>{ const n=parseInt(y); return n>=2011?q<=2:q<=3; };
 function relBtns(x){ const k=ZC.relKey, L=((window.ZREL.links||{})[k]||{})[x.y]||{}, A=(h,t,c)=>`<a class="rl-b${c?" "+c:""}" href="${h}" target="_blank" rel="noopener">${t}</a>`;
   if((k==="ab"||k==="bc")&&OFFY.includes(x.y)){ const yy=x.y.slice(2), base="https://apcentral.collegeboard.org/media/pdf/ap"+yy;
@@ -275,7 +275,7 @@ function relTable(list,cur,title,open){ return `<details class="rl-d"${open?" op
 function relHTML(u){ const k=ZC.relKey.toUpperCase(), nm=ZC.relName||("AP Calculus "+k), yrs=ZC.relYears||"1998–2026";
   const all=relList(u).sort((a,b)=>yKey(b.y)-yKey(a.y)||a.q-b.q), calcBook=(ZC.relKey==="ab"||ZC.relKey==="bc");
   const how=`<div class="rl-how"><b>How to use these:</b> 1. Open <b>Question</b> and answer it on paper, timed (about 15 minutes per question). 2. Grade yourself with <b>Scoring guidelines</b> (the official rubric, point by point). 3. Open <b>Student samples</b> to see real graded answers (high, middle and low scores) with the readers' commentary on why each point was or wasn't earned.</div>`;
-  const src=calcBook?`<p class="rl-note">Buttons open free PDFs with no sign-in. <b>2019 and 2021–2026</b> open the official College Board files on AP Central, including student samples and commentary for each question (2026 samples are not released yet). <b>1998–2018</b> open the free MyMathsCloud archive copy of the official College Board files: press <b>Download</b> on that page to get the PDF. No exam was released in 2020. Form B was a second exam given to students abroad and for late testing. Each PDF holds the whole exam: go to the question number shown. Unit numbers follow the current Course and Exam Description; older exams can include topics now taught in a different unit.</p>`
+  const src=calcBook?`<p class="rl-note">Buttons open free PDFs with no sign-in. <b>2023–2026</b> open the official College Board files on AP Central, with student samples and commentary for each question (2026 samples are not released yet). <b>1998–2022</b> open the PDF directly from the free MyMathsCloud archive of the official College Board files (each PDF covers all six questions). No exam was released in 2020. Form B was a second exam given to students abroad and for late testing. Each PDF holds the whole exam: go to the question number shown. Unit numbers follow the current Course and Exam Description; older exams can include topics now taught in a different unit.</p>`
      :`<p class="rl-note">Archive: <a href="${window.ZREL.res[ZC.relKey]}" target="_blank" rel="noopener">${ZC.relArchive||"archive"}</a>.</p>`;
   if(u.relAll){
     const units=ZC.units.filter(v=>v.num>0&&!v.relAll&&v.num<=20);
