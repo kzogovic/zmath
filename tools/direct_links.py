@@ -8,8 +8,9 @@ for p in pages:
         try:
             req = urllib.request.Request(p, headers={"User-Agent": "Mozilla/5.0 (Z-Math link checker)"})
             body = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
-            m = re.search(r'https://www\.mymathscloud\.com/api/download/[^"\'<>\s]+', html.unescape(body))
-            if m: out[p] = m.group(0).replace(" ", "%20")
+            links = re.findall(r'https://www\.mymathscloud\.com/api/download/[^"\'<>]+?\.pdf\?id=[A-Za-z0-9_\-]+', html.unescape(body))
+            links = [l for l in links if "AP-Calculus" in l or "AP%20Calculus" in l]
+            if links: out[p] = links[0].replace(" ", "%20")
             break
         except Exception as e:
             time.sleep(2)
