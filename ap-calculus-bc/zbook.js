@@ -437,7 +437,7 @@ main{max-width:1180px;margin:0 auto;padding:22px 16px 60px}
 footer{max-width:860px;margin:0 auto;padding:16px 16px 44px;color:#333;font-size:16px;text-align:center;border-top:3px double #111;font-style:italic}
 @media (max-width:640px){.cm{grid-template-columns:1fr}.cm-cur{font-size:15px}}`;
 const st3=document.createElement("style"); st3.textContent=SHCSS; document.head.appendChild(st3);
-window.ZB={route,_test:{G,gen,options,parseAns,U}};
-const start=()=>{ initData(); route(); };
+window.ZB={route,init:initData,_test:{G,gen,options,parseAns,U}};
+const start=()=>{ initData(); if(!window.ZNOBOOK) route(); };
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start); else setTimeout(start,0);
 })();
