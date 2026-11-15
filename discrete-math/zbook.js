@@ -259,14 +259,46 @@ const yKey=y=>(parseInt(y)*2+(/B$/.test(y)?0:1));
 function relList(u){ const R=window.ZREL, k=ZC&&ZC.relKey; if(!R||!k||!R[k]) return []; if(u.relAll) return R[k].slice(); return R[k].filter(x=>x.u.includes(u.num)); }
 const exLabel=y=>/B$/.test(y)?`${y.slice(0,-1)} Form B`:y;
 function relLinks(y,q){ const L=(window.ZREL.links[ZC.relKey]||{})[y]||{}; return Object.entries(L).filter(([t])=>!q||!/^Q\d/.test(t)||t.startsWith("Q"+q+" ")).map(([t,h])=>`<a class="rl-b" href="${h}" target="_blank" rel="noopener">${t}</a>`).join(""); }
-function relHTML(u){ const list=relList(u).sort((a,b)=>yKey(b.y)-yKey(a.y)||a.q-b.q); const k=ZC.relKey.toUpperCase();
-  const uu=x=>x.u.map(n=>`<span class="rl-u${n===u.num?" on":""}">${n}</span>`).join("");
-  let body;
-  if(u.relAll){ const ys=[...new Set(list.map(x=>x.y))]; body=ys.map(y=>`<details class="rl-y"${ys.indexOf(y)<2?" open":""}><summary><b>${exLabel(y)}</b> · ${ZC.relName||("AP Calculus "+k)} · ${list.filter(x=>x.y===y).length} questions</summary><div class="rl-ln">${relLinks(y)}</div><ol class="rl-ol">${list.filter(x=>x.y===y).map(x=>`<li><span class="rl-t">Q${x.q}. ${x.t}</span><span class="rl-us">Units ${uu(x)}</span></li>`).join("")}</ol></details>`).join(""); }
-  else body=list.map(x=>`<div class="rl-c"><div class="rl-h"><b>${exLabel(x.y)} Q${x.q}</b><span class="rl-us">Units ${uu(x)}</span></div><div class="rl-t">${x.t}</div><div class="rl-ln">${relLinks(x.y,x.q)}</div></div>`).join("");
-  const nm=ZC.relName||("AP Calculus "+k), yrs=ZC.relYears||"1998–2026";
-  return `<p class="lead2">${u.relAll?`Every released ${nm} free-response question (${yrs}), by exam.`:`Every released ${nm} free-response question (${yrs}) that tests this unit: <b>${list.length} questions</b>, newest first.`} Each button opens the official College Board PDF (questions, scoring guidelines, sample student responses), free and with no sign-in. The PDFs hold the whole exam: go to the question number shown.</p>
-  <div class="rl">${body}</div><p class="rl-note">Archive: <a href="${window.ZREL.res[ZC.relKey]}" target="_blank" rel="noopener">${ZC.relArchive||("MyMathsCloud AP Calculus "+k+" past papers")}</a>.${ZC.relName?"":" 2020 had no regular free-response questions."} Unit numbers follow the current AP Course and Exam Description${ZC.relName?"":"; older exams can include topics now taught in a different unit"}.</p>`; }
+const OFFY=["2019","2021","2022","2023","2024","2025","2026"];
+const isCalcQ=(y,q)=>{ const n=parseInt(y); return n>=2011?q<=2:q<=3; };
+function relBtns(x){ const k=ZC.relKey, L=((window.ZREL.links||{})[k]||{})[x.y]||{}, A=(h,t,c)=>`<a class="rl-b${c?" "+c:""}" href="${h}" target="_blank" rel="noopener">${t}</a>`;
+  if((k==="ab"||k==="bc")&&OFFY.includes(x.y)){ const yy=x.y.slice(2), base="https://apcentral.collegeboard.org/media/pdf/ap"+yy;
+    let s=A(`${base}-frq-calculus-${k}.pdf`,"Question")+A(`${base}-sg-calculus-${k}.pdf`,"Scoring guidelines");
+    s+= x.y==="2026"?`<span class="rl-b off">Student samples: not yet released</span>`:A(`${base}-apc-calculus-${k}-q${x.q}.pdf`,`Student samples Q${x.q}`,"smp");
+    if(L.Questions) s+=A(L.Questions,"Archive copy","arc"); return s; }
+  const nm={"Questions":"Question","Scoring guidelines":"Scoring guidelines","Student samples":"Student samples"};
+  return Object.entries(L).filter(([t])=>!/^Q\d/.test(t)||t.startsWith("Q"+x.q+" ")).map(([t,h])=>A(h,(nm[t]||t),t==="Student samples"?"smp":"")).join("")||`<span class="rl-b off">Links coming</span>`; }
+function relRow(x,cur){ const uu=x.u.map(n=>`<span class="rl-u${n===cur?" on":""}" title="${(ZC.units.find(v=>v.num===n)||{}).name||""}">${n}</span>`).join(""),
+  calc=ZC.relKey==="pc"?"":`<span class="rl-cal ${isCalcQ(x.y,x.q)?"yes":"no"}">${isCalcQ(x.y,x.q)?"Calculator":"No calculator"}</span>`;
+  return `<tr><td class="rl-ex"><b>${exLabel(x.y)}</b> · Q${x.q}${calc}</td><td class="rl-tt">${x.t}</td><td class="rl-us2">${uu}</td><td class="rl-ln">${relBtns(x)}</td></tr>`; }
+function relTable(list,cur,title,open){ return `<details class="rl-d"${open?" open":""}><summary>${title} (${list.length})</summary><table class="rl-tb"><thead><tr><th>Exam</th><th>Question</th><th>Units</th><th>Official PDFs</th></tr></thead><tbody>${list.map(x=>relRow(x,cur)).join("")}</tbody></table></details>`; }
+function relHTML(u){ const k=ZC.relKey.toUpperCase(), nm=ZC.relName||("AP Calculus "+k), yrs=ZC.relYears||"1998–2026";
+  const all=relList(u).sort((a,b)=>yKey(b.y)-yKey(a.y)||a.q-b.q), calcBook=(ZC.relKey==="ab"||ZC.relKey==="bc");
+  const how=`<div class="rl-how"><b>How to use these:</b> 1. Open <b>Question</b> and answer it on paper, timed (about 15 minutes per question). 2. Grade yourself with <b>Scoring guidelines</b> (the official rubric, point by point). 3. Open <b>Student samples</b> to see real graded answers (high, middle and low scores) with the readers' commentary on why each point was or wasn't earned.</div>`;
+  const src=calcBook?`<p class="rl-note">Buttons open free PDFs with no sign-in. <b>2019 and 2021–2026</b> open the official College Board files on AP Central, including student samples and commentary for each question (2026 samples are not released yet). <b>1998–2018</b> open the free MyMathsCloud archive copy of the official College Board files: press <b>Download</b> on that page to get the PDF. No exam was released in 2020. Form B was a second exam given to students abroad and for late testing. Each PDF holds the whole exam: go to the question number shown. Unit numbers follow the current Course and Exam Description; older exams can include topics now taught in a different unit.</p>`
+     :`<p class="rl-note">Archive: <a href="${window.ZREL.res[ZC.relKey]}" target="_blank" rel="noopener">${ZC.relArchive||"archive"}</a>.</p>`;
+  if(u.relAll){
+    const units=ZC.units.filter(v=>v.num>0&&!v.relAll&&v.num<=20);
+    const byUnit=units.map(v=>{ const L=all.filter(x=>x.u.includes(v.num)); return L.length?relTable(L,v.num,`Unit ${v.num}: ${(v.name||"").replace(/^Unit \d+:\s*/,"")}`,false):""; }).join("");
+    const ys=[...new Set(all.map(x=>x.y))];
+    const byYear=ys.map((y,i)=>relTable(all.filter(x=>x.y===y),0,`${exLabel(y)} exam`,i<1)).join("");
+    return `<p class="lead2">All ${all.length} released ${nm} free-response questions (${yrs}). Every question appears under each unit it tests. Switch between the two views:</p>${how}
+     <div class="rl-tog"><button class="on" data-rv="unit">By unit</button><button data-rv="year">By exam year</button></div>
+     <div data-rvp="unit">${byUnit}</div><div data-rvp="year" hidden>${byYear}</div>${src}`; }
+  const cur=u.num;
+  return `<p class="lead2">Every released ${nm} free-response question (${yrs}) that tests <b>Unit ${u.num}</b>: <b>${all.length} questions</b>, newest first. The highlighted unit number is this unit.</p>${how}${relTable(all,cur,"Released FRQs for this unit",true)}${src}`; }
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-rv]"); if(!b) return; const box=b.closest(".zp")||document; box.querySelectorAll("[data-rv]").forEach(x=>x.classList.toggle("on",x===b)); box.querySelectorAll("[data-rvp]").forEach(p=>p.hidden=p.dataset.rvp!==b.dataset.rv); });
+const RLCSS=`.rl-how{background:#f4f8ff;border-left:4px solid #1f5fa8;border-radius:0 8px 8px 0;padding:8px 12px;font-size:16.5px;margin:8px 0 12px}
+.rl-d{border:1px solid #ddd;border-radius:12px;margin:10px 0;background:#fff}.rl-d>summary{cursor:pointer;font-weight:700;font-size:18px;padding:10px 14px}
+.rl-tb{width:100%;border-collapse:collapse;font-size:16px}.rl-tb th{background:#111;color:#fff;text-align:left;padding:7px 8px;font-weight:600}
+.rl-tb td{border-top:1px solid #e6e6e6;padding:8px;vertical-align:top}.rl-ex{white-space:nowrap}.rl-tt{font-weight:600}
+.rl-cal{display:block;margin-top:3px;font-size:12px;font-weight:700;border-radius:6px;padding:0 6px;width:max-content}.rl-cal.yes{background:#e5f2e8;color:#1e6236}.rl-cal.no{background:#f3f2ee;color:#555}
+.rl-ln{display:flex;flex-wrap:wrap;gap:5px}.rl-b{display:inline-block;font-size:14px;font-weight:600;border:1.5px solid #1f5fa8;color:#1f5fa8;border-radius:999px;padding:2px 10px;text-decoration:none;background:#fff}
+.rl-b:hover{background:#1f5fa8;color:#fff}.rl-b.smp{border-color:#2a7a46;color:#2a7a46}.rl-b.smp:hover{background:#2a7a46;color:#fff}.rl-b.arc{border-color:#999;color:#666;font-weight:500}.rl-b.off{border-color:#ccc;color:#888;font-weight:500}
+.rl-us2 .rl-u{display:inline-block;min-width:20px;text-align:center;border-radius:6px;background:#eee;margin:1px;font-size:13px;font-weight:700}.rl-us2 .rl-u.on{background:#1f5fa8;color:#fff}
+.rl-tog{display:flex;gap:6px;margin:6px 0}.rl-tog button{font:600 16px inherit;border:1.5px solid #111;background:#fff;border-radius:999px;padding:4px 14px;cursor:pointer}.rl-tog button.on{background:#111;color:#fff}
+@media(max-width:640px){.rl-tb thead{display:none}.rl-tb tr{display:block;border-top:1px solid #e6e6e6;padding:6px 4px}.rl-tb td{display:block;border:0;padding:3px 6px}.rl-ex{white-space:normal}.rl-ex br{display:none}.rl-ex .rl-cal{display:inline-block;margin:0 0 0 8px}}`;
+{ const s=document.createElement("style"); s.textContent=RLCSS; document.head.appendChild(s); }
 /* ---------- Fixed practice sets (same problems every time: seeded) and printable posters ---------- */
 function seeded(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
 const hash=str=>{ let h=2166136261; for(const c of str){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; };
