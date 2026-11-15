@@ -289,10 +289,44 @@ function posterHTML(u){ const sh=u.sheet||[]; const fl=u.flow? (u.flow.cols||[])
   <div class="ksheet">${sh.map(x=>ks2(...x)).join("")}</div></div>`; }
 function bindPoster(root){ root.querySelectorAll("[data-pp]").forEach(b=>{ b.onclick=()=>printEl(b.closest(".zp").querySelector(".pst")); }); }
 const ks2=(c,h,items,ex)=>`<div class="ks" style="--c:${c}"><h4>${h}</h4><ul>${items.map(i=>`<li>${i}</li>`).join("")}</ul>${ex?`<p class="ex">${ex}</p>`:""}</div>`;
-const SECS=[["flow","Method flowchart","which method, when","#1d4e89"],["sheet","Key formulas","rules on one page","#c2571a"],["ex","Solved examples","step by step, new each time","#2a7a46"],["prac","Practice","MCQ · deck · type","#0f7a6c"],["sets","Practice sets","fixed, printable","#1f4fd1"],["chal","Challenge Lab","hardest, new each time","#6a3d9a"],["frq","FRQs","AP-style, with scoring","#c23a52"],["rel","Released FRQs","official, by unit","#7a5a12"]];
-function unitHTML(u){ const secs=SECS.filter(s=>s[0]!=="flow"||u.flow).filter(s=>s[0]!=="chal"||(u.chal&&u.chal.length)).filter(s=>s[0]!=="frq"||(u.frq&&u.frq.length)).filter(s=>s[0]!=="rel"||relList(u).length).filter(s=>!["ex","prac","sets"].includes(s[0])||(u.gen&&u.gen.length)).filter(s=>s[0]!=="sheet"||(u.sheet&&u.sheet.length));
+
+/* ===== Theory (definitions, theorems, proofs, counterexamples) and Uses & resources (applications, two ways, study more) ===== */
+const ZTK={watch:"Watch",free:"Free textbook",play:"Interactive",book:"Book",read:"Read",practice:"Practice"};
+const ZTL={1:["zl1","Start here"],2:["zl2","Next step"],3:["zl3","Deep dive"]};
+function thmHTML(u,t){ let h=`<p class="lead2">Read the definitions first, then the theorems. Try to prove each theorem yourself before you open the proof. Counterexamples show why every condition matters.</p>`;
+  h+=`<h4 class="zt-h">Definitions</h4><dl class="zt-defs">${t.defs.map(d=>`<dt>${d[0]}</dt><dd>${d[1]}${d[2]?`<div class="zt-ex"><b>Example.</b> ${d[2]}</div>`:""}</dd>`).join("")}</dl>`;
+  if(t.thms) h+=`<h4 class="zt-h">Theorems</h4>${t.thms.map((m,i)=>`<div class="zt-thm"><div class="zt-tn">Theorem ${u.num}.${i+1}${m.n?` <span>(${m.n})</span>`:""}</div><div class="zt-st">${m.s}</div>${m.p?`<details><summary>Proof${m.pi?" idea":""}</summary><div class="zt-pf">${m.p} <span class="qed">∎</span></div></details>`:""}${m.ce?`<details><summary>Why the conditions matter: counterexample</summary><div class="zt-ce">${m.ce}</div></details>`:""}</div>`).join("")}`;
+  if(t.mist) h+=`<h4 class="zt-h">Common mistakes</h4><ul class="zt-ul">${t.mist.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  return h; }
+function stItem(r){ return `<div class="zt-r">${r.l?`<span class="zt-lv ${ZTL[r.l][0]}">${ZTL[r.l][1]}</span>`:""}<span class="zt-k">${ZTK[r.k]||""}${r.free===false?"":" · free"}</span>${r.u?`<a href="${r.u}" target="_blank" rel="noopener">${r.t} ↗</a>`:`<b>${r.t}</b>`}${r.by?`<i>${r.by}</i>`:""}${r.d?`<p>${r.d}</p>`:""}</div>`; }
+function useHTML(u,t){ let h="";
+  if(t.apps) h+=`<h4 class="zt-h">Where it's used</h4><div class="zt-apps">${t.apps.map(a=>`<div class="zt-app"><b>${a[0]}</b><p>${a[1]}</p></div>`).join("")}</div>`;
+  if(t.ways) h+=t.ways.map(w=>`<h4 class="zt-h">Two ways to solve it</h4><div class="zt-wq">${w.q}</div><div class="zt-ways">${w.m.map(m=>`<div class="zt-way"><b>${m[0]}</b><ol>${m[1].map(s=>`<li>${s}</li>`).join("")}</ol></div>`).join("")}</div>${w.note?`<p class="zt-note"><b>Which is better?</b> ${w.note}</p>`:""}`).join("");
+  if(t.study) h+=`<h4 class="zt-h">Study this unit further</h4><div class="zt-res">${t.study.map(stItem).join("")}</div>`;
+  const c=(window.ZT||{})._course; if(c) h+=`<h4 class="zt-h">For the whole course</h4><div class="zt-res">${c.map(stItem).join("")}</div>`;
+  return h; }
+const ZTCSS=`.zt-h{font-size:21px;margin:18px 0 8px;padding-bottom:3px;border-bottom:1px solid #ddd}
+.zt-defs{margin:0}.zt-defs dt{font-weight:700;margin-top:10px;color:var(--c)}.zt-defs dd{margin:2px 0 0 0;padding-left:12px;border-left:3px solid #eee}
+.zt-ex{font-size:16.5px;color:#333;margin-top:3px}
+.zt-thm{border:1px solid #ddd;border-left:5px solid var(--c);border-radius:10px;padding:10px 12px;margin:10px 0;background:#fcfcfb}
+.zt-tn{font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:var(--c)}.zt-tn span{text-transform:none;letter-spacing:0;font-weight:700}
+.zt-st{margin:4px 0}.zt-thm details{margin-top:6px}.zt-thm summary{cursor:pointer;font-weight:600;color:#333}
+.zt-pf,.zt-ce{padding:6px 10px;background:#fff;border-radius:8px;margin-top:4px;font-size:17px}.zt-ce{background:#fff6ea}.qed{float:right}
+.zt-ul{padding-left:20px}.zt-apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.zt-app{border:1px solid #e3e3e3;border-radius:10px;padding:8px 12px}.zt-app p{margin:3px 0 0;font-size:16.5px}
+.zt-wq{font-weight:600;margin-bottom:6px}.zt-ways{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.zt-way{border:1px solid #ddd;border-radius:10px;padding:8px 12px}.zt-way ol{margin:4px 0 0;padding-left:20px}.zt-note{font-size:17px}
+.zt-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.zt-r{border:1px solid #e3e3e3;border-radius:10px;padding:8px 12px}.zt-r a,.zt-r>b{display:block;font-weight:700;font-size:17.5px;text-decoration:none;color:#111;margin-top:2px}.zt-r a:hover{text-decoration:underline}
+.zt-r i{display:block;font-size:15px;color:#555}.zt-r p{margin:3px 0 0;font-size:16px}.zt-k{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#555}
+.zt-lv{font-size:12px;font-weight:700;border-radius:6px;padding:1px 6px;margin-right:6px;text-transform:uppercase}.zl1{background:#e5f2e8;color:#1e6236}.zl2{background:#fff1dc;color:#8a5205}.zl3{background:#f3e6f3;color:#6b2b6b}
+@media print{.zt-thm details{display:block}.zt-thm details>*{display:block}}`;
+{ const s=document.createElement("style"); s.textContent=ZTCSS; document.head.appendChild(s); }
+
+const SECS=[["thm","Theory","definitions · theorems · proofs","#111111"],["flow","Method flowchart","which method, when","#1d4e89"],["sheet","Key formulas","rules on one page","#c2571a"],["ex","Solved examples","step by step, new each time","#2a7a46"],["prac","Practice","MCQ · deck · type","#0f7a6c"],["sets","Practice sets","fixed, printable","#1f4fd1"],["chal","Challenge Lab","hardest, new each time","#6a3d9a"],["frq","FRQs","AP-style, with scoring","#c23a52"],["rel","Released FRQs","official, by unit","#7a5a12"],["use","Uses & resources","applications · 2 ways · study more","#0b5d6b"]];
+function unitHTML(u){ const zt=(window.ZT||{})[u.id]; const secs=SECS.filter(s=>s[0]!=="thm"||(zt&&zt.defs)).filter(s=>s[0]!=="use"||(zt&&(zt.apps||zt.study))).filter(s=>s[0]!=="flow"||u.flow).filter(s=>s[0]!=="chal"||(u.chal&&u.chal.length)).filter(s=>s[0]!=="frq"||(u.frq&&u.frq.length)).filter(s=>s[0]!=="rel"||relList(u).length).filter(s=>!["ex","prac","sets"].includes(s[0])||(u.gen&&u.gen.length)).filter(s=>s[0]!=="sheet"||(u.sheet&&u.sheet.length));
   const N=secs.length, pos=secs.map((_,i)=>{ const a=-Math.PI/2+2*Math.PI*i/N; return [50+38*Math.cos(a),50+35*Math.sin(a)]; });
-  const body=k=>k==="flow"?flowHTML("f-"+u.id,u.flow):k==="ex"?exBox(u.id):k==="prac"?boxHTML(u.id,"sat"):k==="frq"?frqBox(u.id):k==="rel"?relHTML(u):k==="sets"?setsBox(u):k==="sheet"?posterHTML(u):boxHTML(u.id,"chal");
+  const body=k=>k==="thm"?thmHTML(u,zt):k==="use"?useHTML(u,zt):k==="flow"?flowHTML("f-"+u.id,u.flow):k==="ex"?exBox(u.id):k==="prac"?boxHTML(u.id,"sat"):k==="frq"?frqBox(u.id):k==="rel"?relHTML(u):k==="sets"?setsBox(u):k==="sheet"?posterHTML(u):boxHTML(u.id,"chal");
   return `<section class="zu" id="sec-${u.id}" style="--c:${u.c}"><div class="zu-ch">${esc2(u.label||("Unit "+u.num))}</div><h2>${esc2(u.name)}</h2><p class="zu-sub">${esc2(u.sub)}</p>
    <div class="amap"><div class="am-stage"><svg class="am-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${pos.map(([x,y])=>`<line x1="50" y1="50" x2="${x}" y2="${y}"/>`).join("")}${pos.slice(0,-1).map(([x,y],i)=>`<line class="pth" x1="${x}" y1="${y}" x2="${pos[i+1][0]}" y2="${pos[i+1][1]}"/>`).join("")}</svg>
     <div class="am-hub"><b>${esc2(u.short)}</b><span>Tap a node</span></div>
