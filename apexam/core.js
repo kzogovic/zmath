@@ -99,7 +99,9 @@ ZX.build=function(seed,course){ const C=ZX.COURSES[course], R=rng(seed), old=Mat
  /* Section I Part A: book bank, by unit weight; difficulty mix 30% standard, 40% medium, 30% advanced */
  const nA=alloc(C.w,C.mcA,R);
  Object.keys(nA).forEach(k=>{ const g=G["u"+k]; if(!g) return; let got=0, tries=0;
-  while(got<nA[k]&&tries++<200){ const r=R.u(), lvl=r<0.3?"sat":r<0.7?"med":"adv", pool=(g[lvl]&&g[lvl].length)?g[lvl]:g.sat; const i=R.int(0,pool.length-1), key=k+lvl+i;
+  const REP=((ZX.rep||{})[course]||[]).filter(f=>{ for(let z=1;z<12;z++){ try{ const t=f(rng(z*131),H); if(t) return t.u===+k; }catch(e){} } return false; });
+  while(got<nA[k]&&tries++<200){ if(REP.length&&R.u()<0.4){ const f=R.pick(REP); let m=null; for(let t=0;t<10&&!m;t++){ try{ m=tplMC(f(R,H),R); }catch(e){} } if(m&&!mcA.some(x=>x.t===m.t)){ m.lvl="med"; m.calc="no"; mcA.push(m); got++; continue; } }
+   const r=R.u(), lvl=r<0.3?"sat":r<0.7?"med":"adv", pool=(g[lvl]&&g[lvl].length)?g[lvl]:g.sat; const i=R.int(0,pool.length-1), key=k+lvl+i;
    if(used.has(key)&&tries<120) continue; const p=T.gen(pool[i]); if(!p) continue; if(/calculator/i.test(p.q)) continue; const m=bookMC(p,+k,lvl); if(!m) continue; used.add(key); mcA.push(m); got++; } });
  /* Section I Part B: calculator-active templates, spread across units */
  const CB=ZX.cmc[course]; const order=R.shuffle(CB.map((_,i)=>i)); let tries=0;

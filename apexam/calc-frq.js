@@ -460,5 +460,115 @@ Bbc.push((R)=>{
    model:`d/dt(dy/dx) = [6t(2t${p?sg(p):""}) − 2(3t² − ${q})]/(2t${p?sg(p):""})². d²y/dx² = [d/dt(dy/dx)]/(dx/dt). At t = ${t1}: <b>${frac(d2)}</b>.`}]};
 });
 
+
+/* B7. Function analysis from a formula */
+B.push((R)=>{
+ const a=R.pick([-1,0,1,2,3]); const eN=n=>n===0?"1":n===1?"e":`e<sup>${n}</sup>`; const xa=a===0?"x":`(x ${a<0?"+ "+(-a):"− "+a})`;
+ const c=a-1, ip=a-2, lo=a-3, hi=a+1; const f=x=>(x-a)*e(x);
+ return {title:"Analyzing a function",topic:"analysis",type:"Function analysis (no calculator)",
+  stem:`<p>Let f be the function defined by f(x) = ${xa}e<sup>x</sup> for all real numbers x.</p>`,
+  parts:[
+  {id:"a",q:"Find f′(x). Find the x-coordinate of the critical point of f, and determine whether f has a relative minimum, a relative maximum, or neither there. Justify your answer.",
+   pts:[P("f′(x)",`Product rule: f′(x) = e<sup>x</sup> + ${xa}e<sup>x</sup> = (x ${c<0?"+ "+(-c):c?"− "+c:""})e<sup>x</sup>.`,"Missing the product rule.",[[/e\s*\^|e<sup>|e\s*x|eˣ/i,"Use the product rule."]]),
+        P("Critical point",`x = ${c}.`,"",[[NUM(c,0.001),`x = ${c}.`]]),
+        P("Classification with reason",`Relative minimum: f′ changes from negative to positive at x = ${c} (e<sup>x</sup> &gt; 0).`,"Classifying without a sign change or second-derivative argument.",[[/min/i,"It is a relative minimum."],[/sign|negative|positive|f″|second/i,"Justify with the sign of f′ (or f″)."]])],
+   model:`f′(x) = e<sup>x</sup> + ${xa}e<sup>x</sup> = (x ${c<0?"+ "+(-c):c?"− "+c:""})e<sup>x</sup>. Since e<sup>x</sup> &gt; 0, f′(x) = 0 only at <b>x = ${c}</b>. f′ &lt; 0 for x &lt; ${c} and f′ &gt; 0 for x &gt; ${c}, so f has a <b>relative minimum</b> at x = ${c}.`},
+  {id:"b",q:"On what intervals is the graph of f concave up? Concave down? Justify your answer.",
+   pts:[P("f″(x)",`f″(x) = (x ${ip<0?"+ "+(-ip):ip?"− "+ip:""})e<sup>x</sup>.`,"",[]),
+        P("Intervals",`Concave down on (−∞, ${ip}); concave up on (${ip}, ∞), because f″ &lt; 0 and f″ &gt; 0 there.`,"",[[NUM(ip,0.001),`The concavity changes at x = ${ip}.`]])],
+   model:`f″(x) = e<sup>x</sup> + (x ${c<0?"+ "+(-c):c?"− "+c:""})e<sup>x</sup> = (x ${ip<0?"+ "+(-ip):ip?"− "+ip:""})e<sup>x</sup>. f″ &lt; 0 on <b>(−∞, ${ip})</b>: concave down. f″ &gt; 0 on <b>(${ip}, ∞)</b>: concave up.`},
+  {id:"c",q:`Find the absolute maximum value and the absolute minimum value of f on the closed interval ${lo} ≤ x ≤ ${hi}. Justify your answers.`,
+   pts:[P("Candidates",`f(${lo}) = −3${eN(lo)}, f(${c}) = −${eN(c)}, f(${hi}) = ${eN(hi)}.`,"Not checking the endpoints.",[[/candidate|endpoint|f\s*\(/i,"Evaluate f at the endpoints and the critical point."]]),
+        P("Answers",`Absolute maximum ${eN(hi)} (at x = ${hi}); absolute minimum −${eN(c)} (at x = ${c}).`,"",[[NUM(f(hi),Math.max(0.01,f(hi)*0.003)),`The maximum is ${eN(hi)} ≈ ${f3(f(hi))}.`]])],
+   model:`Candidates: f(${lo}) = −3${eN(lo)} ≈ ${f3(f(lo))}; f(${c}) = −${eN(c)} ≈ ${f3(f(c))}; f(${hi}) = ${eN(hi)} ≈ ${f3(f(hi))}.<br>Absolute maximum: <b>${eN(hi)}</b>. Absolute minimum: <b>−${eN(c)}</b>.`},
+  {id:"d",q:"Find lim<sub>x→−∞</sub> f(x). Show the work that leads to your answer.",
+   pts:[P("Indeterminate form",`Rewrites as ${FR(xa.replace(/[()]/g,""),"e<sup>−x</sup>")} (form ∞/∞) and applies L'Hôpital's Rule.`,"",[[/l.?h[oô]pital|∞\s*\/\s*∞|e\s*\^?\s*[−-]x|e<sup>−x/i,"Rewrite as a quotient and use L'Hôpital's Rule."]]),
+        P("Answer","0.","",[[NUM(0,0.001),"The limit is 0."]])],
+   model:`lim (x ${a<0?"+ "+(-a):"− "+a})/e<sup>−x</sup> has the form −∞/∞. By L'Hôpital's Rule it equals lim 1/(−e<sup>−x</sup>) = lim (−e<sup>x</sup>) = <b>0</b>.`}]};
+});
+
+/* B8. Piecewise function: continuity and differentiability */
+B.push((R)=>{
+ const c=R.pick([1,2]), b=R.int(-3,3), c0=R.int(-2,4); const diff=R.chance(0.5); const m=diff?2*c+b:2*c+b+R.pick([-2,-1,1,2]); const d=c*c+b*c+c0-m*c;
+ const top=`x²${b?(b<0?" − ":" + ")+(Math.abs(b)===1?"":Math.abs(b))+"x":""}${c0?(c0<0?" − ":" + ")+Math.abs(c0):""}`; const I=c**3/3+b*c*c/2+c0*c+m*((c+2)**2-c*c)/2+2*d;
+ const f=x=>x<=c?x*x+b*x+c0:m*x+d; const avr=(f(c+2)-f(0))/(c+2);
+ return {title:"Piecewise-defined function",topic:"piecewise",type:"Continuity and differentiability (no calculator)",
+  stem:`<p>Let f be the function defined by f(x) = { ${top} for x ≤ ${c};  ${m===1?"":m===-1?"−":m}x + k for x &gt; ${c} }, where k is a constant.</p>`,
+  parts:[
+  {id:"a",q:`Find the value of k for which f is continuous at x = ${c}. Justify your answer.`,
+   pts:[P("One-sided limits",`lim<sub>x→${c}<sup>−</sup></sub> f(x) = ${N(c*c+b*c+c0)} and lim<sub>x→${c}<sup>+</sup></sub> f(x) = ${N(m*c)} + k, and they must equal f(${c}).`,"",[[/lim|left|right|=/i,"Set the one-sided limits equal."]]),
+        P("Value",`k = ${N(d)}.`,"",[[NUM(d,0.001),`k = ${N(d)}.`]])],
+   model:`Continuity at x = ${c}: lim from the left = f(${c}) = ${c}² ${b<0?"−":"+"} ${Math.abs(b)}(${c}) ${c0<0?"−":"+"} ${Math.abs(c0)} = ${N(c*c+b*c+c0)}; lim from the right = ${N(m*c)} + k. So <b>k = ${N(d)}</b>.`},
+  {id:"b",q:`With this value of k, is f differentiable at x = ${c}? Justify your answer.`,
+   pts:[P("Left and right derivatives",`From the left: 2x ${b<0?"−":"+"} ${Math.abs(b)} → ${N(2*c+b)}; from the right: ${N(m)}.`,"",[[NUM(2*c+b,0.001),`The left derivative is ${N(2*c+b)}.`]]),
+        P("Conclusion",`${diff?"Yes":"No"}: the one-sided derivatives are ${diff?"equal (and f is continuous)":"not equal"}.`,"",[[diff?/yes|is differentiable/i:/\bno\b|not differentiable/i,`f ${diff?"is":"is not"} differentiable at x = ${c}.`]])],
+   model:`f is continuous at x = ${c}. The derivative from the left is 2(${c}) ${b<0?"−":"+"} ${Math.abs(b)} = ${N(2*c+b)}; from the right it is ${N(m)}. ${diff?"They are equal, so f <b>is differentiable</b> at x = "+c+".":"They differ, so f is <b>not differentiable</b> at x = "+c+" (a corner)."}`},
+  {id:"c",q:`Find ${ig(0,c+2)} f(x) dx.`,
+   pts:[P("Splits the integral",`${ig(0,c)} (${top}) dx + ${ig(c,c+2)} (${N(m)}x + ${N(d)}) dx.`,"",[[/\+/,"Split the integral at x = "+c+"."]]),
+        P("Antiderivatives","Correct antiderivatives of both pieces.","",[]),
+        P("Value",`${frac(I)}.`,"",[[NUM(I,0.01),`The value is ${frac(I)}.`]])],
+   model:`${ig(0,c)} (${top}) dx = ${frac(c**3/3+b*c*c/2+c0*c)}; ${ig(c,c+2)} (${N(m)}x + ${N(d)}) dx = ${frac(m*((c+2)**2-c*c)/2+2*d)}. Total: <b>${frac(I)}</b>.`},
+  {id:"d",q:`Find the average rate of change of f on [0, ${c+2}]. Does the Mean Value Theorem guarantee a value x in (0, ${c+2}) with f′(x) equal to this average rate? Explain.`,
+   pts:[P("Average rate",`[f(${c+2}) − f(0)]/${c+2} = ${frac(avr)}.`,"",[[NUM(avr,0.01),`The average rate is ${frac(avr)}.`]]),
+        P("MVT hypotheses",diff?"Yes: f is continuous on [0, "+(c+2)+"] and differentiable on (0, "+(c+2)+"), so the MVT applies.":"No: f is not differentiable at x = "+c+", so the hypotheses of the MVT are not met.","",[[/differentiab/i,"Check the differentiability hypothesis."]])],
+   model:`f(${c+2}) = ${N(f(c+2))}, f(0) = ${N(f(0))}; average rate = <b>${frac(avr)}</b>. ${diff?"f is continuous and differentiable on the interval, so the Mean Value Theorem <b>does</b> guarantee such a value.":`f is not differentiable at x = ${c}, which is inside (0, ${c+2}), so the Mean Value Theorem <b>does not</b> apply (it guarantees nothing).`}`}]};
+});
+
+/* B9. The graph of f′ */
+B.push((R)=>{
+ const xs=[-4,-3,-2,-1,0,1,2,3,4]; let ys, ok=false;
+ for(let tr=0;tr<80&&!ok;tr++){ ys=[R.int(-2,2)]; for(let i=1;i<9;i++) ys.push(Math.max(-3,Math.min(3,ys[i-1]+R.pick([-2,-1,-1,0,1,1,2]))));
+  for(let i=0;i<8;i++) if(ys[i]*ys[i+1]<0){ if(Math.abs(ys[i])<=Math.abs(ys[i+1])) ys[i]=0; else ys[i+1]=0; }
+  ok=ys.some(v=>v>0)&&ys.some(v=>v<0)&&ys.slice(1).some((v,i)=>v<ys[i])&&ys.slice(1).some((v,i)=>v>ys[i]); }
+ if(!ok) return null;
+ const k=R.int(-2,5); const area=(i)=>(ys[i]+ys[i+1])/2; const Fv=x=>{ let s=0; if(x>=0) for(let i=4;i<4+x;i++) s+=area(i); else for(let i=4+x;i<4;i++) s-=area(i); return k+s; };
+ const sc=[]; for(let i=1;i<8;i++){ if(ys[i]!==0) continue; const L=ys.slice(0,i).reverse().find(v=>v!==0), Rr=ys.slice(i+1).find(v=>v!==0); if(L&&Rr&&L*Rr<0) sc.push([xs[i],L>0?"max":"min"]); }
+ const ask=sc.some(s=>s[1]==="min")?"minimum":"maximum", ex=sc.filter(s=>s[1]===(ask==="minimum"?"min":"max")).map(s=>s[0]); if(!ex.length) return null;
+ const iv=[]; for(let i=0;i<8;i++){ if(ys[i+1]<ys[i]){ if(iv.length&&iv[iv.length-1][1]===xs[i]) iv[iv.length-1][1]=xs[i+1]; else iv.push([xs[i],xs[i+1]]); } } const ivs=iv.map(([a,b])=>`(${a}, ${b})`).join(" ∪ ");
+ const pc=R.pick([-3,-2,-1,1,2].filter(p=>ys[p+5]!==ys[p+4])); if(pc==null) return null; const sl=ys[pc+5]-ys[pc+4], fp=ys[pc+4], fpv=Fv(pc), apx=fpv+fp*0.5, under=sl>0;
+ return {title:"Graph of the derivative",topic:"fprime",type:"Graphical analysis of f′ (no calculator)",
+  stem:`<p>The function f is differentiable on −4 ≤ x ≤ 4, and f(0) = ${k}. The graph of f′, the derivative of f, consists of line segments and is shown.</p>${plot({xmin:-4,xmax:4,ymin:-3.5,ymax:3.5,curves:[{pts:xs.map((x,i)=>[x,ys[i]])}],dots:xs.map((x,i)=>[x,ys[i]]),lab:{x:"x",y:"y"},cap:"Graph of f′"})}`,
+  parts:[
+  {id:"a",q:`On −4 &lt; x &lt; 4, find all x-values at which f has a relative ${ask}. Justify.`,
+   pts:[P("Answer",`x = ${ex.join(", ")}.`,"Including zeros of f′ where it does not change sign.",[[NUM(ex[0],0.01),`x = ${ex.join(", ")}.`]]),P("Justification",`f′ changes from ${ask==="minimum"?"negative to positive":"positive to negative"} there.`,"",[[/chang|sign/i,"Justify with a sign change of f′."]])],
+   model:`f′ changes from ${ask==="minimum"?"negative to positive":"positive to negative"} at <b>x = ${ex.join(", ")}</b>, so f has a relative ${ask} there.`},
+  {id:"b",q:"Find all open intervals on which the graph of f is concave down. Justify.",
+   pts:[P("Intervals",ivs+".","Using where f′ is negative (that is where f decreases).",[[NUM(iv[0][0],0.01),`The intervals are ${ivs}.`]]),P("Justification","f′ is decreasing on those intervals (f″ &lt; 0).","",[[/decreas|f″|second|slope/i,"Justify: f′ is decreasing."]])],
+   model:`f is concave down where f′ is decreasing: <b>${ivs}</b>.`},
+  {id:"c",q:"Find f(4) and f(−4).",
+   pts:[P("f(4)",`f(4) = ${k} + ${ig(0,4)} f′(x) dx = ${frac(Fv(4))}.`,"",[[NUM(Fv(4),0.01),`f(4) = ${frac(Fv(4))}.`]]),P("f(−4)",`f(−4) = ${k} − ${ig(-4,0)} f′(x) dx = ${frac(Fv(-4))}.`,"",[[NUM(Fv(-4),0.01),`f(−4) = ${frac(Fv(-4))}.`]])],
+   model:`f(4) = f(0) + ${ig(0,4)} f′(x) dx = ${k} + (${frac(Fv(4)-k)}) = <b>${frac(Fv(4))}</b>.<br>f(−4) = f(0) − ${ig(-4,0)} f′(x) dx = ${k} − (${frac(k-Fv(-4))}) = <b>${frac(Fv(-4))}</b>.`},
+  {id:"d",q:`Write an equation for the line tangent to the graph of f at x = ${pc}, and use it to approximate f(${pc+0.5}). Is the approximation an overestimate or an underestimate? Explain.`,
+   pts:[P("Tangent line",`f(${pc}) = ${frac(fpv)}, f′(${pc}) = ${fp}: y = ${frac(fpv)} ${fp<0?"−":"+"} ${Math.abs(fp)}(x ${pc<0?"+ "+(-pc):"− "+pc}).`,"",[[NUM(fpv,0.01),`f(${pc}) = ${frac(fpv)}.`]]),
+        P("Approximation",`f(${pc+0.5}) ≈ ${frac(apx)}.`,"",[[NUM(apx,0.01),`The approximation is ${frac(apx)}.`]]),
+        P("Over/under with reason",`${under?"Underestimate":"Overestimate"}: f′ is ${under?"increasing":"decreasing"} on (${pc}, ${pc+1}), so f is concave ${under?"up":"down"} and the tangent line lies ${under?"below":"above"} the graph.`,"",[[under?/under/i:/over/i,`It is an ${under?"underestimate":"overestimate"}.`]])],
+   model:`f(${pc}) = ${frac(fpv)} (from the areas) and f′(${pc}) = ${fp}. Tangent line: y = ${frac(fpv)} + ${fp}(x − ${pc}). f(${pc+0.5}) ≈ <b>${frac(apx)}</b>. On (${pc}, ${pc+1}) the graph of f′ is ${under?"increasing":"decreasing"}, so f is concave ${under?"up":"down"}: an <b>${under?"underestimate":"overestimate"}</b>.`}]};
+});
+
+/* BC S2. Power series: interval of convergence */
+S.push((R)=>{
+ const c=R.pick([-2,-1,1,2,3]), k=R.pick([2,3,4,5]); const xs=`(x ${c<0?"+ "+(-c):"− "+c})`;
+ return {title:"Power series",topic:"series",type:"Power series (no calculator)",
+  stem:`<p>The function f is defined by the power series f(x) = Σ<sub>n=1</sub><sup>∞</sup> ${FR(`${xs}<sup>n</sup>`,`n · ${k}<sup>n</sup>`)} for all x for which the series converges.</p>`,
+  parts:[
+  {id:"a",q:"Use the ratio test to find the radius of convergence of the series.",
+   pts:[P("Ratio test",`|a<sub>n+1</sub>/a<sub>n</sub>| = ${FR("n","n + 1")}·|x ${c<0?"+ "+(-c):"− "+c}|/${k} → |x ${c<0?"+ "+(-c):"− "+c}|/${k}.`,"",[[/ratio|lim/i,"Set up the ratio test with a limit."]]),P("Radius",`${k}.`,"",[[NUM(k,0.001),`The radius is ${k}.`]])],
+   model:`lim |a<sub>n+1</sub>/a<sub>n</sub>| = lim ${FR("n","n + 1")}·|x ${c<0?"+ "+(-c):"− "+c}|/${k} = |x ${c<0?"+ "+(-c):"− "+c}|/${k} &lt; 1 ⇒ radius <b>${k}</b>.`},
+  {id:"b",q:"Find the interval of convergence. Justify your treatment of the endpoints.",
+   pts:[P(`Right endpoint x = ${c+k}`,"Σ 1/n, the harmonic series: diverges.","",[[/harmonic|diverg|p\s*=\s*1/i,"The right endpoint gives the harmonic series."]]),
+        P(`Left endpoint x = ${c-k}`,"Σ (−1)<sup>n</sup>/n converges by the alternating series test.","",[[/alternat/i,"Use the alternating series test."]]),
+        P("Interval",`[${c-k}, ${c+k}).`,"",[[NUM(c-k,0.001),`The interval is [${c-k}, ${c+k}).`]])],
+   model:`At x = ${c+k}: Σ ${k}<sup>n</sup>/(n·${k}<sup>n</sup>) = Σ 1/n diverges (harmonic). At x = ${c-k}: Σ (−1)<sup>n</sup>/n converges (terms alternate, decrease, and approach 0). Interval: <b>[${c-k}, ${c+k})</b>.`},
+  {id:"c",q:`Does the series converge absolutely or conditionally at x = ${c-k}? Explain.`,
+   pts:[P("Conditional","Conditionally: it converges, but Σ |(−1)<sup>n</sup>/n| = Σ 1/n diverges.","",[[/condition/i,"It converges conditionally."]])],
+   model:`The series of absolute values is Σ 1/n, which diverges, so the convergence at x = ${c-k} is <b>conditional</b>.`},
+  {id:"d",q:"Write the first three nonzero terms and the general term of the series for f′(x).",
+   pts:[P("First three terms",`${FR(1,k)} + ${FR(xs,k*k)} + ${FR(xs+"²",k**3)}.`,"",[[NUM(1/k,0.001),`The first term is 1/${k}.`]]),P("General term",`${FR(`${xs}<sup>n−1</sup>`,`${k}<sup>n</sup>`)}.`,"",[[/n\s*[−-]\s*1/i,"General term has the power n − 1."]])],
+   model:`Differentiate term by term: f′(x) = Σ ${FR(`n${xs}<sup>n−1</sup>`,`n·${k}<sup>n</sup>`)} = <b>${FR(1,k)} + ${FR(xs,k*k)} + ${FR(xs+"²",k**3)} + … + ${FR(`${xs}<sup>n−1</sup>`,`${k}<sup>n</sup>`)} + …</b>`},
+  {id:"e",q:`Find f′(${c}).`,
+   pts:[P("Value",`${FR(1,k)}.`,"",[[NUM(1/k,0.001),`f′(${c}) = 1/${k}.`]])],
+   model:`At x = ${c} every term after the first is 0: f′(${c}) = <b>1/${k}</b>.`}]};
+});
+
 ZX.frq.ab={A,B}; ZX.frq.bc={A,B,Abc,Bbc,S};
 })();

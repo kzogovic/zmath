@@ -41,16 +41,16 @@ document.addEventListener("click",e=>{ const a=e.target.closest("a.rl-b"); if(!a
 const isCalcQ=(y,q)=>{ const n=parseInt(y); return n>=2011?q<=2:q<=3; };
 function kind(t){ t=String(t);
  const R=[["polar",/polar/i],["param",/parametric|vector|plane|xy-plane/i],["series",/series|taylor|maclaurin|convergen|power|lagrange|error bound|polynomial approx/i],["logistic",/logistic|euler/i],["de",/differential equation|slope field|separa|\bDE\b/i],["rr",/related|cone|ladder|balloon|shadow|conical|trough/i],["implicit",/implicit|curve given|tangent line to the curve/i],
-  ["graph",/graph of|f′ graph|derivative graph|accumulation function|integral-defined|integral function|piecewise|defined by an integral|g\(x\)|function g|extrema|concavity|inflection|critical/i],["motion",/particle|velocity|motion|position|train|runner|rocket|bike|cyclist/i],["areavol",/area|volume|region|solid/i],
+  ["fprime",/derivative graph|graph of f′|from f′|f′ graph/i],["piecewise",/piecewise|continuity|differentiab/i],["graph",/graph of|accumulation function|integral-defined|integral function|piecewise|defined by an integral|g\(x\)|function g/i],["motion",/particle|velocity|motion|position|train|runner|rocket|bike|cyclist/i],["areavol",/area|volume|region|solid/i],
   ["table",/table|tabular|riemann|trapez|estimate|average value|temperature|density|blood/i],["rates",/rate|flow|enter|leav|tank|water|people|accumulat|traffic|snow|sand|gallons|entries|species/i]];
- const r=R.find(r=>r[1].test(t)); return r?r[0]:"graph"; }
-const LBL={rates:"Rates in context",motion:"Particle motion",areavol:"Area and volume",table:"Data in a table",graph:"Graphical analysis",implicit:"Implicit differentiation",de:"Differential equations",rr:"Related rates",param:"Parametric and vector motion",polar:"Polar curves",series:"Taylor series",logistic:"Logistic growth and Euler's method",q1:"Function Concepts",q2:"Modeling a Non-Periodic Context",q3:"Modeling a Periodic Context",q4:"Symbolic Manipulations"};
+ const r=R.find(r=>r[1].test(t)); return r?r[0]:"analysis"; }
+const LBL={rates:"Rates in context",motion:"Particle motion",areavol:"Area and volume",table:"Data in a table",graph:"Graphical analysis",implicit:"Implicit differentiation",de:"Differential equations",rr:"Related rates",param:"Parametric and vector motion",polar:"Polar curves",series:"Taylor series",fprime:"Graph of f′",piecewise:"Continuity and differentiability",analysis:"Function analysis",logistic:"Logistic growth and Euler's method",q1:"Function Concepts",q2:"Modeling a Non-Periodic Context",q3:"Modeling a Periodic Context",q4:"Symbolic Manipulations"};
 function pickTemplate(course,x){
  if(course==="pc"){ const s=Math.min(4,Math.max(1,+x.q||1)), L=ZX.frq.pc[s]; return {k:"q"+s,calc:s<=2,f:L[Math.floor(Math.random()*L.length)]}; }
  const F=course==="bc"?ZX.frq.bc:ZX.frq.ab, calc=isCalcQ(x.y,x.q); let k=kind(x.t);
  if(course==="ab"&&/series|logistic|param|polar/.test(k)) k="graph";
- const A=F.A, B=F.B, map={rates:[A[0]],areavol:[A[2]],motion:[calc?A[1]:B[4]],table:[calc?A[3]:B[1]],graph:[B[0]],implicit:[B[2]],de:[B[3]],rr:[B[5]],
-  param:[calc?(F.Abc||[])[0]:(F.Bbc||[])[1]],polar:[(F.Abc||[])[1]],series:[(F.S||[])[0]],logistic:[(F.Bbc||[])[0]]};
+ const A=F.A, B=F.B, map={rates:[A[0]],areavol:[A[2]],motion:[calc?A[1]:B[4]],table:[calc?A[3]:B[1]],graph:[B[0]],implicit:[B[2]],de:[B[3]],rr:[B[5]],fprime:[B[8]],piecewise:[B[7]],analysis:[B[6]],
+  param:[calc?(F.Abc||[])[0]:(F.Bbc||[])[1]],polar:[(F.Abc||[])[1]],series:[(F.S||[])[/converg|interval|ratio|power/i.test(x.t)?1:0]],logistic:[(F.Bbc||[])[0]]};
  const f=(map[k]||[B[0]])[0]||B[0]; const calcT=/^(rates|areavol|polar)$/.test(k)||(/^(motion|table|param)$/.test(k)&&calc);
  return {k,calc:calcT,f}; }
 const RNG=()=>ZX.rng(1+Math.floor(Math.random()*2e9));
