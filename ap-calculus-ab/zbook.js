@@ -270,7 +270,7 @@ function relBtns(x){ const k=ZC.relKey, L=((window.ZREL.links||{})[k]||{})[x.y]|
   return Object.entries(L).filter(([t])=>!/^Q\d/.test(t)||t.startsWith("Q"+x.q+" ")).map(([t,h])=>A(h,(nm[t]||t),t==="Student samples"?"smp":"")).join("")||`<span class="rl-b off">Links coming</span>`; }
 function relRow(x,cur){ const uu=x.u.map(n=>`<span class="rl-u${n===cur?" on":""}" title="${(ZC.units.find(v=>v.num===n)||{}).name||""}">${n}</span>`).join(""),
   calc=ZC.relKey==="pc"?"":`<span class="rl-cal ${isCalcQ(x.y,x.q)?"yes":"no"}">${isCalcQ(x.y,x.q)?"Calculator":"No calculator"}</span>`;
-  return `<tr><td class="rl-ex"><b>${exLabel(x.y)}</b> · Q${x.q}${calc}</td><td class="rl-tt">${x.t}</td><td class="rl-us2">${uu}</td><td class="rl-ln">${relBtns(x)}</td></tr>`; }
+  return `<tr><td class="rl-ex"><b>${exLabel(x.y)}</b> · Q${x.q}${calc}</td><td class="rl-tt">${x.t}</td><td class="rl-us2">${uu}</td><td class="rl-ln">${relBtns(x)}${window.ZRV?window.ZRV.btn(x):""}</td></tr>`; }
 function relTable(list,cur,title,open){ return `<details class="rl-d"${open?" open":""}><summary>${title} (${list.length})</summary><table class="rl-tb"><thead><tr><th>Exam</th><th>Question</th><th>Units</th><th>Official PDFs</th></tr></thead><tbody>${list.map(x=>relRow(x,cur)).join("")}</tbody></table></details>`; }
 function relHTML(u){ const k=ZC.relKey.toUpperCase(), nm=ZC.relName||("AP Calculus "+k), yrs=ZC.relYears||"1998–2026";
   const all=relList(u).sort((a,b)=>yKey(b.y)-yKey(a.y)||a.q-b.q), calcBook=(ZC.relKey==="ab"||ZC.relKey==="bc");
