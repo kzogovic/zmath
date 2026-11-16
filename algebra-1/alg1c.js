@@ -132,4 +132,34 @@ const Z=window.ZC, L=Z.units, rv=L.findIndex(u=>u.id==="review");
 EOC.num=rv; L.splice(rv,0,EOC); const R0=L[rv+1]; R0.num=rv+1;
 ["gen","med","adv"].forEach(k=>R0[k]=R0[k].concat(EOC[k])); R0.sheet.push([EOC.c,EOC.short,EOC.sheet[2][2],""]);
 Z.strands.splice(Z.strands.length-1,0,["EOC prep",GOLD,["eoc"]]);
+/* ---- answer-format instructions on every question ---- */
+const decs=v=>{ const s=String(+(+v).toFixed(6)); return s.includes(".")?s.split(".")[1].length:0; };
+function numHint(v,tol,a){ const A=String(a).replace(/<[^>]+>/g,"");
+  if(/^\$/.test(A)&&!Number.isInteger(v)) return "Round to the nearest cent.";
+  if(tol!=null&&tol>=0.4) return "Round to the nearest whole number.";
+  if(tol!=null&&tol>=0.04) return "Round to the nearest tenth.";
+  if(tol!=null&&tol>=0.004) return "Round to the nearest hundredth.";
+  if(/\d\/\d/.test(A)) return "Write your answer as a fraction in simplest form, like 3/4.";
+  if(decs(v)>0) return "Write your answer as a decimal.";
+  return "Give an exact answer: no rounding."; }
+function hintOf(p,uid){ const q=String(p.q), A=String(p.a).replace(/<[^>]+>/g,"");
+  const TH={"qf|Completing the square":"Write in vertex form: y = a(x − h)^2 + k.","qf|Vertex to standard form":"Write in standard form: y = ax^2 + bx + c.","lf|Equation from two points":"Write in slope-intercept form: y = mx + b.","lf|Point-slope form":"Write in slope-intercept form: y = mx + b.","lf|Graph to equation":"Write in slope-intercept form: y = mx + b.","lf|Line through a point":"Write in slope-intercept form: y = mx + b.","u5|Graphing":"Choose the circle (open or closed) and the direction."}; if(TH[uid+"|"+p.t]) return TH[uid+"|"+p.t];
+  if(/round|nearest|decimal places|to 2 decimals|to the cent/i.test(q)) return "";
+  if(!p.mc&&typeof p.v==="number"&&isFinite(p.v)) return numHint(p.v,p.tol,p.a);
+  if(/^\(.*,.*\)/.test(A)) return A.includes(" and ")?"Write each solution as an ordered pair (x, y).":"Write the answer as an ordered pair (x, y).";
+  if(/^x = .* (or|and) /.test(A)||/±/.test(A)) return "Give all solutions.";
+  if(uid==="u9"||/^Factor/.test(q.replace(/<[^>]+>/g,""))) return "Factor completely.";
+  if(uid==="u6") return "Simplify. Use positive exponents only.";
+  if(/√/.test(A)) return "Write in simplest radical form.";
+  if(/^y = /.test(A)) return "Write the equation solved for y (y = …).";
+  if(/(&lt;|&gt;|≤|≥|<|>)/.test(A)) return "Write the solution as an inequality.";
+  if(uid==="u8"||uid==="u0") return /x/.test(A)?"Simplify. Write terms from the highest power down.":"";
+  if(/^[a-zA-Z] = /.test(A)) return "Write the formula solved for the variable named.";
+  return ""; }
+const addH=(q,h)=>h?`${q}<span class="afh">✎ ${h}</span>`:q;
+if(!document.getElementById("afhcss")){ const st=document.createElement("style"); st.id="afhcss"; st.textContent=`.afh{display:block;font-size:15px;font-style:italic;color:#8a3b12;margin-top:3px}`; document.head.appendChild(st); }
+L.forEach(u=>{ if(u.id==="review") return; ["gen","med","adv"].forEach(k=>{ u[k]=u[k].map(g=>{ const h=()=>{ const p=g(); if(p&&!p._h){ p._h=1; p.q=addH(p.q,hintOf(p,u.id)); } return p; }; return h; }); }); });
+const RV=L.find(u=>u.id==="review"); ["gen","med","adv"].forEach(k=>RV[k]=L.filter(u=>u.id!=="review").flatMap(u=>u[k]));
+EOC.open=EOC.open.map(g=>()=>{ const p=g(); if(p) p.parts.forEach(pt=>{ const h=pt.k==="num"?(/round|nearest/i.test(pt.q)?"":numHint(pt.v,pt.tol,pt.a)):pt.k==="expr"?"Write an expression or equation. Use ^ for exponents, like x^2.":pt.k==="pair"?"Write an ordered pair, like (3, 5).":""; pt.q=addH(pt.q,h); }); return p; });
+
 })();
