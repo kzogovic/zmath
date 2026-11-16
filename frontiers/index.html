@@ -112,6 +112,7 @@ table.goals td{border-top:1px solid #eee;padding:8px 6px;vertical-align:top}
 table.goals td:first-child{font-weight:600;width:34%}
 .lchip{display:inline-block;border:1.5px solid var(--c);color:var(--c);border-radius:999px;padding:2px 11px;font-weight:700;text-decoration:none;font-size:15.5px;margin:2px 4px 2px 0}
 footer{text-align:center;font-size:15px;color:#555;padding:20px 14px 40px;font-style:italic}
+.pc{margin:6px 0;border:1px solid #e5e7eb;border-radius:8px;padding:4px 8px;background:#fafafa}.pc summary{cursor:pointer;font-weight:700}.pc ul{margin:4px 0 6px}.cmpt td,.cmpt th{border:1px solid #e5e7eb;padding:6px 8px;vertical-align:top;font-size:15px}.cmpt th{background:#f3f4f6}
 </style>
 <script>(function(){ var NS="https://abacus.jasoncameron.dev/hit/kzogovic.github.io/", K="frontiers";
  function hit(k){ try{ fetch(NS+k).catch(function(){}); }catch(e){} }
@@ -208,6 +209,7 @@ function topic(id){
  <div class="chain">${t.chain.map(c=>`<span>${esc(c)}</span>`).join("<i>→</i>")}</div>
  <h2 style="color:${t.color}">Which concept is used where</h2><p class="sub">Tap a class to open its Z-book.</p>
  <table class="path">${t.path.map(p=>`<tr><td><a class="cn" href="${C[p[0]].href}">${esc(C[p[0]].n)}</a><br><span class="cc">${esc(p[1])}</span></td><td>${esc(p[2])}</td></tr>`).join("")}</table>
+ ${(window.ZF_CODE||{})[t.id]?`<div class="note" style="--c:${t.color};margin-top:12px"><b>How it's coded in practice:</b> ${window.ZF_CODE[t.id].langs.map(x=>`<a class="lchip" style="--c:${LB[x].c}" href="#coding-${x}">${esc(LB[x].n)}</a>`).join(" ")}<p style="margin:6px 0 0">${esc(window.ZF_CODE[t.id].why)}</p><p style="margin:6px 0 0;font-size:15px;color:#555">The AP CS A rows above are about the <i>ideas</i> (loops, arrays, classes). The class teaches them in Java; in this field you would write them in the languages listed here.</p></div>`:""}
  ${t.demo?`<div class="demo" id="demo"></div>`:""}
  <h2 style="color:${t.color}">Dig deeper</h2><p class="sub">Start with green, then move to orange and purple.</p>
  ${resGrid(t.res,true,t.id)}
@@ -226,12 +228,20 @@ function coding(sel){
  document.getElementById("homeLink").style.display="";
  const usedIn=id=>T.filter(t=>(t.langs||[]).includes(id));
  let h=`<div class="thead" style="--c:#111"><h2>Which programming language for what?</h2><p>Every field on this site needs some coding. Here is which language to pick for which problems and careers, and where to learn it free.</p></div>
- <div class="note" style="--c:#2a7a46"><b>Short answer:</b> if you're in AP CS A, master <b>Java</b> for the exam, then learn <b>Python</b>. It's the main language of AI, data science and research. Add <b>SQL</b> for data and <b>JavaScript</b> for the web. Once you know one language well, the next one takes weeks, not years: loops, conditions, arrays and functions are the same ideas everywhere.</div>
+ <div class="note" style="--c:#2a7a46"><b>Short answer:</b> if you're in AP CS A, master <b>Java</b> for the exam, then learn <b>Python</b>: it's the main language of AI, data science and research, and the one most fields on this site use. Add <b>SQL</b> for any data job, <b>R</b> for statistics, <b>C++</b> where speed matters, and <b>JavaScript</b> for the web. Once you know one language well, the next one takes weeks, not years: loops, conditions, arrays and functions are the same ideas everywhere.</div>
+ <h2>The big five, side by side</h2><p class="sub">The languages you'll meet most in math, data and AI careers.</p><div class="mapwrap"><table class="goals cmpt"><tr><th></th><th>Python</th><th>SQL</th><th>R</th><th>C++</th><th>Java</th></tr>
+ <tr><td><b>Main job</b></td><td>AI, data, science, automation</td><td>Getting data out of databases</td><td>Statistics and research</td><td>Speed: engines, robots, AI cores</td><td>Big business systems, Android, AP CS A</td></tr>
+ <tr><td><b>How hard to start</b></td><td>Easiest</td><td>Easy</td><td>Medium</td><td>Hardest</td><td>Medium</td></tr>
+ <tr><td><b>Speed</b></td><td>Slow alone, fast with libraries</td><td>Depends on the database</td><td>Slow alone, fast with libraries</td><td>Fastest</td><td>Fast</td></tr>
+ <tr><td><b>Used with</b></td><td>SQL, C++ underneath</td><td>Python, R, Excel</td><td>SQL</td><td>Python on top</td><td>SQL</td></tr>
+ <tr><td><b>Biggest limit</b></td><td>Not for speed-critical code or phone apps</td><td>Not a full programming language</td><td>Little use outside statistics</td><td>Slow to write, easy to make bugs</td><td>Wordy; few data/AI tools</td></tr>
+ <tr><td><b>Typical jobs</b></td><td>Data scientist, ML engineer, researcher</td><td>Data analyst, every data job</td><td>Biostatistician, research analyst</td><td>Game, robotics, trading engineer</td><td>Back-end and Android developer</td></tr></table></div>
+ <p class="sub">A common path: <b>Java</b> in AP CS A → <b>Python</b> → <b>SQL</b>. Add <b>R</b> for statistics, or <b>C++</b> for games, robotics and competitive programming.</p>
  <h2>Pick by goal</h2><table class="goals">${GOALS.map(([g,l,a])=>`<tr><td>${esc(g)}</td><td><a class="lchip" style="--c:${LB[l].c}" href="#coding-${l}">${esc(LB[l].n)}</a> ${esc(a)}</td></tr>`).join("")}</table>
  <h2>The languages</h2><p class="sub">All the learning links below are free.</p><div class="langs">`;
  for(const l of L){ const u=usedIn(l.id);
   h+=`<div class="lang${l.id===sel?" hl":""}" id="lang-${l.id}" style="--c:${l.c}"><h3>${esc(l.n)}</h3><div class="lv">${esc(l.lvl)}</div><p style="margin:6px 0">${esc(l.why)}</p>
-  <b>Best for</b><ul>${l.best.map(b=>`<li>${esc(b)}</li>`).join("")}</ul><div class="sec"><b>Sectors:</b> ${esc(l.sectors)}</div>
+  <b>Best for</b><ul>${l.best.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>${(window.ZF_LANGX||{})[l.id]?(()=>{ const x=window.ZF_LANGX[l.id]; return `<details class="pc"><summary>Pros, cons and limits</summary><b style="color:#166534">Pros</b><ul>${x.pros.map(b=>`<li>${esc(b)}</li>`).join("")}</ul><b style="color:#991b1b">Cons</b><ul>${x.cons.map(b=>`<li>${esc(b)}</li>`).join("")}</ul><p style="margin:4px 0"><b>When to use it:</b> ${esc(x.limits)}</p></details>`; })():""}<div class="sec"><b>Sectors:</b> ${esc(l.sectors)}</div>
   ${u.length?`<div class="ff"><b>Fields on this site:</b> ${u.map(t=>`<a href="#${t.id}" style="color:${t.color};text-decoration:none;font-weight:600">${t.icon} ${esc(t.name)}</a>`).join(" · ")}</div>`:""}
   <div class="lr" style="margin-top:8px"><b>Learn it free</b>${l.res.map(r=>`<a href="${esc(r.u)}"${r.u.startsWith("http")?' target="_blank" rel="noopener"':""}>${esc(r.t)}${r.u.startsWith("http")?" ↗":" →"}${r.by?` <span>${esc(r.by)}</span>`:""}</a>`).join("")}</div></div>`; }
  h+=`</div><h2>Practice in any language</h2>${resGrid([

@@ -10,7 +10,7 @@ window.ZF_COURSES = {
   "ap-calculus-ab":       {n:"AP Calculus AB", href:"../ap-calculus-ab/"},
   "ap-calculus-bc":       {n:"AP Calculus BC", href:"../ap-calculus-bc/"},
   "ap-statistics":        {n:"AP Statistics", href:"../ap-statistics/"},
-  "ap-computer-science-a":{n:"AP CS A (Java)", href:"../ap-computer-science-a/"},
+  "ap-computer-science-a":{n:"AP CS A", href:"../ap-computer-science-a/"},
   "discrete-math":        {n:"Discrete Math", href:"../discrete-math/"},
   "linear-algebra":       {n:"Linear Algebra", href:"../linear-algebra/"},
   "multivariable-calculus":{n:"Multivariable Calculus", href:"../multivariable-calculus/"},
@@ -85,7 +85,7 @@ window.ZF_TOPICS = [
   {k:"journal",l:3,t:"arXiv: Artificial Intelligence (cs.AI)",u:"https://arxiv.org/list/cs.AI/recent",d:"New AI papers every day."}
  ]},
 
-{id:"game",langs:["python", "java"], name:"Game Theory", icon:"♟️", color:"#b03a2e",
+{id:"game",langs:["python"], name:"Game Theory", icon:"♟️", color:"#b03a2e",
  hook:"The math of strategy: what to do when your best move depends on what everyone else does.",
  what:"Game theory models players, their choices and their payoffs. A Nash equilibrium is a set of choices where nobody can do better by changing only their own move. It explains why people cooperate or cheat, how auctions should be designed, how to take a penalty kick, and how evolution can produce cooperation. Two Nobel Prizes in economics (1994 and 2012) went to game theory.",
  see:["Online ad auctions behind every web search","Matching students to schools and kidney donors to patients","Penalty kicks, pitch choice and play calling","Traffic jams and Braess's paradox","Cooperation in biology and evolution","AI that plays poker and Go"],
@@ -159,7 +159,7 @@ window.ZF_TOPICS = [
   ["algebra-2","Inverse functions","Encryption and decryption are inverse functions."],
   ["linear-algebra","Matrices mod n, lattices","The Hill cipher; lattice-based codes are the new quantum-safe standard."],
   ["ap-statistics","Frequency analysis","Letter frequencies break substitution ciphers."],
-  ["ap-computer-science-a","Strings and loops","Code a Caesar or Vigenère cipher in Java."]
+  ["ap-computer-science-a","Strings and loops","Code a Caesar or Vigenère cipher. You can do it in Java in class; security people would use Python."]
  ],
  demo:"rsa",
  careers:["Cryptographer","Security engineer","Penetration tester","Blockchain developer","Intelligence analyst"],
@@ -449,7 +449,7 @@ window.ZF_LANGS = [
 
 /* Pick by goal */
 window.ZF_GOALS = [
- ["I'm in AP Computer Science A","java","Stick with Java for the exam; learn Python next. Most ideas transfer directly."],
+ ["I'm in AP Computer Science A","java","Java for the exam (it teaches strict, careful programming). Then learn Python: it is what most fields on this site actually use. Loops, arrays, classes and algorithms transfer directly."],
  ["My first language","python","Python (or Scratch for younger students). Readable, and useful in every field on this site."],
  ["Machine learning / AI","python","Python, with NumPy, pandas, scikit-learn and PyTorch. Learn SQL to get data."],
  ["Data science and statistics","python","Python or R, plus SQL."],
@@ -464,3 +464,36 @@ window.ZF_GOALS = [
  ["Finance and business analytics","python","Python and SQL, plus spreadsheets."],
  ["Quantum computing","python","Python with Qiskit (IBM)."]
 ];
+
+/* How each field is coded in practice (shown under each pathway). */
+window.ZF_CODE = {
+ ml:{langs:["python","sql","r"],why:"Almost all machine learning is written in Python, using scikit-learn for classic models and PyTorch for deep learning. The training data usually lives in a database, so SQL is how you get it out. R is common when the goal is statistical modeling and explaining results (medicine, social science) rather than building products."},
+ ai:{langs:["python","cpp"],why:"Researchers and engineers build and train neural networks in Python (PyTorch, JAX, TensorFlow). The heavy math underneath runs in C++ and CUDA on GPUs. Python is the steering wheel, C++ is the engine, so most people only write Python unless they work on the libraries themselves."},
+ game:{langs:["python"],why:"Game-theory simulations and tournaments are usually written in Python (for example the Axelrod and Nashpy libraries). Economists also use R, Julia and MATLAB. Java is fine for learning the loops and arrays in AP CS A, but it's rarely used for this research."},
+ data:{langs:["python","r","sql"],why:"SQL pulls the data out of the database. Then Python (pandas, Matplotlib) or R (tidyverse, ggplot2) cleans, analyzes and graphs it. R is strongest for statistics and research reports; Python is stronger when the analysis becomes part of an app or an AI pipeline. Most data analysts use SQL every day."},
+ crypto:{langs:["python","c","rust"],why:"Python is the best language for learning cryptography and for security puzzles (picoCTF). Real encryption libraries are written in C, and newer ones in Rust, because they must be fast and resist timing attacks. Security analysts also script in Python and Bash."},
+ opt:{langs:["python","julia","cpp"],why:"Optimization models are usually written in Python (SciPy, PuLP, Google OR-Tools) or Julia (JuMP). The solvers that do the hard work are written in C and C++. Businesses also use spreadsheet solvers for small problems."},
+ net:{langs:["python","javascript"],why:"Python (NetworkX) is the standard tool for analyzing networks. JavaScript (D3.js) draws interactive network pictures for the web. Very large graphs, like a whole social network, are processed with C++ or special graph databases."},
+ chaos:{langs:["python","julia","matlab"],why:"Simulations of differential equations are written in Python (NumPy, SciPy, Matplotlib) or Julia, which is faster for big models. Many engineering programs still use MATLAB. Climate models and weather forecasts run in Fortran and C++ on supercomputers."},
+ quantum:{langs:["python"],why:"Quantum programs are written in Python with Qiskit (IBM), Cirq (Google) or similar libraries. The Python code describes the circuit; the hardware or simulator runs it."},
+ graphics:{langs:["cpp","csharp","javascript"],why:"Big game engines (Unreal) and graphics software are written in C++ for speed. Unity games use C#. Web graphics use JavaScript (three.js, WebGL). Robots use C++ for real-time control and Python for planning and vision (ROS). Shaders, the small programs that color pixels, use GLSL or HLSL."},
+ signals:{langs:["python","matlab","c"],why:"Engineers design and test filters in Python (NumPy, SciPy) or MATLAB. The final code that runs inside phones, hearing aids and audio chips is written in C (or C++) because it must be small and fast."},
+ finance:{langs:["python","sql","r"],why:"Quantitative analysts use Python for models and backtesting, SQL for market and customer data, and R for statistics. High-speed trading systems are written in C++ because microseconds matter. Spreadsheets (Excel) are still everywhere in finance."}
+};
+
+/* Strengths, weaknesses and limits of each language. */
+window.ZF_LANGX = {
+ python:{pros:["Easiest to read and write; short programs","The biggest libraries for AI, data, science and math","Huge community: an answer exists for almost every question","Runs on every computer; great for quick experiments (Jupyter notebooks)"],cons:["Slow when you write the loops yourself (10–100× slower than C++); fast libraries hide this","Errors about types show up only when the code runs","Not used for phone apps or web pages in the browser","Indentation errors confuse beginners"],limits:"Use it for AI, data, science, automation and learning. Avoid it when every microsecond matters (game engines, trading systems, device firmware)."},
+ java:{pros:["Strict types catch many mistakes before the program runs","Very fast once running; scales to huge business systems","Teaches object-oriented design clearly (the AP CS A exam)","Used for Android and in robotics competitions (FIRST)"],cons:["Long and wordy: even \"Hello\" needs a class and a main method","Few tools for data science and AI compared with Python","Slower to experiment with than Python","Android development now prefers Kotlin"],limits:"Use it for AP CS A, large company back-end systems and Android. It is not the usual choice for data science, AI or research."},
+ javascript:{pros:["Runs in every web browser: share your project with a link","Instant visual results (HTML, CSS, canvas, p5.js)","Also runs on servers (Node.js)","Huge job market for web developers"],cons:["Quirky rules (for example \"5\" + 1 is \"51\")","Thousands of frameworks that change quickly","Weak for heavy math and statistics","Large projects usually add TypeScript for safety"],limits:"Use it for anything that lives in a web page. Avoid it for statistics, machine learning training and low-level hardware."},
+ sql:{pros:["The standard way to ask questions of a database","Short: a few lines can summarize millions of rows","Used in almost every data job, with every other language","Easy to start: SELECT, WHERE, GROUP BY"],cons:["Not a full programming language: no apps, games or graphs","Each database (MySQL, PostgreSQL, SQL Server) has small differences","Complicated questions become hard to read","You need a database to practice (free online sandboxes help)"],limits:"Use it whenever data is stored in tables. You'll pair it with Python, R or Excel to analyze and graph the results."},
+ r:{pros:["Built by statisticians: every statistical test and model is available","Beautiful graphs with ggplot2","Excellent for reports (R Markdown, Quarto) and research","Very strong in medicine, biology, psychology and public health"],cons:["Unusual syntax; harder for general programming","Slower and less used outside statistics","Fewer jobs than Python in tech and AI","Not used to build apps or websites"],limits:"Use it for statistics, data analysis and research papers. Choose Python if you also want AI, automation or apps."},
+ cpp:{pros:["Among the fastest languages; full control of memory and hardware","Runs game engines, robots, trading systems and the core of AI libraries","The top choice for competitive programming (USACO)","Huge amount of existing code in industry"],cons:["Hard to learn: memory management, pointers, long error messages","Easy to write bugs that crash or create security holes","Slow to write compared with Python","Building big projects is complicated"],limits:"Use it where speed and control matter most. For learning, data work and quick projects, Python is easier."},
+ c:{pros:["Small and close to the hardware: shows how computers really work","Runs on tiny chips (Arduino, microcontrollers)","Operating systems and many libraries are written in it","Very fast and predictable"],cons:["No objects, few built-in tools","Memory errors cause crashes and security bugs","Slow to write large programs","Not used for data science or web pages"],limits:"Use it for electronics, operating systems and understanding computers. Too low-level for most apps."},
+ csharp:{pros:["The language of Unity: huge share of mobile, indie and VR games","Similar to Java, so AP CS A students learn it quickly","Excellent tools (Visual Studio)","Also used for Windows and business software"],cons:["Mostly tied to Microsoft and Unity","Less used in AI, data and research","Big game engines (Unreal) use C++ instead"],limits:"Use it for Unity games and VR. Not the usual choice outside games and Microsoft systems."},
+ swift:{pros:["The official languages for iPhone (Swift) and Android (Kotlin) apps","Modern and safer than older languages","Great beginner tools (Swift Playgrounds)"],cons:["Each one mostly works on one platform","Swift development needs a Mac","Not used for data science or AI"],limits:"Use them for phone apps. For other projects, a general language like Python or JavaScript is more flexible."},
+ rust:{pros:["As fast as C++ but prevents most memory bugs","Loved by developers; growing in security and cloud companies","Excellent error messages"],cons:["Steep learning curve (ownership and borrowing rules)","Fewer jobs than C++ for now","Slower to write than Python"],limits:"Use it for secure, fast systems software. Learn it after you are comfortable with another language."},
+ julia:{pros:["Reads like math, runs nearly as fast as C","Excellent for differential equations and optimization","Can use Python libraries"],cons:["Small community and fewer jobs","Slow start-up the first time code runs","Fewer tutorials for beginners"],limits:"Use it for heavy scientific computing in research. Python is the safer first choice."},
+ matlab:{pros:["Matrices and engineering toolboxes built in","Standard in many engineering and university courses","Simulink for control systems and robotics"],cons:["Expensive outside schools","Less used outside engineering","Python now does most of the same things for free"],limits:"Use it if your engineering class or company uses it. Otherwise Python with NumPy covers most of the same ground."},
+ scratch:{pros:["No typing mistakes: drag blocks","Teaches loops, conditions and variables visually","Fun projects to share right away"],cons:["Not used for real-world software","Large projects get messy"],limits:"Great first step. Move to Python (or JavaScript) once you want to build real tools."}
+};
