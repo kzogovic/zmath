@@ -14,7 +14,7 @@ function build(seed,n){ const old=Math.random; Math.random=rng(seed);
     const k=t.topic==="Quick check"?"q"+CSBANK.B.indexOf(t):t.topic; if(used.has(k)&&tries<250) continue; const q=CSBANK.make(t); if(!q) continue; used.add(k); mc.push(q); got++; } }
   for(let i=mc.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [mc[i],mc[j]]=[mc[j],mc[i]]; }
   mc.sort((a,b)=>a.lvl-b.lvl);
-  const fr=[1,2,3,4].map(t=>{ const l=CSFRQ.F.filter(f=>f.type===t); return n?l[(n-1+t)%l.length]:l[Math.floor(Math.random()*l.length)]; });
+  const fr=[1,2,3,4].map(t=>{ const l=CSFRQ.F.filter(f=>f.type===t); return n?l[(n-1+3*t)%l.length]:l[Math.floor(Math.random()*l.length)]; });
   return {mc,fr}; } finally { Math.random=old; } }
 const T=build(CFG.seed,CFG.n); const app=document.getElementById("app"); const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 let S; try{ S=JSON.parse(localStorage.getItem(KEY))||null; }catch(e){ S=null; }

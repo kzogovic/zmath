@@ -115,7 +115,7 @@ function render(){
       const nf = frqFor(id).length; if(nf) panels.push({k:"frq", label:"Released FRQs", n:nf, body:frqTable(id, true)});
     }
     if(!term && id==="frq" && window.CSFRQ){
-      panels.push({k:"allfrq", label:"20 practice FRQs", n:CSFRQ.F.length, body:`<p class="ptitle">Five original problems for each AP free-response type, with scoring guides and line-by-line solutions. Every model solution was compiled and tested in Java.</p>${[1,2,3,4].map(t=>`<h3 style="margin:18px 0 6px">Q${t}: ${CSFRQ.TYPES[t]}</h3><div class="cx-list">${CSFRQ.F.filter(f=>f.type===t).map(f=>`<button type="button" data-allf="${f.id}"><b>${esc(f.title)}</b>${f.parts.reduce((s,p)=>s+p.points,0)} points</button>`).join("")}</div>`).join("")}<div class="cx-fbox-all"></div>`});
+      panels.push({k:"allfrq", label:"40 practice FRQs", n:CSFRQ.F.length, body:`<p class="ptitle">Ten original problems for each AP free-response type, with scoring guides and line-by-line solutions. Every model solution was compiled and tested in Java.</p>${[1,2,3,4].map(t=>`<h3 style="margin:18px 0 6px">Q${t}: ${CSFRQ.TYPES[t]}</h3><div class="cx-list">${CSFRQ.F.filter(f=>f.type===t).map(f=>`<button type="button" data-allf="${f.id}"><b>${esc(f.title)}</b>${f.parts.reduce((s,p)=>s+p.points,0)} points</button>`).join("")}</div>`).join("")}<div class="cx-fbox-all"></div>`});
     }
     if(!term && id==="beyond"){
       const nf = frqFor(id).length; if(nf) panels.push({k:"frq", label:"Old FRQs on these topics", n:nf, body:frqTable(id, true)});
