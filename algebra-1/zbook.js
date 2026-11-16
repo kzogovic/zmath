@@ -343,7 +343,7 @@ function exprFn(src){ let s=String(src||"").toLowerCase().replace(/[−–—]/g
   try{ const f=sum(); if(i!==s.length) return null; return f; }catch(e){ return null; } }
 function opCheck(pt,val){ const v=String(val||"").trim(); if(!v) return null;
   if(pt.k==="num"){ const x=parseAns(v); return x!==null&&!isNaN(x)&&Math.abs(x-pt.v)<=(pt.tol!=null?pt.tol:Math.max(1e-6,Math.abs(pt.v)*1e-6))+1e-9; }
-  if(pt.k==="expr"){ const f=exprFn(v); if(!f) return false; return [-2.5,-1,0.5,1.5,3,4.2].every(x=>{ const a=f(x),b=pt.f(x); return isFinite(a)&&Math.abs(a-b)<=1e-6*Math.max(1,Math.abs(b))+(pt.tol||0); }); }
+  if(pt.k==="expr"){ const f=exprFn(v); if(!f) return false; return (pt.xs?[0.5,1.5,2,3,4.2]:[-2.5,-1,0.5,1.5,3,4.2]).every(x=>{ const a=f(x),b=pt.f(x); return isFinite(a)&&Math.abs(a-b)<=1e-6*Math.max(1,Math.abs(b))+(pt.tol||0); }); }
   if(pt.k==="pair"){ const m=v.replace(/[−–—]/g,"-").replace(/\s+/g,"").match(/^\(?(-?\d*\.?\d+(?:\/\d+)?),(-?\d*\.?\d+(?:\/\d+)?)\)?$/); if(!m) return false; const a=parseAns(m[1]),b=parseAns(m[2]); return Math.abs(a-pt.v[0])<1e-6&&Math.abs(b-pt.v[1])<1e-6; }
   if(pt.k==="text"){ const n=t=>String(t).toLowerCase().replace(/[−–—]/g,"-").replace(/≥/g,">=").replace(/≤/g,"<=").replace(/\s+/g,""); return pt.ok.some(o=>n(o)===n(v)); }
   return false; }
@@ -421,7 +421,9 @@ header{padding:40px 20px 18px;text-align:center}header .wrap{max-width:860px;mar
 .kicker{text-transform:uppercase;letter-spacing:.3em;font-size:13px;margin:0 0 8px}h1{font-weight:800;font-size:clamp(36px,7vw,60px);margin:0 0 6px;line-height:1.05}
 header p{margin:0 auto;font-style:italic;color:#333;max-width:640px;font-size:18.5px}
 #znav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #111;padding:8px 16px}
-:root{color-scheme:light}
+:root{color-scheme:only light}
+button,input,select,textarea{color:#111}
+input,select,textarea{background-color:#fff}
 .cm-bar{display:flex;align-items:center;gap:10px;max-width:1180px;margin:0 auto}
 .cm-bar button{border:1.5px solid #111;background:#fff;color:#111;padding:5px 14px;font:600 16px 'EB Garamond',Georgia,serif;cursor:pointer;border-radius:999px}
 .cm-open{background:#111!important;color:#fff!important}

@@ -305,7 +305,9 @@ header{padding:40px 20px 18px;text-align:center}header .wrap{max-width:860px;mar
 .kicker{text-transform:uppercase;letter-spacing:.3em;font-size:13px;margin:0 0 8px}h1{font-weight:800;font-size:clamp(36px,7vw,60px);margin:0 0 6px;line-height:1.05}
 header p{margin:0 auto;font-style:italic;color:#333;max-width:640px;font-size:18.5px}
 #znav{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #111;padding:8px 16px}
-:root{color-scheme:light}
+:root{color-scheme:only light}
+button,input,select,textarea{color:#111}
+input,select,textarea{background-color:#fff}
 .cm-bar{display:flex;align-items:center;gap:10px;max-width:1180px;margin:0 auto}
 .cm-bar button{border:1.5px solid #111;background:#fff;color:#111;padding:5px 14px;font:600 16px 'EB Garamond',Georgia,serif;cursor:pointer;border-radius:999px}
 .cm-open{background:#111!important;color:#fff!important}

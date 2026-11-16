@@ -125,6 +125,43 @@ EOC.open=[
   {q:"What is the range?",k:"num",v:d[k-1]-d[0],a:N(d[k-1]-d[0]),s:[`${d[k-1]} − ${d[0]} = ${d[k-1]-d[0]}`]}]}; }];
 function shuffleArr(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 EOC.secLabel.open=["Open response","EOC-style, type every part"];
+/* ---- more EOC topics: average rate of change, choosing a model, data (box plots, outliers, margin of error, residuals) ---- */
+const qs=a=>{ const s=a.slice().sort((x,y)=>x-y), n=s.length, md=v=>v.length%2?v[(v.length-1)/2]:(v[v.length/2-1]+v[v.length/2])/2; const lo=s.slice(0,Math.floor(n/2)), hi=s.slice(Math.ceil(n/2)); return {s,min:s[0],max:s[n-1],med:md(s),q1:md(lo),q3:md(hi)}; };
+EOC.learn+=`<h4>Average rate of change (any function)</h4><p>Average rate of change from x = a to x = b is (f(b) − f(a))/(b − a): the slope of the line joining the two points.</p>
+${we("f(x) = x<sup>2</sup> + 1 from x = 1 to x = 4",["f(4) = 17, f(1) = 2.","(17 − 2)/(4 − 1) = 15/3","<b>5</b>"],"Average rate of change",{f:[x=>x*x+1],p:[[1,2],[4,17]],seg:[[1,2,4,17]],xr:[-1,5],yr:[0,19]})}
+<h4>Which model? Linear, quadratic or exponential</h4><p>Look at equal steps in x: <b>same difference</b> in y → linear; <b>same second difference</b> → quadratic; <b>same ratio</b> → exponential.</p>
+${we("x: 0, 1, 2, 3 · y: 1, 4, 9, 16",["Differences: 3, 5, 7. Second differences: 2, 2.","<b>Quadratic</b>"],"Choose a model")}
+<h4>Box plots, IQR and outliers</h4><p>Five-number summary: min, Q1, median, Q3, max. IQR = Q3 − Q1. A value is an <b>outlier</b> if it is below Q1 − 1.5·IQR or above Q3 + 1.5·IQR.</p>
+${we("Data: 2, 4, 5, 7, 8, 9, 30",["Median 7; Q1 = 4 (middle of 2, 4, 5); Q3 = 9 (middle of 8, 9, 30).","IQR = 9 − 4 = 5. Upper fence: 9 + 7.5 = 16.5.","<b>30 is an outlier.</b>"],"Box plots and IQR")}
+<h4>Margin of error</h4>${we("A survey: 62% like the plan, margin of error ±4%.",["62 − 4 = 58, 62 + 4 = 66.","<b>Between 58% and 66%</b> of everyone likely like it."],"Margin of error")}
+<h4>Residuals</h4><p>Residual = actual − predicted. Positive: the point is above the line; negative: below.</p>${we("Line y = 2x + 3. The point (4, 13).",["Predicted: 2(4) + 3 = 11.","13 − 11 = <b>2</b> (above the line)"],"Residuals")}`;
+EOC.gen.push(
+ ()=>{ const b=R(-4,4),c=R(-5,5),a=R(-3,2),d=a+R(1,4); const f=x=>x*x+b*x+c; return P("Average rate of change",`f(x) = ${poly([1,b,c])}. Find the average rate of change from x = ${N(a)} to x = ${N(d)}.`,(f(d)-f(a))/(d-a),[f(d)-f(a),(f(d)+f(a))/(d-a),d-a],[`f(${N(d)}) = ${N(f(d))}, f(${N(a)}) = ${N(f(a))}.`,`(${N(f(d))} − ${f(a)<0?`(${N(f(a))})`:N(f(a))})/(${N(d)} − ${a<0?`(${N(a)})`:N(a)}) = <b>${N((f(d)-f(a))/(d-a))}</b>`]); },
+ ()=>{ const k=R(5,9); const d=Array.from({length:k},()=>R(10,60)); const S=qs(d); return P("Box plots and IQR",`Data: ${d.join(", ")}. What is the median?`,S.med,[S.q1,S.q3,Math.round(d.reduce((a,b)=>a+b,0)/k)],[`In order: ${S.s.join(", ")}.`,k%2?`Middle value: <b>${N(S.med)}</b>`:`Average of the two middle values: <b>${N(S.med)}</b>`]); });
+EOC.med.push(
+ ()=>{ const t=pick(["lin","quad","exp"]),a=R(1,4),k=R(2,3); const xs=[0,1,2,3,4],ys=xs.map(x=>t==="lin"?a+k*x:t==="quad"?x*x+a:a*k**x); const ans=t==="lin"?"Linear":t==="quad"?"Quadratic":"Exponential"; return PSX("Choose a model",`${xyTbl(xs,ys)}Which kind of function best fits the table?`,ans,["Linear","Quadratic","Exponential","None of these"],[`Differences: ${ys.slice(1).map((y,i)=>N(y-ys[i])).join(", ")}.`,t==="exp"?`Ratios: all ${k}.`:t==="quad"?`Second differences are all 2.`:`The differences are all ${k}.`,`<b>${ans}</b>`]); },
+ ()=>{ const p=R(35,80),m=pick([2,3,4,5]),N0=pick([1200,2000,5000,800]); const lo=Math.round(N0*(p-m)/100),hi=Math.round(N0*(p+m)/100); return PSX("Margin of error",`In a sample survey, ${p}% of students said yes, with a margin of error of ±${m}%. The school has ${N0.toLocaleString()} students. Which is a reasonable estimate of how many would say yes?`,`Between ${lo.toLocaleString()} and ${hi.toLocaleString()}`,[`Exactly ${Math.round(N0*p/100).toLocaleString()}`,`Between ${Math.round(N0*(p-2*m)/100).toLocaleString()} and ${Math.round(N0*(p-m)/100).toLocaleString()}`,`Between ${p-m} and ${p+m}`],[`${p}% ± ${m}%: ${p-m}% to ${p+m}%.`,`${p-m}% of ${N0.toLocaleString()} = ${lo.toLocaleString()}; ${p+m}% = ${hi.toLocaleString()}.`]); },
+ ()=>{ const m=pick([1.5,2,2.5,3,-1.5]),b=R(2,20),x=R(2,12),res=pick([-4,-3,-2,-1.5,1,2,3,4.5]); const y=+(m*x+b+res).toFixed(1); return P("Residuals",`The line of best fit is y = ${m}x + ${b}. For the data point (${x}, ${y}), what is the residual?`,+(y-(m*x+b)).toFixed(2),[+(m*x+b-y).toFixed(2),+(m*x+b).toFixed(2),y],[`Predicted: ${m}(${x}) + ${b} = ${N(+(m*x+b).toFixed(2))}.`,`Residual = actual − predicted = ${y} − ${N(+(m*x+b).toFixed(2))} = <b>${N(+(y-(m*x+b)).toFixed(2))}</b>`]); });
+EOC.adv.push(
+ ()=>{ const k=R(7,9); const d=Array.from({length:k-1},()=>R(10,30)); d.push(pick([R(60,90),R(31,40)])); const S=qs(d),I=S.q3-S.q1,up=S.q3+1.5*I; const big=d[d.length-1]; const out=big>up; return PSX("Box plots and IQR",`Data: ${shuffleArr(d).join(", ")}. Is ${big} an outlier?`,out?"Yes":"No",[out?"No":"Yes","Only if the mean is used","Cannot tell"],[`Q1 = ${N(S.q1)}, Q3 = ${N(S.q3)}, IQR = ${N(I)}.`,`Upper fence: ${N(S.q3)} + 1.5(${N(I)}) = ${N(up)}.`,`${big} ${out?"&gt;":"≤"} ${N(up)}: <b>${out?"Yes, an outlier":"No"}</b>`]); },
+ ()=>{ const k=R(7,9); const d=Array.from({length:k},()=>R(10,50)); const S=qs(d); return P("Box plots and IQR",`Data: ${d.join(", ")}. Find the interquartile range (IQR).`,S.q3-S.q1,[S.max-S.min,S.q3,S.med-S.q1],[`In order: ${S.s.join(", ")}.`,`Q1 = ${N(S.q1)}, Q3 = ${N(S.q3)}.`,`IQR = <b>${N(S.q3-S.q1)}</b>`]); },
+ ()=>{ const a=pick([200,500,1200]),r=pick([3,4,6,8]),g=pick([true,false]); const b=g?1+r/100:1-r/100; const what=pick(["b","a"]); return PSX("Interpreting expressions",`The value of an item is V = ${a}(${N(b)})<sup>t</sup> after t years. What does ${what==="b"?N(b):a} represent?`,what==="b"?`It ${g?"grows":"loses"} ${r}% of its value each year`:`The starting value, $${a}`,what==="b"?[`It ${g?"loses":"grows"} ${r}% each year`,`It ${g?"grows":"loses"} ${N(b*100)}% each year`,`The value after 1 year`]:[`The value after t years`,`It grows $${a} each year`,`The rate of change`],[what==="b"?`b = ${N(b)} = 1 ${g?"+":"−"} ${N(r/100)}: ${g?"growth":"decay"} of ${r}% per year.`:`At t = 0, V = ${a}: the starting value.`]); });
+EOC.open.push(
+ ()=>{ const k=pick([7,9]); const d=Array.from({length:k},()=>R(10,40)).sort((x,y)=>x-y); d[k-1]=R(70,95); const S=qs(d),I=S.q3-S.q1; return {t:"Box plot and outliers",stem:`Test scores: ${shuffleArr(d).join(", ")}.`,parts:[
+  {q:"What is the median?",k:"num",v:S.med,a:N(S.med),s:[`In order: ${S.s.join(", ")}.`,`Middle: ${N(S.med)}`]},
+  {q:"What is the interquartile range (IQR)?",k:"num",v:I,a:N(I),s:[`Q1 = ${N(S.q1)}, Q3 = ${N(S.q3)}.`,`IQR = ${N(I)}`]},
+  {q:"What is the upper fence Q3 + 1.5·IQR?",k:"num",v:S.q3+1.5*I,a:N(S.q3+1.5*I),s:[`${N(S.q3)} + 1.5(${N(I)}) = ${N(S.q3+1.5*I)}`]},
+  {q:`Is ${d[k-1]} an outlier? Type yes or no.`,k:"text",ok:[d[k-1]>S.q3+1.5*I?"yes":"no"],a:d[k-1]>S.q3+1.5*I?"yes":"no",s:[`${d[k-1]} ${d[k-1]>S.q3+1.5*I?"&gt;":"≤"} ${N(S.q3+1.5*I)}`]}]}; },
+ ()=>{ const h=nz(-4,4),k=nz(-5,5),a=pick([1,-1,2,-2]); return {t:"Transformations",stem:`g(x) = ${a===1?"":a===-1?"−":a}|x${sg(-h)}|${sg(k)} is a transformation of f(x) = |x|.`,g:{f:[{f:x=>Math.abs(x),dash:true},x=>a*Math.abs(x-h)+k],xr:[-8,8],yr:[-8,8]},parts:[
+  {q:"What is the vertex of g? Type it as (x, y).",k:"pair",v:[h,k],a:pt(h,k),s:[`y = a|x − h| + k has vertex (h, k) = ${pt(h,k)}`]},
+  {q:`How many units ${h>0?"right":"left"} is the graph moved?`,k:"num",v:Math.abs(h),a:N(Math.abs(h)),s:[`x${sg(-h)}: ${h>0?"right":"left"} ${Math.abs(h)}`]},
+  {q:`Does g open up or down? Type up or down.`,k:"text",ok:[a>0?"up":"down"],a:a>0?"up":"down",s:[`a = ${a}: ${a>0?"positive, opens up":"negative, opens down"}`]},
+  {q:`Find g(${h+2}).`,k:"num",v:a*2+k,a:N(a*2+k),s:[`${a}|${h+2}${sg(-h)}|${sg(k)} = ${a}(2)${sg(k)} = ${N(a*2+k)}`]}]}; },
+ ()=>{ const n=pick([2,3]),b=n===3?R(2,4):R(2,5),m=n===2?3:2; const a=b**n; return {t:"Rational exponents",stem:`Expressions with fraction exponents.`,parts:[
+  {q:`Evaluate ${a}${ex2(m,n)}.`,k:"num",v:b**m,a:N(b**m),s:[`${n===2?"√":"∛"}${a} = ${b}, ${b}<sup>${m}</sup> = ${b**m}`]},
+  {q:`Evaluate ${a}<sup>−1/${n}</sup>.`,k:"num",v:1/b,a:`1/${b}`,s:[`1/${n===2?"√":"∛"}${a} = 1/${b}`]},
+  {q:`Write ${n===2?"√":"∛"}(x<sup>${m}</sup>) as x to a power.`,k:"expr",f:x=>Math.pow(x,m/n),a:`x<sup>${m}/${n}</sup>`,s:[`Root ${n} → denominator ${n}; power ${m} → numerator.`],xs:true}]}; });
+function ex2(m,n){ return `<sup>${m}/${n}</sup>`; }
 /* ---- add to the course ---- */
 const wrap=g=>()=>{ for(let i=0;i<40;i++){ let p=null; try{ p=g(); }catch(e){} if(p&&p.q) return p; } return g(); };
 ["gen","med","adv"].forEach(k=>EOC[k]=EOC[k].map(wrap)); EOC.chal=[]; EOC.frq=[];
@@ -143,14 +180,14 @@ function numHint(v,tol,a){ const A=String(a).replace(/<[^>]+>/g,"");
   if(decs(v)>0) return "Write your answer as a decimal.";
   return "Give an exact answer: no rounding."; }
 function hintOf(p,uid){ const q=String(p.q), A=String(p.a).replace(/<[^>]+>/g,"");
-  const TH={"qf|Completing the square":"Write in vertex form: y = a(x − h)^2 + k.","qf|Vertex to standard form":"Write in standard form: y = ax^2 + bx + c.","lf|Equation from two points":"Write in slope-intercept form: y = mx + b.","lf|Point-slope form":"Write in slope-intercept form: y = mx + b.","lf|Graph to equation":"Write in slope-intercept form: y = mx + b.","lf|Line through a point":"Write in slope-intercept form: y = mx + b.","u5|Graphing":"Choose the circle (open or closed) and the direction."}; if(TH[uid+"|"+p.t]) return TH[uid+"|"+p.t];
+  const TH={"qf|Completing the square":"Write in vertex form: y = a(x − h)^2 + k.","qf|Vertex to standard form":"Write in standard form: y = ax^2 + bx + c.","lf|Equation from two points":"Write in slope-intercept form: y = mx + b.","lf|Point-slope form":"Write in slope-intercept form: y = mx + b.","lf|Graph to equation":"Write in slope-intercept form: y = mx + b.","lf|Line through a point":"Write in slope-intercept form: y = mx + b.","u5|Graphing":"Choose the circle (open or closed) and the direction.","sys|Writing inequalities":"Choose the inequality that models the situation.","qf|Write from zeros":"Write in standard form: y = ax^2 + bx + c.","qf|Write from a table":"Write in vertex form: y = a(x − h)^2 + k.","u7|Radicals and exponents":"Write with a rational exponent, like x^(2/3).","u7|Exponent rules with fractions":"Simplify. Write with one rational exponent.","u7|Rational exponents":"Simplify. Give an exact answer.","u7|Simplify with rational exponents":"Simplify. Use positive exponents only."}; if(TH[uid+"|"+p.t]) return TH[uid+"|"+p.t];
   if(/round|nearest|decimal places|to 2 decimals|to the cent/i.test(q)) return "";
-  if(!p.mc&&typeof p.v==="number"&&isFinite(p.v)) return numHint(p.v,p.tol,p.a);
+  if(!p.mc&&typeof p.v==="number"&&isFinite(p.v)) return (uid==="u7"?"Simplify. ":"")+numHint(p.v,p.tol,p.a);
   if(/^\(.*,.*\)/.test(A)) return A.includes(" and ")?"Write each solution as an ordered pair (x, y).":"Write the answer as an ordered pair (x, y).";
   if(/^x = .* (or|and) /.test(A)||/±/.test(A)) return "Give all solutions.";
   if(uid==="u9"||/^Factor/.test(q.replace(/<[^>]+>/g,""))) return "Factor completely.";
   if(uid==="u6") return "Simplify. Use positive exponents only.";
-  if(/√/.test(A)) return "Write in simplest radical form.";
+  if(/√/.test(A)) return "Simplify completely: write in simplest radical form (no perfect squares under the √, no √ in a denominator).";
   if(/^y = /.test(A)) return "Write the equation solved for y (y = …).";
   if(/(&lt;|&gt;|≤|≥|<|>)/.test(A)) return "Write the solution as an inequality.";
   if(uid==="u8"||uid==="u0") return /x/.test(A)?"Simplify. Write terms from the highest power down.":"";
