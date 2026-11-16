@@ -88,7 +88,7 @@ const FM={
   rule:"Let u = x"+S2+". Factor au"+S2+" + bu + c like a quadratic, put x"+S2+" back, then factor again if you can.",
   ex:[["x"+S4+" − 5x"+S2+" + 4",["u = x"+S2+": u"+S2+" − 5u + 4 = (u − 1)(u − 4).","Back to x: (x"+S2+" − 1)(x"+S2+" − 4).","Both are differences of squares: <b>(x − 1)(x + 1)(x − 2)(x + 2)</b>"]],
       ["x"+S4+" + x"+S2+" − 12",["u"+S2+" + u − 12 = (u + 4)(u − 3).","(x"+S2+" + 4)(x"+S2+" − 3). x"+S2+" + 4 is a sum of squares and doesn't factor.","<b>(x"+S2+" + 4)(x"+S2+" − 3)</b>"]]]},
- grp:{grp:"4 terms",c:PURP,name:"Grouping",hint:"pair up, factor each pair",
+ grp:{grp:"4 terms",c:PURP,name:"Grouping",hint:"pair up, factor each pair",go:"sub-factor-grp",
   when:"Four terms, often a cubic.",
   rule:"Group the first two and last two terms. Take the GCF out of each pair. If the parentheses match, factor out that binomial.",
   ex:[["x"+S3+" + 2x"+S2+" − 9x − 18",["x"+S2+"(x + 2) − 9(x + 2)","(x + 2)(x"+S2+" − 9)","x"+S2+" − 9 is a difference of squares: <b>(x + 2)(x − 3)(x + 3)</b>"]],
@@ -716,6 +716,67 @@ function rufPCard(fs,i){ const c=fs.reduce((a,b)=>mul(a,b),[1]), n=c.length-1;
    <div class="fx-btns"><button type="button" data-act="show">Show answer</button><button type="button" data-act="clear">Clear</button></div></article>`;
 }
 
+/* ---------- section 6: factoring by grouping ---------- */
+const S3G="x<sup>3</sup>";
+const cx2=c=>x2(c), sq2=(c,d)=>`(${x2(c)} ${d<0?"−":"+"} ${Math.abs(d)})`;
+const GRP_EX=[[1,2,1,-9],[2,-3,1,2],[1,-5,1,4],[3,1,1,-4],[1,4,2,-5]];
+const GRP_AC=[{a:6,b:7,c:2,m:3,n:4},{a:2,b:-5,c:-12,m:-8,n:3}];
+function grpCubic([a,b,c,d]){ return [a*c,b*c,a*d,b*d]; }
+function grpSteps([a,b,c,d]){ const P=grpCubic([a,b,c,d]), st=[];
+  st.push(`Group the first two terms and the last two terms: (${poly([P[0],P[1],0,0])}) ${P[2]<0?"−":"+"} (${poly([Math.abs(P[2]),(P[2]<0?-1:1)*P[3]])}).`);
+  st.push(`GCF of the first pair: <b>${cx2(c)}</b>. ${poly([P[0],P[1],0,0])} = ${cx2(c)}${bin(a,b)}.`);
+  st.push(`GCF of the second pair: <b>${num(d)}</b>${d<0?" (take out a negative so the binomial matches)":""}. ${poly([P[2],P[3]])} = ${num(d)}${bin(a,b)}.`);
+  st.push(`Both pairs contain ${bin(a,b)} <span class="yes">✓ they match</span>, so factor it out: <b>${bin(a,b)}${sq2(c,d)}</b>.`);
+  const k=Math.sqrt(-d); if(c===1&&d<0&&Number.isInteger(k)) st.push(`Factor completely: x<sup>2</sup> − ${-d} is a difference of squares, (x − ${k})(x + ${k}). Answer: <b>${bin(a,b)}(x − ${k})(x + ${k})</b>.`);
+  else st.push(d>0&&c>0?`${sq2(c,d)} is a sum (both terms positive), so it does not factor over the real numbers. Done.`:`${sq2(c,d)} does not factor further with whole numbers. Done.`);
+  return st; }
+function grpCard(g,i){ return `<article class="fx-card"><div class="fx-k">Example ${i+1}</div><h4>${poly(grpCubic(g))}</h4><ol class="fx-steps">${grpSteps(g).map(x=>`<li>${x}</li>`).join("")}</ol></article>`; }
+function acCard(o,i){ const ac=o.a*o.c, g1=gcd(o.a,o.m)*(o.a<0?-1:1), g2=o.n/(o.a/g1), p=o.a/g1, q=o.m/g1;
+  return `<article class="fx-card"><div class="fx-k">Example ${i+1} · trinomial (AC method)</div><h4>${poly([o.a,o.b,o.c])}</h4><ol class="fx-steps">
+   <li>a · c = ${o.a} · ${par(o.c)} = <b>${ac}</b>. Find two numbers that multiply to ${ac} and add to b = ${o.b}: <b>${num(o.m)}</b> and <b>${num(o.n)}</b>.</li>
+   <li>Split the middle term: ${x2(o.a)} ${o.m<0?"−":"+"} ${tx(Math.abs(o.m))} ${o.n<0?"−":"+"} ${tx(Math.abs(o.n))} ${o.c<0?"−":"+"} ${Math.abs(o.c)}.</li>
+   <li>Group in pairs and take out each GCF: ${tx(g1)}${bin(p,q)} ${g2<0?"−":"+"} ${Math.abs(g2)}${bin(p,q)}.</li>
+   <li>The binomials match <span class="yes">✓</span>: <b>${bin(p,q)}${bin(g1,g2)}</b>.</li></ol></article>`; }
+const GRP=`<div class="fx-lead"><p><b>Use it for</b> polynomials with <b>four terms</b>, like ax<sup>3</sup> + bx<sup>2</sup> + cx + d. It also factors trinomials: split the middle term into two terms (the AC method), then group.</p></div>
+<div class="fx-how"><ol class="fx-rules">
+ <li><b>Pair up:</b> group the first two terms and the last two terms.</li>
+ <li><b>GCF of each pair:</b> take out the greatest common factor of each pair.</li>
+ <li><b>Match:</b> the two binomials in parentheses must be the same. If the third term is negative, take out a <b>negative</b> GCF so they match.</li>
+ <li><b>Factor out the binomial:</b> (common binomial)(what is left).</li>
+ <li><b>Factor completely:</b> check the leftover factor, for example x<sup>2</sup> − 9 = (x − 3)(x + 3).</li>
+ <li><b>If the binomials don't match,</b> try a different order of the terms, or use Ruffini's method.</li></ol></div>
+<h4 class="h4">Solved examples: four terms</h4><div class="fx-grid">${GRP_EX.map(grpCard).join("")}</div>
+<h4 class="h4">Solved examples: trinomials by grouping (AC method)</h4><div class="fx-grid">${GRP_AC.map((o,i)=>acCard(o,i+GRP_EX.length)).join("")}</div>`;
+const GRP_P=[[1,3,1,-4],[1,-2,1,5],[2,1,1,-9],[1,-4,3,2],[3,-2,1,3],[1,6,2,-1],[1,-1,1,-16],[2,5,1,7]];
+function genGrp(){ for(let k=0;k<500;k++){ const a=pick([1,1,2,3]), b=nz(-6,6), c=pick([1,1,1,2,3]), d=nz(-9,9); if(gcd(a,b)!==1||gcd(c,d)!==1) continue; return [a,b,c,d]; } return GRP_P[0]; }
+function grpPCard(g,i){ const P=grpCubic(g);
+  return `<article class="fx-pc" data-kind="grp" data-p='${JSON.stringify({g,P})}'>
+   <div class="fx-pc-h"><span class="fx-pn">${i+1}</span><h4>${poly(P)}</h4><span class="fx-badge">Solved</span></div>
+   <div class="fx-grow"><span class="fx-gl">First pair</span><span>${poly([P[0],P[1],0,0])} =</span><span class="fx-paren">${inp("g1","First pair: GCF coefficient")}<i>x<sup>2</sup></i>(${inp("p1","First pair: x coefficient")}<i>x</i> + ${inp("q1","First pair: number","±")})</span><span class="fx-ok" data-o="g1"></span></div>
+   <div class="fx-grow"><span class="fx-gl">Second pair</span><span>${poly([P[2],P[3]])} =</span><span class="fx-paren">${inp("g2","Second pair: GCF","±")}(${inp("p2","Second pair: x coefficient")}<i>x</i> + ${inp("q2","Second pair: number","±")})</span><span class="fx-ok" data-o="g2"></span></div>
+   <div class="fx-fac"><span>Factors:</span><span class="fx-paren">(${inp("f1","Binomial: x coefficient")}<i>x</i> + ${inp("f2","Binomial: number","±")})(${inp("f3","Second factor: x squared coefficient")}<i>x<sup>2</sup></i> + ${inp("f4","Second factor: number","±")})</span></div>
+   <p class="fx-msg" data-o="msg">Take the GCF out of each pair. Use a negative GCF in the second pair if you need one so the parentheses match. Type negative numbers like −4.</p>
+   <div class="fx-btns"><button type="button" data-act="show">Show answer</button><button type="button" data-act="clear">Clear</button></div></article>`; }
+function checkGrp(card){ const {g,P}=JSON.parse(card.dataset.p), F={}; card.querySelectorAll("[data-f]").forEach(e=>F[e.dataset.f]=e);
+  const v=k=>pv(F[k].value), all=(...a)=>a.every(x=>x!==null&&!isNaN(x)); Object.values(F).forEach(e=>mark(e,null));
+  const [g1,p1,q1,g2,p2,q2]=["g1","p1","q1","g2","p2","q2"].map(v); let ok1=null, ok2=null;
+  if(all(g1,p1,q1)){ ok1=eq(g1*p1,P[0])&&eq(g1*q1,P[1]); ["g1","p1","q1"].forEach(k=>mark(F[k],ok1)); }
+  if(all(g2,p2,q2)){ ok2=eq(g2*p2,P[2])&&eq(g2*q2,P[3]); ["g2","p2","q2"].forEach(k=>mark(F[k],ok2)); }
+  const match=ok1&&ok2&&eq(p1,p2)&&eq(q1,q2);
+  const f=["f1","f2","f3","f4"].map(v); let solved=false;
+  if(all(...f)){ const pr=mul([f[0],f[1]],[f[2],0,f[3]]); solved=pr.every((x,i)=>eq(x,P[i])); ["f1","f2","f3","f4"].forEach(k=>mark(F[k],solved)); }
+  const msg=card.querySelector('[data-o="msg"]'); msg.className="fx-msg"+(solved?" yes":"");
+  const k=Math.sqrt(-g[3]), more=g[2]===1&&g[3]<0&&Number.isInteger(k)?` Factor completely: x<sup>2</sup> − ${-g[3]} = (x − ${k})(x + ${k}).`:"";
+  msg.innerHTML=solved?`Solved! ${poly(P)} = ${bin(g[0],g[1])}${sq2(g[2],g[3])}.${more}`
+   :ok1===false?"First pair: the GCF times each term in the parentheses must give back the first two terms."
+   :ok2===false?(eq(g2*p2,-P[2])?"Second pair: close! Try a GCF with the opposite sign so the parentheses match the first pair.":"Second pair: the GCF times each term in the parentheses must give back the last two terms.")
+   :ok1&&ok2&&!match?"Both pairs are right, but the parentheses don't match. Flip the sign of the second GCF."
+   :match?`The binomials match: ${bin(p1,q1)} <span class="yes">✓</span>. Now write (binomial)(what is left).`
+   :all(...f)?`Those factors multiply to ${poly(mul([f[0],f[1]],[f[2],0,f[3]]))}, not ${poly(P)}.`
+   :"Take the GCF out of each pair. Use a negative GCF in the second pair if you need one so the parentheses match. Type negative numbers like −4.";
+  card.classList.toggle("done",solved); return solved; }
+const GRPP=`<div class="fx-lead"><p>Factor by grouping in three steps: the GCF of each pair, check that the parentheses match, then the two factors. Each box turns <span class="yes">green</span> when it's right and <span class="no">red</span> when it's wrong.</p></div>${setHTML("grp",GRP_P)}`;
+
 /* ---------- checking ---------- */
 function pv(s){ s=String(s||"").trim().replace(/[−–—]/g,"-").replace(/\s+/g,"");
   if(/^[+-]?x$/i.test(s)) return s[0]==="-"?-1:1; s=s.replace(/x$/i,"");
@@ -766,11 +827,12 @@ function checkRuf(card){ const P=JSON.parse(card.dataset.p), c=P.c, n=c.length-1
     :"Now factor Q(x). Use the cross table if the first coefficient is not 1.";
   card.classList.toggle("done",solved); return solved; }
 function fillAnswer(card){ const P=JSON.parse(card.dataset.p), set=(k,x)=>{ const e=card.querySelector(`[data-f="${k}"]`); if(e) e.value=String(x).replace("-","−"); };
+  if(card.dataset.kind==="grp"){ const [a,b,c,d]=P.g; set("g1",c); set("p1",a); set("q1",b); set("g2",d); set("p2",a); set("q2",b); set("f1",a); set("f2",b); set("f3",c); set("f4",d); return; }
   if(card.dataset.kind==="cross"){ const [a1,c1,a2,c2]=P.ans; set("a1",a1); set("a2",a2); set("c1",c1); set("c2",c2); set("m1",a1*c2); set("m2",a2*c1); set("f1",a1); set("f2",c1); set("f3",a2); set("f4",c2); }
   else { const c=P.c, r=intCands(c).find(x=>ev(c,x)===0), {s,p}=synth(c,r); set("r",r); p.forEach((x,j)=>{ if(j) set("p"+j,x); }); s.forEach((x,j)=>set("s"+j,x));
     const f=factorQuad(s.slice(0,-1)); set("f1",f[0]); set("f2",f[1]); set("f3",f[2]); set("f4",f[3]); } }
 
-function setHTML(kind,list){ const cards=kind==="cross"?list.map(crossPCard):list.map(rufPCard);
+function setHTML(kind,list){ const cards=kind==="cross"?list.map(crossPCard):kind==="grp"?list.map(grpPCard):list.map(rufPCard);
   return `<div class="fx-set" data-set="${kind}"><div class="fx-ctl"><span class="fx-score">Solved <b>0</b> / ${list.length}</span><button type="button" data-act="new">↻ New problems</button><button type="button" data-act="reset">Clear all</button></div>
    <div class="fx-pgrid">${cards.join("")}</div></div>`; }
 const CROSSP=`<div class="fx-lead"><p>Type numbers in the boxes. Each box turns <span class="yes">green</span> when it's right and <span class="no">red</span> when it's wrong. Type negative numbers with a minus sign, like −4. Type 1 for a plain x.</p></div>${setHTML("cross",CROSS_P)}`;
@@ -779,21 +841,21 @@ const RUFP=`<div class="fx-lead"><p>Find a root, fill in the Ruffini table, then
 function bindSets(root){
   root.querySelectorAll(".fx-set").forEach(set=>{ if(set.dataset.bound) return; set.dataset.bound=1; const kind=set.dataset.set;
     const score=()=>{ const cs=[...set.querySelectorAll(".fx-pc")]; set.querySelector(".fx-score").innerHTML=`Solved <b>${cs.filter(c=>c.classList.contains("done")).length}</b> / ${cs.length}`; };
-    const chk=card=>{ (card.dataset.kind==="cross"?checkCross:checkRuf)(card); score(); };
+    const CHK={cross:checkCross,ruf:checkRuf,grp:checkGrp}; const chk=card=>{ CHK[card.dataset.kind](card); score(); };
     set.addEventListener("input",e=>{ const card=e.target.closest(".fx-pc"); if(card) chk(card); });
     set.addEventListener("click",e=>{ const b=e.target.closest("[data-act]"); if(!b) return; const act=b.dataset.act, card=b.closest(".fx-pc");
       if(act==="show"&&card){ fillAnswer(card); chk(card); }
       else if(act==="clear"&&card){ card.querySelectorAll("[data-f]").forEach(x=>x.value=""); chk(card); }
-      else if(act==="reset"){ set.querySelectorAll("[data-f]").forEach(x=>x.value=""); set.querySelectorAll(".fx-pc").forEach(c=>(c.dataset.kind==="cross"?checkCross:checkRuf)(c)); score(); }
-      else if(act==="new"){ const seen=new Set(), list=[]; const n=kind==="cross"?8:6;
-        while(list.length<n){ const p=kind==="cross"?genCross():genRuf(); const k=JSON.stringify(kind==="cross"?[p.a,p.b,p.c]:p); if(seen.has(k)) continue; seen.add(k); list.push(p); }
-        set.querySelector(".fx-pgrid").innerHTML=(kind==="cross"?list.map(crossPCard):list.map(rufPCard)).join(""); score(); } });
+      else if(act==="reset"){ set.querySelectorAll("[data-f]").forEach(x=>x.value=""); set.querySelectorAll(".fx-pc").forEach(c=>CHK[c.dataset.kind](c)); score(); }
+      else if(act==="new"){ const seen=new Set(), list=[]; const n=kind==="ruf"?6:8;
+        while(list.length<n){ const p=kind==="cross"?genCross():kind==="grp"?genGrp():genRuf(); const k=JSON.stringify(kind==="cross"?[p.a,p.b,p.c]:p); if(seen.has(k)) continue; seen.add(k); list.push(p); }
+        set.querySelector(".fx-pgrid").innerHTML=(kind==="cross"?list.map(crossPCard):kind==="grp"?list.map(grpPCard):list.map(rufPCard)).join(""); score(); } });
   }); }
 
 /* ---------- node map for this folder ---------- */
-const META={start:["Start","every method as a node"],cross:["Cross Table","ax² + bx + c, a ≠ 1"],crossp:["Practice","type in the grid"],ruf:["Ruffini","degree 3 and higher"],rufp:["Practice","type in the table"]};
-const SHORT={start:"Method Flowchart",cross:"Cross Table",crossp:"Cross Table Practice",ruf:"Ruffini's Method",rufp:"Ruffini Practice"};
-const GCOL={"Start":NAVY,"Cross Table":RED,"Ruffini":PURP,"Practice":TEAL};
+const META={start:["Start","every method as a node"],cross:["Cross Table","ax² + bx + c, a ≠ 1"],crossp:["Practice","type in the grid"],grp:["Grouping","4 terms: pair them up"],grpp:["Practice","type in the boxes"],ruf:["Ruffini","degree 3 and higher"],rufp:["Practice","type in the table"]};
+const SHORT={start:"Method Flowchart",cross:"Cross Table",crossp:"Cross Table Practice",grp:"Grouping",grpp:"Grouping Practice",ruf:"Ruffini's Method",rufp:"Ruffini Practice"};
+const GCOL={"Start":NAVY,"Cross Table":RED,"Grouping":ORG,"Ruffini":PURP,"Practice":TEAL};
 function mapInit(root){
   const sec=root.querySelector("#sec-factor"); if(!sec||sec.querySelector(".pmap")) return;
   const subs=[...sec.querySelectorAll('[id^="sub-factor-"]')]; if(subs.length<2) return;
@@ -838,12 +900,13 @@ function polishMaps(root){ root.querySelectorAll(".pmap").forEach(w=>{ if(w.data
 
 /* ---------- link from Unit 2 ---------- */
 function unit2(root){ const s=root.querySelector("#sec-unit-2 .sub"); if(!s||root.querySelector(".fx-u2")) return;
-  const d=document.createElement("div"); d.className="fx-u2"; d.innerHTML=`<b>Factoring folder:</b> the Cross Table method and Ruffini's method, with solved examples and practice you can type into. <button type="button" class="openu" data-open="factor">Open Factoring →</button>`;
+  const d=document.createElement("div"); d.className="fx-u2"; d.innerHTML=`<b>Factoring folder:</b> the Cross Table method, factoring by grouping and Ruffini's method, with solved examples and practice you can type into. <button type="button" class="openu" data-open="factor">Open Factoring →</button>`;
   s.after(d); d.querySelector("button").onclick=()=>{ location.hash="factor"; }; }
 
 /* ---------- styles ---------- */
 const fl=document.createElement("link"); fl.rel="stylesheet"; fl.href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&display=swap"; document.head.appendChild(fl);
-const CSS=`
+const CSS=`.fx-grow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0;font-size:17px}.fx-gl{font:700 13px system-ui;color:#555;min-width:86px;text-transform:uppercase;letter-spacing:.04em}
+
 nav button.xbtn{background:${TEAL};border-color:${TEAL};color:#fff;font-weight:600}
 nav button.xbtn:hover{background:#0b5f54}
 nav button.xbtn[aria-current="true"]{background:#08463e;border-color:#08463e;box-shadow:inset 0 -3px 0 #fff}
@@ -1037,22 +1100,24 @@ const st=document.createElement("style"); st.textContent=CSS+`
 @media (max-width:700px){.mf{padding:14px 4px}.mf-br{--g:4px}.mf-n{padding:5px 3px;border-radius:9px}.mf-n b{font-size:12.5px}.mf-col .mf-n span{display:none}.mf-l{padding:2px 4px}.mf-l b{font-size:12.5px}.mf-l span{display:none}.mf-s,.mf-q{font-size:15px}.mf-br[style*="--n:5"] .mf-n b,.mf-br[style*="--n:5"] .mf-l b{font-size:10.5px;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:normal}.mf-n b{overflow-wrap:normal;-webkit-hyphens:auto;hyphens:auto}}
 `; document.head.appendChild(st);
 
-const NEX=CROSS_EX.length+RUF_EX.length, NPR=CROSS_P.length+RUF_P.length;
+const NEX=CROSS_EX.length+RUF_EX.length+GRP_EX.length+GRP_AC.length, NPR=CROSS_P.length+RUF_P.length+GRP_P.length;
 window.A2FACT={_reg:()=>{[QFLOW,SYS,ZER,RAT,RAD,EXP,CNT,SEQ,STA,MTX,IND].forEach(f=>f());},_fresh:freshEx,_has:hasFresh,_flows:FLOWS,
   count:()=>NEX+NPR,
   tip:()=>`${NEX} solved examples · ${NPR} type-in problems`,
   subs:()=>[["start","Method Flowchart: Which Method When?","11 methods",START,"Method Flowchart"],
     ["cross","The Cross Table Method",CROSS_EX.length+" examples",CROSS,"Cross Table"],
     ["crossp","Cross Table Practice: Type in the Grid",CROSS_P.length+" problems",CROSSP,"Cross Table Practice"],
+    ["grp","Factoring by Grouping",(GRP_EX.length+GRP_AC.length)+" examples",GRP,"Grouping"],
+    ["grpp","Grouping Practice: Type in the Boxes",GRP_P.length+" problems",GRPP,"Grouping Practice"],
     ["ruf","Ruffini's Method (Degree 3 and Higher)",RUF_EX.length+" examples",RUF,"Ruffini's Method"],
     ["rufp","Ruffini Practice: Type in the Table",RUF_P.length+" problems",RUFP,"Ruffini Practice"]],
-  lead:()=>`<p class="lead2 fx-lead" style="font-style:normal">Factor trinomials with the Cross Table method and higher-degree polynomials with Ruffini's method. Includes ${NEX} solved examples and ${NPR} practice problems where students type numbers into the boxes and see right away whether each one is correct. <button type="button" class="openu" style="background:${TEAL};border-color:${TEAL}" data-open="factor">Open Factoring →</button></p>`,
+  lead:()=>`<p class="lead2 fx-lead" style="font-style:normal">Factor trinomials with the Cross Table method, four-term polynomials by grouping, and higher-degree polynomials with Ruffini's method. Includes ${NEX} solved examples and ${NPR} practice problems where students type numbers into the boxes and see right away whether each one is correct. <button type="button" class="openu" style="background:${TEAL};border-color:${TEAL}" data-open="factor">Open Factoring →</button></p>`,
   bind(root){ bindSets(root); bindFlow(root); mapInit(root); polishMaps(root); unit2(root); const f=root.querySelector("#sub-factor-start"); if(f&&f.tagName==="DETAILS") f.open=true;
     root.querySelectorAll("#sec-factor [data-open]").forEach(b=>b.onclick=()=>{ location.hash=b.dataset.open; }); },
   flowHas:id=>!!FLOWMAP[id],
   flowHtml:id=>FLOWMAP[id][1](),
   flowTitle:id=>"Method Flowchart: "+FLOWMAP[id][0],
   flowCount:id=>FLOWMAP[id][2],
-  _test:{CROSS_EX,CROSS_P,RUF_EX,RUF_P,genCross,genRuf,rufSolve,factorQuad,checkCross,checkRuf,fillAnswer,pv,synth,poly}
+  _test:{GRP_EX,GRP_P,genGrp,grpCubic,checkGrp,CROSS_EX,CROSS_P,RUF_EX,RUF_P,genCross,genRuf,rufSolve,factorQuad,checkCross,checkRuf,fillAnswer,pv,synth,poly}
 };
 })();
