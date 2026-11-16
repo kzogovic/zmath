@@ -34,7 +34,7 @@ const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(M
 const GRP=[["Learn",/flow|cheat|graphs|summary|posters/,"#1d4e89"],["Practice",/quiz|drill|sets/,"#0f7a6c"],["Challenge",/honors|sat|chal/,"#6a3d9a"],["Resources",/res/,"#c2571a"]];
 const DESC={flow:"which method, when",lab3:"Gauss, matrices, 3D graphs",cheatx:"one-page formulas & rules",satgen:"SAT-style, new every time",chal:"advanced problems",cheat:"key rules, formulas and examples",graphs:"graphs, asymptotes, worked steps",summary:"one-page summaries",posters:"solved examples on posters",quiz:"10 · 15 · 20 new questions",drill:"problems, deck and quiz",sets:"step-by-step sets",honors:"harder multi-step problems",sat:"SAT-style questions",res:"videos, sites and links"};
 function mapUnit(root){
-  root.querySelectorAll("section.unit").forEach(sec=>{ const uid=sec.id.replace(/^sec-/,""); if(uid==="poly"||uid==="formulas"||uid==="factor"||sec.querySelector(".pmap")) return;
+  root.querySelectorAll("section.unit").forEach(sec=>{ const uid=sec.id.replace(/^sec-/,""); if(uid==="poly"||uid==="formulas"||uid==="factor"||uid==="div"||sec.querySelector(".pmap")) return;
     const subs=[...sec.querySelectorAll(`[id^="sub-${uid}-"]`)].filter(e=>e.querySelector(".subh")); if(subs.length<3) return;
     const items=subs.map((el,i)=>{ const k=el.id.slice(`sub-${uid}-`.length), sm=el.querySelector(".subh small"), t=el.querySelector(".subh").cloneNode(true); t.querySelectorAll(".num,small,a,button").forEach(x=>x.remove());
       const g=GRP.find(([,re])=>re.test(k))||GRP[0]; return {k,el,i,title:t.textContent.replace(/↑\s*Sections?/g,"").replace(/\s*\([^)]*\)\s*/g," ").replace(/\s+/g," ").trim(),cnt:sm?sm.textContent:"",grp:g[0],col:g[2],desc:DESC[k]||""}; });

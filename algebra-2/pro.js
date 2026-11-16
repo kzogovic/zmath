@@ -84,6 +84,18 @@ chal:[
  ()=>{ const r=nz(-4,4),a=R(-3,3),b=R(1,4); const c=-r*(a*a+b*b); return P("Complex zeros",`A monic cubic with real coefficients has zeros ${N(r)} and ${N(a)} + ${b}i. What is its constant term?`,c,[r*(a*a+b*b),-r*(a*a-b*b),a*a+b*b],[`${N(a)} − ${b}i is also a zero. (x − (${N(a)} + ${b}i))(x − (${N(a)} − ${b}i)) = x${sq} − ${N(2*a)}x + ${a*a+b*b}`,`Constant = −(${N(r)})(${a*a+b*b}) = <b>${N(c)}</b>`]); },
  ()=>{ const fs=[[1,R(1,3)],[-2,R(1,3)],[4,R(1,3)],[-5,R(1,3)]].slice(0,R(3,4)); const v=fs.filter(f=>f[1]%2===1).length; return P("Multiplicity",`p(x) = ${fs.map(([r,m])=>`(x${sg(-r)})${m>1?`<sup>${m}</sup>`:""}`).join("")}. At how many x-intercepts does the graph cross the x-axis?`,v,[fs.length,fs.length-v,v+1].filter(x=>x!==v),[`It crosses where the multiplicity is odd.`,fs.map(([r,m])=>`x = ${N(r)}: ${m}`).join(", "),`<b>${v}</b>`]); },
  ()=>{ const a=pick([1,2,3,4,6]),d=pick([2,3,4,6,8,10,12]); const set=new Set(); const dv=n=>{const o=[];for(let i=1;i<=n;i++) if(n%i===0) o.push(i); return o;}; dv(d).forEach(p=>dv(a).forEach(q=>set.add((p/q).toFixed(6)))); const v=2*set.size; return P("Rational roots",`How many different possible rational zeros ±p/q does ${a===1?"":a}x${cu} − 5x${sq} + x + ${d} have?`,v,[v/2,dv(d).length*dv(a).length*2,v+2],[`p divides ${d}: ${dv(d).join(", ")}. q divides ${a}: ${dv(a).join(", ")}.`,`Distinct values of p/q: ${set.size}, each with ±: <b>${v}</b>`]); }]};
+
+G.div={sat:[
+ ()=>{ const a=R(-5,5),b=R(-9,9),k=nz(-4,4); const r=k**3+a*k+b; return P("Remainder theorem",`What is the remainder when x${cu}${a?sg(a)+"x":""}${sg(b)} is divided by x${sg(-k)}?`,r,[(-k)**3-a*k+b,b,r+k],[`Remainder Theorem: R = P(${N(k)}).`,`${N(k**3)}${a?sg(a*k):""}${sg(b)} = <b>${N(r)}</b>`]); },
+ ()=>{ const r=nz(-4,4),p=nz(-5,5),q=R(-9,9); const Pc=[1,p-r,q-p*r,-q*r]; return P("Synthetic division",`(${poly(Pc)}) ÷ (x${sg(-r)}) = x${sq} + bx + c. What is b + c?`,p+q,[p,q,p*q],[`Synthetic division with r = ${N(r)}: bottom row 1, ${N(p)}, ${N(q)} | 0.`,`b + c = ${N(p)}${sg(q)} = <b>${N(p+q)}</b>`]); },
+ ()=>{ const r=nz(-3,3),a=R(-5,5),c=R(-8,8); const k=-(r**3+a*r+c)/(r*r); if(!Number.isInteger(k)) return null; return P("Factor theorem",`For what value of k is x${sg(-r)} a factor of x${cu} + kx${sq}${a?sg(a)+"x":""}${c?sg(c):""}?`,k,[-k,k+1,r],[`Factor Theorem: P(${N(r)}) = 0.`,`${N(r**3)} + ${r*r}k${sg(a*r+c)} = 0`,`k = <b>${N(k)}</b>`]); },
+ ()=>{ const r=nz(-5,5),Q=[1,R(-5,5),R(-6,6)],e=R(-9,9); const Pc=[1,Q[1]-r,Q[2]-Q[1]*r,-Q[2]*r+e]; return P("Remainders",`When ${poly(Pc)} is divided by x${sg(-r)}, what is the remainder?`,e,[-e,Pc[3],e+r],[`Synthetic division with r = ${N(r)}, or compute P(${N(r)}).`,`<b>${N(e)}</b>`]); },
+ ()=>{ const s=nz(-4,4),t=nz(-4,4),u=nz(-4,4); const Pc=[1,-(s+t+u),s*t+s*u+t*u,-s*t*u]; return P("Zeros",`x = ${N(s)} is a zero of ${poly(Pc)}. What is the product of the other two zeros?`,t*u,[t+u,-t*u,s*t*u],[`Divide by x${sg(-s)}: quotient x${sq}${sg(-(t+u))}x${sg(t*u)}.`,`Product of its zeros = <b>${N(t*u)}</b>`]); }],
+chal:[
+ ()=>{ const a=nz(-4,4),b=nz(-4,4); const r1=pick([1,2]),r2=-r1; const Pf=x=>x**4+a*x+b; return P("Remainders",`What is the remainder when x<sup>4</sup>${sg(a)}x${sg(b)} is divided by x${sq} − ${r1*r1}? Give its constant term.`,(Pf(r1)+Pf(r2))/2,[Pf(r1),b,(Pf(r1)-Pf(r2))/2],[`R(x) = px + q with R(${r1}) = P(${r1}) = ${N(Pf(r1))} and R(−${r1}) = P(−${r1}) = ${N(Pf(r2))}.`,`q = (${N(Pf(r1))} + ${N(Pf(r2))})/2 = <b>${N((Pf(r1)+Pf(r2))/2)}</b>`]); },
+ ()=>{ const r=nz(-3,3),s=nz(-3,3); if(r===s) return null; const A=R(-6,6),B=R(-6,6); const p=(A-B)/(r-s), q=A-p*r; if(!Number.isInteger(p)||!Number.isInteger(q)) return null; return P("Remainder theorem",`P(x) leaves remainder ${N(A)} when divided by x${sg(-r)} and ${N(B)} when divided by x${sg(-s)}. Its remainder when divided by (x${sg(-r)})(x${sg(-s)}) is px + q. Find p + q.`,p+q,[A+B,p,q],[`R(x) = px + q with R(${N(r)}) = ${N(A)}, R(${N(s)}) = ${N(B)}.`,`p = (${N(A)} − ${N(B)})/(${N(r)} − ${N(s)}) = ${N(p)}, q = ${N(q)}.`,`p + q = <b>${N(p+q)}</b>`]); },
+ ()=>{ const a=pick([2,3]),b=nz(-5,5); if(gcd(a,b)!==1) return null; const Q=[R(1,3),R(-4,4),R(-5,5)],e=R(-6,6); const Pc=[a*Q[0],a*Q[1]-b*Q[0],a*Q[2]-b*Q[1],-b*Q[2]+e]; return P("Synthetic division",`(${poly(Pc)}) ÷ (${a}x${sg(-b)}) has quotient ax${sq} + bx + c. Find a + b + c.`,Q[0]+Q[1]+Q[2],[a*(Q[0]+Q[1]+Q[2]),Q[0],e],[`Use r = ${F(b,a)}; the bottom row is ${a}·(quotient).`,`Divide by ${a}: quotient ${poly(Q)}.`,`<b>${N(Q[0]+Q[1]+Q[2])}</b>`]); },
+ ()=>{ const k=R(2,9); return P("Remainder theorem",`What is the remainder when x<sup>${k*10+1}</sup> − ${k}x + 1 is divided by x + 1?`,-1+k+1,[k+2,-k,2],[`R = P(−1) = (−1)<sup>${k*10+1}</sup> + ${k} + 1 = −1 + ${k} + 1.`,`<b>${k}</b>`]); }]};
 G.poly=G["unit-4"];
 
 G["unit-5"]={sat:[
@@ -319,7 +331,7 @@ window.A2PRO={has,boxHTML,bind,sheet:u=>SHEET[u]||"",count:u=>(G[u]?((G[u].sat||
 (function(){
 const STR=[["Start & Tools","#111",["formulas","cheats","practice","sat","resources","toolkit"]],
   ["Linear Algebra","#c2571a",["unit-1","systems","unit-13"]],
-  ["Polynomials","#1d4e89",["unit-2","factor","unit-3","unit-4","poly"]],
+  ["Polynomials","#1d4e89",["unit-2","factor","div","unit-3","unit-4","poly"]],
   ["Functions","#6a3d9a",["unit-5","unit-6","unit-7","unit-9","unit-11"]],
   ["Discrete & Data","#0f7a6c",["unit-8","unit-14","unit-10","unit-12"]]];
 let last=null;

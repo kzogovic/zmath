@@ -203,13 +203,13 @@ const A2MAP={
 function a2pool(flow,k){ const out=[]; const L=LGEN[flow]&&LGEN[flow][k]; if(L) out.push(()=>L());
   const T=(A2MAP[flow]||{})[k]; if(T&&window.A2GEN){ for(const L2 of Object.values(A2GEN.GEN)) for(const g of L2) if(T.includes(g[0])) out.push(()=>{ const p=g[1](); return {q:p.q,a:p.a}; }); }
   return out; }
-function freshEx(flow,k){ const F=FLOWS[flow], m=F&&F.M[k]; if(flow==="factor"&&m&&m.gen) return [m.gen(),m.gen()];
+function freshEx(flow,k){ const F=FLOWS[flow], m=F&&F.M[k]; if(m&&m.gen) return [m.gen(),m.gen()];
   const pool=a2pool(flow,k); if(!pool.length) return null; const out=[], seen=new Set(); let t=0;
   while(out.length<2&&t++<40){ try{ const r=pick(pool)(); const key=JSON.stringify(r).slice(0,300); if(seen.has(key)) continue; seen.add(key); out.push(r); }catch(e){} } return out.length?out:null; }
 const fmtA=s=>window.A2PRACTICE?A2PRACTICE.fmt(s):s;
 function exCard(r,i){ if(Array.isArray(r)){ const [q,st]=r; return `<div class="mf-ex"><div class="fx-k">New example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(x=>`<li>${x}</li>`).join("")}</ol></div>`; }
   return `<div class="mf-ex"><div class="fx-k">New example ${i+1}</div><p class="mf-eq">${fmtA(r.q)}</p><div class="mf-sol">${fmtA(r.a)}</div></div>`; }
-const hasFresh=(flow,k)=>{ const F=FLOWS[flow], m=F&&F.M[k]; return !!((flow==="factor"&&m&&m.gen)||a2pool(flow,k).length); };
+const hasFresh=(flow,k)=>{ const F=FLOWS[flow], m=F&&F.M[k]; return !!((m&&m.gen)||a2pool(flow,k).length); };
 const fv=()=>`<i class="mf-v" aria-hidden="true"></i>`;
 const FLOWS={};
 function flowHTML(id,F){ FLOWS[id]=F;
@@ -1038,7 +1038,7 @@ const st=document.createElement("style"); st.textContent=CSS+`
 `; document.head.appendChild(st);
 
 const NEX=CROSS_EX.length+RUF_EX.length, NPR=CROSS_P.length+RUF_P.length;
-window.A2FACT={_reg:()=>{[QFLOW,SYS,ZER,RAT,RAD,EXP,CNT,SEQ,STA,MTX,IND].forEach(f=>f());},_fresh:freshEx,_has:hasFresh,_flows:FLOWS,
+window.A2FACT={mkFlow:(id,F)=>flowHTML(id,F),bindFlow:root=>bindFlow(root),_reg:()=>{[QFLOW,SYS,ZER,RAT,RAD,EXP,CNT,SEQ,STA,MTX,IND].forEach(f=>f());},_fresh:freshEx,_has:hasFresh,_flows:FLOWS,
   count:()=>NEX+NPR,
   tip:()=>`${NEX} solved examples · ${NPR} type-in problems`,
   subs:()=>[["start","Method Flowchart: Which Method When?","11 methods",START,"Method Flowchart"],

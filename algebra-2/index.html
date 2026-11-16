@@ -178,23 +178,24 @@ details.fold>.grid,details.fold>.cs,details.fold>.quiz,details.fold>.sat,details
   <button class="nav next" id="lbNext" aria-label="Next">›</button>
 </div>
 
-<script src="plot.js?v=1794832698"></script>
-<script src="practice.js?v=1794832698"></script>
-<script src="gen.js?v=1794832698"></script>
-<script src="sat.js?v=1794832698"></script>
-<script src="res.js?v=1794832698"></script>
-<script src="cheat.js?v=1794832698"></script>
-<script src="explog.js?v=1794832698"></script>
-<script src="moregen.js?v=1794832698"></script>
-<script src="formulas.js?v=1794832698"></script>
-<script src="ws.js?v=1794832698"></script>
-<script src="poly.js?v=1794832698"></script>
-<script src="unitplus.js?v=1794832698"></script>
-<script src="frac.js?v=1794832698"></script>
-<script src="factor.js?v=1794832698"></script>
-<script src="pro.js?v=1794832698"></script>
-<script src="sys3.js?v=1794832698"></script>
-<script src="mathfix.js?v=1794832698"></script>
+<script src="plot.js?v=1794834087"></script>
+<script src="practice.js?v=1794834087"></script>
+<script src="gen.js?v=1794834087"></script>
+<script src="sat.js?v=1794834087"></script>
+<script src="res.js?v=1794834087"></script>
+<script src="cheat.js?v=1794834087"></script>
+<script src="explog.js?v=1794834087"></script>
+<script src="moregen.js?v=1794834087"></script>
+<script src="formulas.js?v=1794834087"></script>
+<script src="ws.js?v=1794834087"></script>
+<script src="poly.js?v=1794834087"></script>
+<script src="unitplus.js?v=1794834087"></script>
+<script src="frac.js?v=1794834087"></script>
+<script src="factor.js?v=1794834087"></script>
+<script src="division.js?v=1794834087"></script>
+<script src="pro.js?v=1794834087"></script>
+<script src="sys3.js?v=1794834087"></script>
+<script src="mathfix.js?v=1794834087"></script>
 <script>
 const UNITS = [
   {id:"formulas", chapter:"Formulas", short:"Formulas & 140 Problems", name:"Formulas: Special Products & Factoring Patterns", sub:"Difference of squares, difference and sum of cubes, square and cube of a binomial. Formulas with examples, multiple choice, flashcards and type-the-answer practice."},
@@ -204,6 +205,7 @@ const UNITS = [
   {id:"unit-1", chapter:"Chapter I", short:"Linear & Absolute Value", name:"Unit 1: Linear Equations, Inequalities & Functions", sub:"Absolute value, lines, systems in three variables, piecewise functions"},
   {id:"unit-2", chapter:"Chapter II", short:"Polynomials & Complex Numbers", name:"Unit 2: Polynomials, Factoring & Solving Quadratics", sub:"Factoring, polynomial division, binomial theorem, four ways to solve, complex numbers"},
   {id:"factor", chapter:"Factoring", short:"Factoring", name:"Factoring: Cross Table & Ruffini's Method", sub:"Which method to use, the Cross Table method for ax² + bx + c, and Ruffini's method for degree 3 and higher. Solved examples plus practice where you type numbers into the boxes and check them as you go."},
+  {id:"div", chapter:"Division", short:"Division", name:"Polynomial Division: Long & Synthetic", sub:"Which method to use, long division for any divisor, synthetic division for x − r and ax − b, and the Remainder and Factor Theorems. Solved examples with new examples on demand, plus practice where you type into the boxes and check as you go."},
   {id:"unit-3", chapter:"Chapter III", short:"Quadratic Functions", name:"Unit 3: Quadratic Functions", sub:"Forms, vertex form, zeros, discriminant, inequalities, writing equations, max/min, nonlinear systems"},
   {id:"systems", chapter:"Systems", short:"Systems", name:"Systems of Equations (Step by Step)", sub:"2 × 2 and 3 × 3 by graphing, substitution, elimination, Cramer's rule, inverse matrices, Gaussian elimination; nonlinear systems and tangent lines"},
   {id:"unit-13", chapter:"Chapter XIII", short:"Matrices", name:"Unit 13: Matrices", sub:"Dimensions, operations, multiplication, determinants, inverses, transformations, and solving systems with AX = B"},
@@ -351,7 +353,7 @@ const tabs = document.getElementById("tabs"), content = document.getElementById(
 const q = document.getElementById("q");
 let current = "all", lbList = [], lbIdx = 0;
 
-function postersFor(id){ if(id==="formulas"||id==="poly"||id==="factor") return []; if(id==="practice"||id==="resources"||id==="cheats") return []; const a=POSTERS.filter(p=>p.units.includes(id)); return a.filter(p=>p.summary).concat(a.filter(p=>!p.summary)); }
+function postersFor(id){ if(id==="formulas"||id==="poly"||id==="factor"||id==="div") return []; if(id==="practice"||id==="resources"||id==="cheats") return []; const a=POSTERS.filter(p=>p.units.includes(id)); return a.filter(p=>p.summary).concat(a.filter(p=>!p.summary)); }
 
 const tip = document.getElementById("tip");
 function showTip(el, html){
@@ -366,15 +368,15 @@ window.addEventListener("scroll", hideTip, {passive:true});
 
 function renderTabs(){
   tabs.innerHTML = "";
-  const all = [{id:"all", short:"All topics", count:POSTERS.length}, ...UNITS.map(u=>({id:u.id, short:u.short, count:u.id==="poly"?A2POLY.count():u.id==="factor"?A2FACT.count():u.id==="formulas"?A2FORM.count():u.id==="cheats"?Object.keys(A2CHEAT.all).reduce((n,k)=>n+A2CHEAT.count(k),0):u.id==="practice"?A2PRACTICE.count("practice"):u.id==="resources"?Object.keys(A2RES.all).reduce((n,k)=>n+A2RES.count(k),0):u.id==="sat"?postersFor("sat").length+A2SAT.count("sat"):(postersFor(u.id).length||(window.A2PRO?A2PRO.count(u.id):0))}))];
+  const all = [{id:"all", short:"All topics", count:POSTERS.length}, ...UNITS.map(u=>({id:u.id, short:u.short, count:u.id==="poly"?A2POLY.count():u.id==="factor"?A2FACT.count():u.id==="div"?(window.A2DIV?A2DIV.count():0):u.id==="formulas"?A2FORM.count():u.id==="cheats"?Object.keys(A2CHEAT.all).reduce((n,k)=>n+A2CHEAT.count(k),0):u.id==="practice"?A2PRACTICE.count("practice"):u.id==="resources"?Object.keys(A2RES.all).reduce((n,k)=>n+A2RES.count(k),0):u.id==="sat"?postersFor("sat").length+A2SAT.count("sat"):(postersFor(u.id).length||(window.A2PRO?A2PRO.count(u.id):0))}))];
   if(window.A2NAV){ A2NAV.render(tabs, all, current, unitById); return; }
   for(const t of all){
     const b = document.createElement("button");
     b.innerHTML = `${t.short}<span class="n">${t.count}</span>`;
-    b.setAttribute("aria-current", t.id===current); if(t.id==="formulas") b.className="fbtn"; if(t.id==="poly") b.className="pbtn"; if(t.id==="factor") b.className="xbtn";
+    b.setAttribute("aria-current", t.id===current); if(t.id==="formulas") b.className="fbtn"; if(t.id==="poly") b.className="pbtn"; if(t.id==="factor") b.className="xbtn"; if(t.id==="div") b.className="dbtn";
     b.onclick = ()=>{ location.hash = t.id==="all" ? "" : t.id; if(t.id==="all") route(); };
     const u = unitById[t.id];
-    const tipHtml = u ? `<b>${esc(u.name)}</b><span>${esc(u.sub)}</span><small>${t.id==="factor"?A2FACT.tip():t.id==="poly"?t.count+" examples · 15 worksheets":t.id==="formulas"?t.count+" formulas · quiz · flashcards · typing":t.id==="cheats"?t.count+" topics":t.id==="resources"?t.count+" links":t.id==="sat"?t.count+" pages & questions":t.id==="practice"?t.count+" problems":t.count+" poster"+(t.count===1?"":"s")+(A2PRACTICE.has(t.id)?" · "+A2PRACTICE.count(t.id)+" practice problems":"")}</small>`
+    const tipHtml = u ? `<b>${esc(u.name)}</b><span>${esc(u.sub)}</span><small>${t.id==="factor"?A2FACT.tip():t.id==="div"?A2DIV.tip():t.id==="poly"?t.count+" examples · 15 worksheets":t.id==="formulas"?t.count+" formulas · quiz · flashcards · typing":t.id==="cheats"?t.count+" topics":t.id==="resources"?t.count+" links":t.id==="sat"?t.count+" pages & questions":t.id==="practice"?t.count+" problems":t.count+" poster"+(t.count===1?"":"s")+(A2PRACTICE.has(t.id)?" · "+A2PRACTICE.count(t.id)+" practice problems":"")}</small>`
                       : `<b>All units</b><span>Show every poster in the book</span><small>${t.count} posters</small>`;
     b.setAttribute("aria-label", u ? u.name : "All units");
     b.addEventListener("mouseenter", ()=>showTip(b, tipHtml));
@@ -481,8 +483,8 @@ function render(){
       } else html += A2PRACTICE.overview(UNITS);
       html += `</section>`; continue;
     }
-    if(id==="formulas"||id==="poly"||id==="factor"){
-      const MOD=id==="poly"?A2POLY:id==="factor"?A2FACT:A2FORM;
+    if(id==="formulas"||id==="poly"||id==="factor"||id==="div"){
+      const MOD=id==="poly"?A2POLY:id==="factor"?A2FACT:id==="div"?A2DIV:A2FORM;
       if(term) continue;
       html += head;
       if(current===id){
@@ -535,7 +537,7 @@ function render(){
   }
   content.innerHTML = html || `<p class="empty">No posters match "${esc(term)}".</p>`;
   foldify(content);
-  A2PRACTICE.bind(content); if(window.A2PRO) A2PRO.bind(content); if(window.A2S3) A2S3.bind(content); if(window.A2NAV) A2NAV.bindHome(content); A2GEN.bind(content); A2SAT.bind(content); A2RES.bind(content); A2CHEAT.bind(content); A2FORM.bind(content); if(window.A2POLY) A2POLY.bind(content); if(window.A2UP){ A2UP.bind(content); A2UP.mapUnit(content); } if(window.A2EXPLOG) A2EXPLOG.bind(content); if(window.A2FACT) A2FACT.bind(content);
+  A2PRACTICE.bind(content); if(window.A2PRO) A2PRO.bind(content); if(window.A2S3) A2S3.bind(content); if(window.A2NAV) A2NAV.bindHome(content); A2GEN.bind(content); A2SAT.bind(content); A2RES.bind(content); A2CHEAT.bind(content); A2FORM.bind(content); if(window.A2POLY) A2POLY.bind(content); if(window.A2UP){ A2UP.bind(content); A2UP.mapUnit(content); } if(window.A2EXPLOG) A2EXPLOG.bind(content); if(window.A2DIV) A2DIV.bind(content); if(window.A2FACT) A2FACT.bind(content);
   content.querySelectorAll("[data-hit]").forEach(b=>b.onclick=()=>{ const [u,i]=b.dataset.hit.split("|"); pendingHit=`cs-${u}-${i}`; q.value=""; if(location.hash.slice(1)===u) route(); else location.hash=u; });
   setupSpy();
   content.querySelectorAll("[data-jump]").forEach(b=>b.onclick=(e)=>{ e.preventDefault(); e.stopPropagation(); const t=document.getElementById(b.dataset.jump); if(!t) return; if(t.tagName==="DETAILS") t.open=true; const sb=content.querySelector(".secnav.sticky"), off=navH()+(sb?sb.offsetHeight:0)+8; window.scrollTo({top:t.getBoundingClientRect().top+window.scrollY-off,behavior:"smooth"}); });
