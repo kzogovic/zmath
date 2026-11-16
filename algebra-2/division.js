@@ -163,16 +163,24 @@ const inp=(f,lab,ph)=>`<input class="bx" data-f="${f}" type="text" inputmode="te
 function pv(s){ s=String(s||"").trim().replace(/[−–—]/g,"-").replace(/\s+/g,""); if(s===""||s==="-"||s==="+") return null; if(/^[-+]?\d+\/\d+$/.test(s)){ const [n,d]=s.split("/"); return +n/+d; } const v=Number(s); return isNaN(v)?NaN:v; }
 const eq=(a,b)=>Math.abs(a-b)<1e-9;
 const mark=(el,ok)=>{ el.classList.toggle("ok",ok===true); el.classList.toggle("bad",ok===false); };
-function longPCard(g,i){ const nq=g.Q.length-1, m=g.D.length-1, Rf=Array(m).fill(0).map((_,j)=>g.R[g.R.length-m+j]||0);
-  const qb=g.Q.map((_,j)=>`${inp("q"+j,"Quotient coefficient of "+(nq-j===0?"constant":"x^"+(nq-j)))}${nq-j?`<i>${S(nq-j)}</i>`:""}`).join(" + ");
-  const rb=Rf.map((_,j)=>`${inp("r"+j,"Remainder coefficient")}${m-1-j?`<i>${S(m-1-j)}</i>`:""}`).join(" + ");
-  return `<article class="fx-pc" data-kind="long" data-p='${JSON.stringify({P:g.P,D:g.D,Q:g.Q,R:Rf})}'>
-   <div class="fx-pc-h"><span class="fx-pn">${i+1}</span><h4>(${poly(g.P)}) ÷ (${poly(g.D)})</h4><span class="fx-badge">Solved</span></div>
-   <p class="fx-st">Do the long division on paper, then type the coefficients. Type 0 if a term is missing.</p>
-   <p class="dv-row"><b>Q(x) =</b> ${qb}</p><p class="dv-row"><b>R(x) =</b> ${rb}</p>
-   <p class="fx-msg" data-o="msg">Start with the first term: ${tcell(g.P[0],g.P.length-1,true)} ÷ ${tcell(g.D[0],m,true)}.</p>
-   <div class="dv-sol" hidden></div>
+function longPCard(g,i){ const P=g.P, D=g.D, n=P.length-1, m=D.length-1, L=ldiv(P,D), W=n+1;
+  const pw=j=>S(n-j), cell=(f,j,lab)=>`<span class="lb">${inp(f,lab)}<i>${pw(j)}</i></span>`;
+  const row=(cells,cls,left="")=>`<tr class="${cls}"><td class="ld-l">${left}</td>${Array.from({length:W},(_,j)=>`<td>${cells[j]||""}</td>`).join("")}</tr>`;
+  const qc=[]; L.q.forEach((_,k)=>{ qc[m+k]=cell("q"+k,m+k,"Quotient term"); });
+  let h=row(qc,"ld-q")+row(P.map((a,j)=>`<span class="lt">${tcell(a,n-j,j===0)}</span>`),"ld-d",poly(D)+"&thinsp;)");
+  L.steps.forEach((st,k)=>{ const pc=[]; for(let j=k;j<=k+m;j++) pc[j]=cell(`m${k}_${j}`,j,"Multiply row");
+    h+=row(pc,"ld-s","−");
+    const dc=[], last=k===L.steps.length-1, to=last?n:Math.min(n,k+m+1); for(let j=k+1;j<=to;j++) dc[j]=cell(`d${k}_${j}`,j,last?"Remainder":"Subtract and bring down");
+    h+=row(dc,last?"ld-r":"ld-n",last?"R":""); });
+  return `<article class="fx-pc" data-kind="long" data-p='${JSON.stringify({P,D})}'>
+   <div class="fx-pc-h"><span class="fx-pn">${i+1}</span><h4>(${poly(P)}) ÷ (${poly(D)})</h4><span class="fx-badge">Solved</span></div>
+   <p class="fx-st">Type the <b>numbers</b> (the x's are already there). Green = right, red = wrong. Type 0 for a missing term and use − for negatives.</p>
+   <div class="ld-wrap"><table class="ld in">${h}</table></div>
+   <p class="fx-msg" data-o="msg">Step 1: divide ${tcell(P[0],n,true)} by ${tcell(D[0],m,true)} and type the number on top.</p>
    <div class="fx-btns"><button type="button" data-act="show">Show answer</button><button type="button" data-act="clear">Clear</button></div></article>`; }
+function longExpect(P,D){ const n=P.length-1, m=D.length-1, L=ldiv(P,D), E={}; L.q.forEach((v,k)=>E["q"+k]=v);
+  L.steps.forEach((st,k)=>{ for(let j=k;j<=k+m;j++) E[`m${k}_${j}`]=st.prod[j]; const last=k===L.steps.length-1, to=last?n:Math.min(n,k+m+1); for(let j=k+1;j<=to;j++) E[`d${k}_${j}`]=st.after[j]; });
+  return {E,L}; }
 function synPCard(g,i){ const c=g.P, n=c.length-1;
   return `<article class="fx-pc" data-kind="syn" data-p='${JSON.stringify({P:c,r:g.b})}'>
    <div class="fx-pc-h"><span class="fx-pn">${i+1}</span><h4>(${poly(c)}) ÷ (${lin(1,-g.b)})</h4><span class="fx-badge">Solved</span></div>
@@ -182,12 +190,14 @@ function synPCard(g,i){ const c=g.P, n=c.length-1;
     <tr class="rf-s"><td class="rf-r"></td>${c.map((_,j)=>`<td${j===n?' class="rf-rem"':""}>${inp("s"+j,j===n?"Remainder":"Bottom row, column "+(j+1))}</td>`).join("")}</tr></table></div>
    <p class="fx-msg" data-o="msg">Start with Step 1.</p>
    <div class="fx-btns"><button type="button" data-act="show">Show answer</button><button type="button" data-act="clear">Clear</button></div></article>`; }
-function checkLong(card){ const P=JSON.parse(card.dataset.p), F={}; card.querySelectorAll("[data-f]").forEach(e=>F[e.dataset.f]=e); let all=true, any=false;
-  P.Q.forEach((v,j)=>{ const x=pv(F["q"+j].value); if(x===null){ mark(F["q"+j],null); all=false; } else { any=true; const ok=eq(x,v); mark(F["q"+j],ok); if(!ok) all=false; } });
-  P.R.forEach((v,j)=>{ const x=pv(F["r"+j].value); if(x===null){ mark(F["r"+j],null); all=false; } else { any=true; const ok=eq(x,v); mark(F["r"+j],ok); if(!ok) all=false; } });
-  const msg=card.querySelector('[data-o="msg"]'); msg.className="fx-msg"+(all?" yes":"");
-  msg.innerHTML=all?`Solved! Q(x) = ${poly(P.Q)}, R(x) = ${poly(trim(P.R))}.`:any?"Green boxes are right. Fix the red ones: check each subtraction (change every sign).":msg.innerHTML;
-  card.classList.toggle("done",all); return all; }
+function checkLong(card){ const P=JSON.parse(card.dataset.p), {E,L}=longExpect(P.P,P.D), F={}; card.querySelectorAll("[data-f]").forEach(e=>F[e.dataset.f]=e);
+  let first=null, filled=0, good=0; const keys=Object.keys(F);
+  keys.forEach(k=>{ const x=pv(F[k].value); if(x===null){ mark(F[k],null); if(!first) first=k; } else { filled++; const ok=eq(x,E[k]); mark(F[k],ok); if(ok) good++; else if(!first) first=k; } });
+  const done=good===keys.length, msg=card.querySelector('[data-o="msg"]'), m=P.D.length-1; msg.className="fx-msg"+(done?" yes":"");
+  if(done){ const R=trim(L.r); msg.innerHTML=`Solved! Q(x) = ${poly(L.q)}, R = ${poly(R)}. So ${FRp(poly(P.P),poly(P.D))} = ${poly(L.q)}${R.every(v=>!v)?"":" + "+FRp(poly(R),poly(P.D))}.`; }
+  else if(first){ const k=first, bad=F[k].classList.contains("bad"), st=+(/\d+/.exec(k.slice(1))||[0])[0];
+    msg.innerHTML=(bad?"<b>Check the red box.</b> ":"")+(k[0]==="q"?`Divide the first term of the line above by ${tcell(P.D[0],m,true)} and write it on top.`:k[0]==="m"?`Multiply the top term by every term of ${poly(P.D)} and write the products in this row.`:`Subtract: change every sign in the row above and add. Then bring down the next term.`); }
+  card.classList.toggle("done",done); return done; }
 function checkSyn(card){ const P=JSON.parse(card.dataset.p), c=P.P, n=c.length-1, F={}; card.querySelectorAll("[data-f]").forEach(e=>F[e.dataset.f]=e);
   const v=k=>pv(F[k].value); Object.values(F).forEach(e=>mark(e,null)); const r=v("r"), msg=card.querySelector('[data-o="msg"]'); let solved=false;
   if(r===null){ msg.className="fx-msg"; msg.innerHTML="Start with Step 1."; card.classList.remove("done"); return false; }
@@ -200,14 +210,15 @@ function checkSyn(card){ const P=JSON.parse(card.dataset.p), c=P.P, n=c.length-1
   msg.innerHTML=solved?`Solved! Q(x) = ${poly(s.slice(0,-1))}, remainder ${num(s[n])}${s[n]===0?` (so ${lin(1,-P.r)} is a factor)`:""}.`:"Bring down the first number. Multiply by r, write it in the next column, add. Repeat.";
   card.classList.toggle("done",solved); return solved; }
 function fill(card){ const P=JSON.parse(card.dataset.p), set=(k,x)=>{ const e=card.querySelector(`[data-f="${k}"]`); if(e) e.value=String(x).replace("-","−"); };
-  if(card.dataset.kind==="long"){ P.Q.forEach((x,j)=>set("q"+j,x)); P.R.forEach((x,j)=>set("r"+j,x)); const sol=card.querySelector(".dv-sol"); sol.hidden=false; sol.innerHTML=ldTable(P.P,P.D); }
+  if(card.dataset.kind==="long"){ const {E}=longExpect(P.P,P.D); Object.entries(E).forEach(([k,x])=>set(k,x)); }
   else { const {s,p}=synth(P.P,P.r); set("r",P.r); p.forEach((x,j)=>{ if(j) set("p"+j,x); }); s.forEach((x,j)=>set("s"+j,x)); } }
 const NLP=6, NSP=6;
-const newLong=()=>{ const kinds=["lin","lin","lead","quad","quad","miss"]; return kinds.map(k=>genLong(k)); };
+function genLongP(k){ for(let t=0;t<400;t++){ const g=genLong(k); const n=g.P.length-1; if(n>3) continue; if(k==="quad"&&g.D.length<3) continue; return g; } return genLong("lin"); }
+const newLong=()=>["lin","lin","lead","miss","quad","lin"].map(genLongP);
 const newSyn=()=>{ const kinds=["int","int","miss","factor","int","miss"]; return kinds.map(k=>genSyn(k)).map(g=>g.a===1?g:genSyn("int")); };
 function setHTML(kind,list){ const cards=kind==="long"?list.map(longPCard):list.map(synPCard);
   return `<div class="fx-set" data-dvset="${kind}"><div class="fx-ctl"><span class="fx-score">Solved <b>0</b> / ${list.length}</span><button type="button" data-act="new">↻ New problems</button><button type="button" data-act="reset">Clear all</button></div><div class="fx-pgrid">${cards.join("")}</div></div>`; }
-const LONGP=()=>`<div class="fx-lead"><p>Do each long division on paper, then type the coefficients of the quotient and the remainder. Each box turns <span class="yes">green</span> when it's right and <span class="no">red</span> when it's wrong. Type negative numbers with a minus sign, like −4. <b>Show answer</b> also shows the whole long-division layout.</p></div>${setHTML("long",newLong())}`;
+const LONGP=()=>`<div class="fx-lead"><p>Fill in the long division right in the layout, step by step: the quotient on top, each multiply row, then each subtract-and-bring-down row. Type only the numbers; the x's are printed for you. Each box turns <span class="yes">green</span> when it's right and <span class="no">red</span> when it's wrong.</p></div>${setHTML("long",newLong())}`;
 const SYNP=()=>`<div class="fx-lead"><p>Type r, then fill in the synthetic division table. Each box turns <span class="yes">green</span> when it's right. Type negative numbers with a minus sign.</p></div>${setHTML("syn",newSyn())}`;
 function bindSets(root){ root.querySelectorAll("[data-dvset]").forEach(set=>{ if(set.dataset.bound) return; set.dataset.bound=1; const kind=set.dataset.dvset;
   const score=()=>{ const cs=[...set.querySelectorAll(".fx-pc")]; set.querySelector(".fx-score").innerHTML=`Solved <b>${cs.filter(c=>c.classList.contains("done")).length}</b> / ${cs.length}`; };
@@ -280,6 +291,16 @@ nav button.dbtn[aria-current="true"]{background:#7a3410;border-color:#7a3410;box
 .dv-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:19px;margin:6px 0}
 .dv-row i{font-style:normal;font-weight:600}
 .dv-sol{margin:6px 0}
+.ld.in td{padding:2px 1px;text-align:left;min-width:0;vertical-align:middle}
+.ld.in td.ld-l{text-align:right;padding-right:4px;font-size:22px}
+.ld.in .lb{display:inline-flex;align-items:center;gap:1px;white-space:nowrap}
+.ld.in .lb i{font-style:normal;color:#111;font-size:17px;min-width:0}
+.ld.in .bx{width:36px;height:34px;font-size:21px;padding:0}
+.ld.in .lt{color:#111;padding:0 2px;font-size:20px;white-space:nowrap}
+.ld.in tr.ld-d td:not(.ld-l){border-top:2px solid #111}
+.ld.in tr.ld-s td:not(.ld-l):not(:empty){border-bottom:2px solid #111}
+.ld.in tr.ld-s td.ld-l{color:#7a7f87}
+.ld.in tr.ld-r td.ld-l{color:${RED}}
 `; document.head.appendChild(st);
 
 const NEX=LD_FIX.length+SYN_FIX.length+6;

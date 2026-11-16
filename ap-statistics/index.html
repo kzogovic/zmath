@@ -189,15 +189,15 @@ img{max-width:100%}
   <button class="nav next" id="lbNext" aria-label="Next">›</button>
 </div>
 
-<script src="practice.js?v=1794834087"></script>
+<script src="practice.js?v=1794835224"></script>
 <script>
 (function(){const c=document.getElementById("content");if(!c)return;new MutationObserver(()=>{const s=document.getElementById("sec-inf-folder");if(s&&!s.querySelector(".dlbar")){const d=document.createElement("div");d.className="dlbar";d.style.cssText="margin:4px 0 18px;padding:10px 14px;border:1.5px dashed #1d2b44;display:flex;gap:12px;align-items:center;flex-wrap:wrap";d.innerHTML='<button type="button" class="dlbtn" style="font:inherit;cursor:pointer;border:0;padding:6px 14px;background:#1d2b44;color:#fff;font-weight:600">⬇ Download the Units 5–7 poster pack (PDF, 11 pages)</button><span class="dlmsg" style="font-style:italic;color:#444">The 11 original solved-example posters for Units 5–7, one per letter-size page, ready to print.</span>';const b=d.querySelector(".dlbtn"),m=d.querySelector(".dlmsg");b.onclick=async()=>{try{const dl=window.claude&&window.claude.use?await window.claude.use("downloads"):null;if(!dl){m.textContent="Downloading isn't available in this view. Open the page in claude.ai to download.";return;}b.disabled=true;m.textContent="Preparing the PDF…";const blob=await (await fetch("dl/AP_Stats_Units_5-7_Posters.pdf")).blob();await dl.save({filename:"AP_Stats_Units_5-7_Posters.pdf",data:blob});m.textContent="Saved.";}catch(e){m.textContent=(e&&e.code==="declined")?"Download cancelled.":"The download didn't start. Please try again.";}finally{b.disabled=false;}};const sub=s.querySelector(".sub");(sub||s.firstChild).after(d);}}).observe(c,{childList:true,subtree:true});})();
 </script>
-<script src="resources.js?v=1794834087"></script>
-<script src="unit4sets.js?v=1794834087"></script>
-<script src="unitsets.js?v=1794834087"></script>
-<script src="finder.js?v=1794834087"></script>
-<script src="mathfix.js?v=1794834087"></script>
+<script src="resources.js?v=1794835224"></script>
+<script src="unit4sets.js?v=1794835224"></script>
+<script src="unitsets.js?v=1794835224"></script>
+<script src="finder.js?v=1794835224"></script>
+<script src="mathfix.js?v=1794835224"></script>
 <script>
 const UNITS = [
   {id:"finder", chapter:"Start here", short:"Which Test? Which Formula?", name:"Method Finder: Which Test? Which Formula? Which Design?", sub:"Flowcharts that show which inference procedure, which formula and which study design to use, and why. Conditions and formulas at a glance, plus practice that is new every time."},
