@@ -110,8 +110,12 @@ function render(){
     if(reg.length) panels.push({k:"posters", label:"Posters", n:reg.length, body:`<p class="ptitle">Click a poster to open it full size. Use ‹ › or the arrow keys to flip through.</p>${pgrid(reg,id)}`});
     if(sol.length) panels.push({k:"solved", label: id==="frq" ? "Practice FRQs" : "Solved examples", n:sol.length, body:`<p class="ptitle">${id==="frq"?"Original free-response practice problems, one per question type, with full solutions.":"Worked examples, traced step by step."} Try the problem before reading the solution.</p>${pgrid(sol,id)}`});
     if(!term && /^unit-/.test(id)){
+      panels.push({k:"center", label:"Quizzes, tests & practice", n:"", body:CSX.center(id)});
       panels.push({k:"quick", label:"Quick practice", n:"", body:PRACTICE.block(id)});
       const nf = frqFor(id).length; if(nf) panels.push({k:"frq", label:"Released FRQs", n:nf, body:frqTable(id, true)});
+    }
+    if(!term && id==="frq" && window.CSFRQ){
+      panels.push({k:"allfrq", label:"20 practice FRQs", n:CSFRQ.F.length, body:`<p class="ptitle">Five original problems for each AP free-response type, with scoring guides and line-by-line solutions. Every model solution was compiled and tested in Java.</p>${[1,2,3,4].map(t=>`<h3 style="margin:18px 0 6px">Q${t}: ${CSFRQ.TYPES[t]}</h3><div class="cx-list">${CSFRQ.F.filter(f=>f.type===t).map(f=>`<button type="button" data-allf="${f.id}"><b>${esc(f.title)}</b>${f.parts.reduce((s,p)=>s+p.points,0)} points</button>`).join("")}</div>`).join("")}<div class="cx-fbox-all"></div>`});
     }
     if(!term && id==="beyond"){
       const nf = frqFor(id).length; if(nf) panels.push({k:"frq", label:"Old FRQs on these topics", n:nf, body:frqTable(id, true)});
@@ -125,6 +129,8 @@ function render(){
   }
   content.innerHTML = html || `<p class="empty">No posters match "${esc(term)}".</p>`;
   PRACTICE.bind(content);
+  if(window.CSX) CSX.bind(content);
+  content.querySelectorAll("[data-allf]").forEach(b=>b.onclick=()=>{ const f=CSFRQ.F.find(x=>x.id===b.dataset.allf), box=b.closest(".upanel").querySelector(".cx-fbox-all"); box.innerHTML=CSX.frqHTML(f); CSX.wireFRQ(box); box.scrollIntoView({block:"start",behavior:"smooth"}); });
   content.querySelectorAll(".ubtn").forEach(b=>b.onclick=()=>{
     const sec=b.closest("section"), willOpen=b.getAttribute("aria-expanded")!=="true";
     sec.querySelectorAll(".ubtn").forEach(x=>x.setAttribute("aria-expanded","false"));
