@@ -12,17 +12,7 @@ const sq="<sup>2</sup>", cu="<sup>3</sup>";
 const X=(k,v="x")=>k===1?v:k===-1?"−"+v:N(k)+v;
 const sg=n=>n<0?" − "+N(-n):" + "+N(n);
 const poly=c=>{ const n=c.length-1; let s=""; c.forEach((a,i)=>{ if(!a) return; const p=n-i, m=Math.abs(a); const co=(m===1&&p>0)?"":String(m); const v=p===0?"":p===1?"x":"x<sup>"+p+"</sup>"; s+=s?(a<0?" − ":" + "):(a<0?"−":""); s+=co+v; }); return s||"0"; };
-/* tidy: cleans generated math text: 1x → x, −1x → −x, x<sup>1</sup> → x, e<sup>1</sup> → e, "+ 0" terms dropped, (x) → x */
-const tidy=h=>typeof h!=="string"?h:h
-  .replace(/(^|\(|[=−+,] )-(?=\d)|<sup>-/g,m=>m.replace("-","−"))
-  .replace(/ \+ −(?=[\w(π√])/g," − ").replace(/ − −(?=[\w(π√])/g," + ")
-  .replace(/(^|[^\d.,\w])([−-]?)1(?=[xyztuvwirθλ](?![a-z])|[ab](?=<sub>)|e(?=<sup>)|f\()/g,(m,a,b)=>a+(b?"−":""))
-  .replace(/([A-Za-zθ)])<sup>1<\/sup>/g,"$1")
-  .replace(/(?<=[A-Za-zθλ>]|\([^()]*[a-zθ][^()]*\)) [+−] 0(?![\d.,])(?=\s*(?:[)|<,;=?]|for\b|and\b|on\b|in\b|$))/g,"")
-  .replace(/(?<=[\w>]) [+−] 0[a-zθλ](?![\w(])/g,"")
-  .replace(/(?<![A-Za-z])(\([^()<>]*[a-zθ][^()<>]*\))\(([a-zθ])\)/g,"$2$1")
-  .replace(/(^|[\s(=−+|√]|(?<!<\/su[pb])>)\(([a-zθ])\)(?=[(<\s|ⁿ]|$)/g,"$1$2");
-const P=(t,q,v,w,s,o={})=>({t,q:tidy(q),v,a:tidy(o.a!=null?o.a:N(v)),w:w.map(x=>tidy(typeof x==="number"?N(x):x)),s:(s||[]).map(tidy),tol:o.tol,mc:o.mc});
+const P=(t,q,v,w,s,o={})=>({t,q,v,a:o.a!=null?o.a:N(v),w:w.map(x=>typeof x==="number"?N(x):x),s,tol:o.tol,mc:o.mc});
 const PF=(t,q,n,d,w,s,o={})=>P(t,q,n/d,w,s,{...o,a:F(n,d)});   // fraction answer
 const PS=(t,q,a,w,s)=>P(t,q,undefined,w,s,{a,mc:true});        // answer is text: MCQ and Deck only
 const money=x=>"$"+(Math.round(x*100)/100).toFixed(Number.isInteger(x)?0:2);
@@ -46,9 +36,9 @@ function flowHTML(id,F){ FLOWS[id]=F;
 <div class="mf-d" aria-live="polite"></div>`; }
 function mfDetail(m,flow,k){
   return `<div class="mf-dc" style="--c:${m.c}"><div class="mf-dk">${m.grp}</div><h4>${m.name}</h4><p class="mf-when"><b>When:</b> ${m.when}</p><p class="mf-rule">${m.rule}</p>${m.why?`<p class="mf-why"><b>Why this method:</b> ${m.why}</p>`:""}
-   <div class="mf-exs">${m.ex.map(([q,st],i)=>`<div class="mf-ex"><div class="fx-k">Example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(s=>`<li>${s}</li>`).join("")}</ol></div>`).join("")}</div>
+   ${zHas(flow)?`<button type="button" class="fx-go mf-gen" data-mgen="1" style="margin:.4em 0 .6em;font-weight:700">↻ New examples (new numbers every tap)</button>`:""}<div class="mf-exs">${m.ex.map(([q,st],i)=>`<div class="mf-ex"><div class="fx-k">Example ${i+1}</div><p class="mf-eq">${q}</p><ol>${st.map(s=>`<li>${s}</li>`).join("")}</ol></div>`).join("")}</div>
    ${m.tip?`<p class="mf-tip"><b>⚠ Watch out:</b> ${m.tip}</p>`:""}
-   ${zHas(flow)?`<button type="button" class="fx-go" data-mgen="1">↻ New examples</button>`:""}${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
+   ${m.go?`<button type="button" class="fx-go" data-mjump="${m.go}">Full method, more examples & practice →</button>`:""}${m.open?`<button type="button" class="fx-go" data-mopen="${m.open[0]}">${m.open[1]} →</button>`:""}</div>`; }
 function bindFlow(root){ root.querySelectorAll(".mf").forEach(mf=>{ if(mf.dataset.bound) return; mf.dataset.bound=1; const d=mf.nextElementSibling, F=FLOWS[mf.dataset.flow]; if(!F) return;
   const pickK=(k,scroll)=>{ mf.querySelectorAll(".mf-n").forEach(b=>b.classList.toggle("on",b.dataset.fm===k)); d.dataset.k=k; d.innerHTML=mfDetail(F.M[k],mf.dataset.flow,k); if(scroll) d.scrollIntoView({behavior:"smooth",block:"nearest"}); };
   mf.querySelectorAll(".mf-n").forEach(b=>b.onclick=()=>pickK(b.dataset.fm,true)); pickK(F.top[0],false);
@@ -71,15 +61,7 @@ function parseAns(s){ s=String(s||"").trim().toLowerCase().replace(/[−–—]/
   if(!s) return null; let m=s.match(/^(-?\d*\.?\d+)\/(-?\d*\.?\d+)$/); if(m) return +m[1]/+m[2]; if(/^-?\d*\.?\d+(e-?\d+)?$/.test(s)) return +s; return NaN; }
 function gen(g){ for(let i=0;i<30;i++){ try{ const p=g(); if(p&&p.q&&p.a!=null) return p; }catch(e){} } return null; }
 function options(p){ const seen=new Set([String(p.a)]), o=[String(p.a)]; for(const w of p.w){ const s=String(w); if(!seen.has(s)&&s!=="NaN"){ seen.add(s); o.push(s); } if(o.length===4) break; }
-  const fm=String(p.a).match(/^(−?)(\d+)\/(\d+)$/), fn=fm?(fm[1]?-1:1)*fm[2]:0, fd=fm?+fm[3]:1;
-  let k=1; while(o.length<4&&typeof p.v==="number"){ const c=fm?(k>8?N(p.v+k):F(fn+(k%2?1:-1)*Math.ceil(k/2)*(k>4?fd:1),fd)):N(p.v+(k%2?k:-k)); if(!seen.has(c)){ seen.add(c); o.push(c); } k++; }
-  for(let j=0;o.length<4&&j<24;j++){ const c=vary(String(p.a),j); if(c&&!seen.has(c)){ seen.add(c); o.push(c); } } return shuffle(o); }
-/* vary: a near-miss of a text answer (one number nudged or its sign flipped), used only when the written distractors run out */
-function vary(a,j){ const parts=a.split(/(<[^>]*>)/), spots=[]; parts.forEach((t,i)=>{ if(i%2) return; const re=/(−?)(\d+)(?![\d.\/])/g; let m; while((m=re.exec(t))) spots.push([i,m.index,m[0],m[1],+m[2]]); });
-  if(!spots.length){ const alt=[["π","2π"],["π","π/2"],["π","3π/2"],["e","e<sup>2</sup>"],["e","1/e"]].filter(([x])=>a.includes(x)); return alt.length&&j<alt.length?a.replace(alt[j][0],alt[j][1]):null; }
-  const [i,at,str,neg,n]=spots[j%spots.length], mode=Math.floor(j/spots.length)%3;
-  const v=mode===0?(n?(neg?"":"−")+n:null):mode===1?neg+(n+1):(n?neg+(n-1):"−1"); if(v==null) return null;
-  parts[i]=parts[i].slice(0,at)+v+parts[i].slice(at+str.length); return parts.join(""); }
+  let k=1; while(o.length<4&&typeof p.v==="number"){ const c=N(p.v+(k%2?k:-k)); if(!seen.has(c)){ seen.add(c); o.push(c); } k++; } return shuffle(o); }
 const esc=s=>String(s).replace(/"/g,"&quot;");
 function setOf(u,kind,tp,n,typeOnly){ const L=G[u][kind].filter(g=>!tp||(g._t||"")===tp); const out=[], seen=new Set(); let tries=0;
   while(out.length<n&&tries++<n*25){ const g=L[out.length%L.length], p=gen(g); if(!p) continue; if(typeOnly&&(p.mc||typeof p.v!=="number")) continue; if(seen.has(p.q)) continue; seen.add(p.q); out.push(p); } return out; }
@@ -259,46 +241,14 @@ const yKey=y=>(parseInt(y)*2+(/B$/.test(y)?0:1));
 function relList(u){ const R=window.ZREL, k=ZC&&ZC.relKey; if(!R||!k||!R[k]) return []; if(u.relAll) return R[k].slice(); return R[k].filter(x=>x.u.includes(u.num)); }
 const exLabel=y=>/B$/.test(y)?`${y.slice(0,-1)} Form B`:y;
 function relLinks(y,q){ const L=(window.ZREL.links[ZC.relKey]||{})[y]||{}; return Object.entries(L).filter(([t])=>!q||!/^Q\d/.test(t)||t.startsWith("Q"+q+" ")).map(([t,h])=>`<a class="rl-b" href="${h}" target="_blank" rel="noopener">${t}</a>`).join(""); }
-const OFFY=["2023","2024","2025","2026"];
-const isCalcQ=(y,q)=>{ const n=parseInt(y); return n>=2011?q<=2:q<=3; };
-function relBtns(x){ const k=ZC.relKey, L=((window.ZREL.links||{})[k]||{})[x.y]||{}, A=(h,t,c)=>`<a class="rl-b${c?" "+c:""}" href="${h}" target="_blank" rel="noopener">${t}</a>`;
-  if((k==="ab"||k==="bc")&&OFFY.includes(x.y)){ const yy=x.y.slice(2), base="https://apcentral.collegeboard.org/media/pdf/ap"+yy;
-    let s=A(`${base}-frq-calculus-${k}.pdf`,"Question")+A(`${base}-sg-calculus-${k}.pdf`,"Scoring guidelines");
-    s+= x.y==="2026"?`<span class="rl-b off">Student samples: not yet released</span>`:A(`${base}-apc-calculus-${k}-q${x.q}.pdf`,`Student samples Q${x.q}`,"smp");
-    if(L.Questions) s+=A(L.Questions,"Archive copy","arc"); return s; }
-  const nm={"Questions":"Question","Scoring guidelines":"Scoring guidelines","Student samples":"Student samples"};
-  return Object.entries(L).filter(([t])=>!/^Q\d/.test(t)||t.startsWith("Q"+x.q+" ")).map(([t,h])=>A(h,(nm[t]||t),t==="Student samples"?"smp":"")).join("")||`<span class="rl-b off">Links coming</span>`; }
-function relRow(x,cur){ const uu=x.u.map(n=>`<span class="rl-u${n===cur?" on":""}" title="${(ZC.units.find(v=>v.num===n)||{}).name||""}">${n}</span>`).join(""),
-  calc=ZC.relKey==="pc"?"":`<span class="rl-cal ${isCalcQ(x.y,x.q)?"yes":"no"}">${isCalcQ(x.y,x.q)?"Calculator":"No calculator"}</span>`;
-  return `<tr><td class="rl-ex"><b>${exLabel(x.y)}</b> · Q${x.q}${calc}</td><td class="rl-tt">${x.t}</td><td class="rl-us2">${uu}</td><td class="rl-ln">${relBtns(x)}${window.ZRV?window.ZRV.btn(x):""}</td></tr>`; }
-function relTable(list,cur,title,open){ return `<details class="rl-d"${open?" open":""}><summary>${title} (${list.length})</summary><table class="rl-tb"><thead><tr><th>Exam</th><th>Question</th><th>Units</th><th>Official PDFs</th></tr></thead><tbody>${list.map(x=>relRow(x,cur)).join("")}</tbody></table></details>`; }
-function relHTML(u){ const k=ZC.relKey.toUpperCase(), nm=ZC.relName||("AP Calculus "+k), yrs=ZC.relYears||"1998–2026";
-  const all=relList(u).sort((a,b)=>yKey(b.y)-yKey(a.y)||a.q-b.q), calcBook=(ZC.relKey==="ab"||ZC.relKey==="bc");
-  const how=`<div class="rl-how"><b>How to use these:</b> 1. Open <b>Question</b> and answer it on paper, timed (about 15 minutes per question). 2. Grade yourself with <b>Scoring guidelines</b> (the official rubric, point by point). 3. Open <b>Student samples</b> to see real graded answers (high, middle and low scores) with the readers' commentary on why each point was or wasn't earned.</div>`;
-  const src=calcBook?`<p class="rl-note">Buttons open free PDFs with no sign-in. <b>2023–2026</b> open the official College Board files on AP Central, with student samples and commentary for each question (2026 samples are not released yet). <b>1998–2022</b> open the PDF directly from the free MyMathsCloud archive of the official College Board files (each PDF covers all six questions). No exam was released in 2020. Form B was a second exam given to students abroad and for late testing. Each PDF holds the whole exam: go to the question number shown. Unit numbers follow the current Course and Exam Description; older exams can include topics now taught in a different unit.</p>`
-     :`<p class="rl-note">Archive: <a href="${window.ZREL.res[ZC.relKey]}" target="_blank" rel="noopener">${ZC.relArchive||"archive"}</a>.</p>`;
-  if(u.relAll){
-    const units=ZC.units.filter(v=>v.num>0&&!v.relAll&&v.num<=20);
-    const byUnit=units.map(v=>{ const L=all.filter(x=>x.u.includes(v.num)); return L.length?relTable(L,v.num,`Unit ${v.num}: ${(v.name||"").replace(/^Unit \d+:\s*/,"")}`,false):""; }).join("");
-    const ys=[...new Set(all.map(x=>x.y))];
-    const byYear=ys.map((y,i)=>relTable(all.filter(x=>x.y===y),0,`${exLabel(y)} exam`,i<1)).join("");
-    return `<p class="lead2">All ${all.length} released ${nm} free-response questions (${yrs}). Every question appears under each unit it tests. Switch between the two views:</p>${how}
-     <div class="rl-tog"><button class="on" data-rv="unit">By unit</button><button data-rv="year">By exam year</button></div>
-     <div data-rvp="unit">${byUnit}</div><div data-rvp="year" hidden>${byYear}</div>${src}`; }
-  const cur=u.num;
-  return `<p class="lead2">Every released ${nm} free-response question (${yrs}) that tests <b>Unit ${u.num}</b>: <b>${all.length} questions</b>, newest first. The highlighted unit number is this unit.</p>${how}${relTable(all,cur,"Released FRQs for this unit",true)}${src}`; }
-document.addEventListener("click",e=>{ const b=e.target.closest("[data-rv]"); if(!b) return; const box=b.closest(".zp")||document; box.querySelectorAll("[data-rv]").forEach(x=>x.classList.toggle("on",x===b)); box.querySelectorAll("[data-rvp]").forEach(p=>p.hidden=p.dataset.rvp!==b.dataset.rv); });
-const RLCSS=`.rl-how{background:#f4f8ff;border-left:4px solid #1f5fa8;border-radius:0 8px 8px 0;padding:8px 12px;font-size:16.5px;margin:8px 0 12px}
-.rl-d{border:1px solid #ddd;border-radius:12px;margin:10px 0;background:#fff}.rl-d>summary{cursor:pointer;font-weight:700;font-size:18px;padding:10px 14px}
-.rl-tb{width:100%;border-collapse:collapse;font-size:16px}.rl-tb th{background:#111;color:#fff;text-align:left;padding:7px 8px;font-weight:600}
-.rl-tb td{border-top:1px solid #e6e6e6;padding:8px;vertical-align:top}.rl-ex{white-space:nowrap}.rl-tt{font-weight:600}
-.rl-cal{display:block;margin-top:3px;font-size:12px;font-weight:700;border-radius:6px;padding:0 6px;width:max-content}.rl-cal.yes{background:#e5f2e8;color:#1e6236}.rl-cal.no{background:#f3f2ee;color:#555}
-.rl-ln{display:flex;flex-wrap:wrap;gap:5px}.rl-b{display:inline-block;font-size:14px;font-weight:600;border:1.5px solid #1f5fa8;color:#1f5fa8;border-radius:999px;padding:2px 10px;text-decoration:none;background:#fff}
-.rl-b:hover{background:#1f5fa8;color:#fff}.rl-b.smp{border-color:#2a7a46;color:#2a7a46}.rl-b.smp:hover{background:#2a7a46;color:#fff}.rl-b.arc{border-color:#999;color:#666;font-weight:500}.rl-b.off{border-color:#ccc;color:#888;font-weight:500}
-.rl-us2 .rl-u{display:inline-block;min-width:20px;text-align:center;border-radius:6px;background:#eee;margin:1px;font-size:13px;font-weight:700}.rl-us2 .rl-u.on{background:#1f5fa8;color:#fff}
-.rl-tog{display:flex;gap:6px;margin:6px 0}.rl-tog button{font:600 16px inherit;border:1.5px solid #111;background:#fff;border-radius:999px;padding:4px 14px;cursor:pointer}.rl-tog button.on{background:#111;color:#fff}
-@media(max-width:640px){.rl-tb thead{display:none}.rl-tb tr{display:block;border-top:1px solid #e6e6e6;padding:6px 4px}.rl-tb td{display:block;border:0;padding:3px 6px}.rl-ex{white-space:normal}.rl-ex br{display:none}.rl-ex .rl-cal{display:inline-block;margin:0 0 0 8px}}`;
-{ const s=document.createElement("style"); s.textContent=RLCSS; document.head.appendChild(s); }
+function relHTML(u){ const list=relList(u).sort((a,b)=>yKey(b.y)-yKey(a.y)||a.q-b.q); const k=ZC.relKey.toUpperCase();
+  const uu=x=>x.u.map(n=>`<span class="rl-u${n===u.num?" on":""}">${n}</span>`).join("");
+  let body;
+  if(u.relAll){ const ys=[...new Set(list.map(x=>x.y))]; body=ys.map(y=>`<details class="rl-y"${ys.indexOf(y)<2?" open":""}><summary><b>${exLabel(y)}</b> · ${ZC.relName||("AP Calculus "+k)} · ${list.filter(x=>x.y===y).length} questions</summary><div class="rl-ln">${relLinks(y)}</div><ol class="rl-ol">${list.filter(x=>x.y===y).map(x=>`<li><span class="rl-t">Q${x.q}. ${x.t}</span><span class="rl-us">Units ${uu(x)}</span></li>`).join("")}</ol></details>`).join(""); }
+  else body=list.map(x=>`<div class="rl-c"><div class="rl-h"><b>${exLabel(x.y)} Q${x.q}</b><span class="rl-us">Units ${uu(x)}</span></div><div class="rl-t">${x.t}</div><div class="rl-ln">${relLinks(x.y,x.q)}</div></div>`).join("");
+  const nm=ZC.relName||("AP Calculus "+k), yrs=ZC.relYears||"1998–2026";
+  return `<p class="lead2">${u.relAll?`Every released ${nm} free-response question (${yrs}), by exam.`:`Every released ${nm} free-response question (${yrs}) that tests this unit: <b>${list.length} questions</b>, newest first.`} Each button opens the official College Board PDF (questions, scoring guidelines, sample student responses), free and with no sign-in. The PDFs hold the whole exam: go to the question number shown.</p>
+  <div class="rl">${body}</div><p class="rl-note">Archive: <a href="${window.ZREL.res[ZC.relKey]}" target="_blank" rel="noopener">${ZC.relArchive||("MyMathsCloud AP Calculus "+k+" past papers")}</a>.${ZC.relName?"":" 2020 had no regular free-response questions."} Unit numbers follow the current AP Course and Exam Description${ZC.relName?"":"; older exams can include topics now taught in a different unit"}.</p>`; }
 /* ---------- Fixed practice sets (same problems every time: seeded) and printable posters ---------- */
 function seeded(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
 const hash=str=>{ let h=2166136261; for(const c of str){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; };
@@ -321,44 +271,10 @@ function posterHTML(u){ const sh=u.sheet||[]; const fl=u.flow? (u.flow.cols||[])
   <div class="ksheet">${sh.map(x=>ks2(...x)).join("")}</div></div>`; }
 function bindPoster(root){ root.querySelectorAll("[data-pp]").forEach(b=>{ b.onclick=()=>printEl(b.closest(".zp").querySelector(".pst")); }); }
 const ks2=(c,h,items,ex)=>`<div class="ks" style="--c:${c}"><h4>${h}</h4><ul>${items.map(i=>`<li>${i}</li>`).join("")}</ul>${ex?`<p class="ex">${ex}</p>`:""}</div>`;
-
-/* ===== Theory (definitions, theorems, proofs, counterexamples) and Uses & resources (applications, two ways, study more) ===== */
-const ZTK={watch:"Watch",free:"Free textbook",play:"Interactive",book:"Book",read:"Read",practice:"Practice"};
-const ZTL={1:["zl1","Start here"],2:["zl2","Next step"],3:["zl3","Deep dive"]};
-function thmHTML(u,t){ let h=`<p class="lead2">Read the definitions first, then the theorems. Try to prove each theorem yourself before you open the proof. Counterexamples show why every condition matters.</p>`;
-  h+=`<h4 class="zt-h">Definitions</h4><dl class="zt-defs">${t.defs.map(d=>`<dt>${d[0]}</dt><dd>${d[1]}${d[2]?`<div class="zt-ex"><b>Example.</b> ${d[2]}</div>`:""}</dd>`).join("")}</dl>`;
-  if(t.thms) h+=`<h4 class="zt-h">Theorems</h4>${t.thms.map((m,i)=>`<div class="zt-thm"><div class="zt-tn">Theorem ${u.num}.${i+1}${m.n?` <span>(${m.n})</span>`:""}</div><div class="zt-st">${m.s}</div>${m.p?`<details><summary>Proof${m.pi?" idea":""}</summary><div class="zt-pf">${m.p} <span class="qed">∎</span></div></details>`:""}${m.ce?`<details><summary>Why the conditions matter: counterexample</summary><div class="zt-ce">${m.ce}</div></details>`:""}</div>`).join("")}`;
-  if(t.mist) h+=`<h4 class="zt-h">Common mistakes</h4><ul class="zt-ul">${t.mist.map(x=>`<li>${x}</li>`).join("")}</ul>`;
-  return h; }
-function stItem(r){ return `<div class="zt-r">${r.l?`<span class="zt-lv ${ZTL[r.l][0]}">${ZTL[r.l][1]}</span>`:""}<span class="zt-k">${ZTK[r.k]||""}${r.free===false?"":" · free"}</span>${r.u?`<a href="${r.u}" target="_blank" rel="noopener">${r.t} ↗</a>`:`<b>${r.t}</b>`}${r.by?`<i>${r.by}</i>`:""}${r.d?`<p>${r.d}</p>`:""}</div>`; }
-function useHTML(u,t){ let h="";
-  if(t.apps) h+=`<h4 class="zt-h">Where it's used</h4><div class="zt-apps">${t.apps.map(a=>`<div class="zt-app"><b>${a[0]}</b><p>${a[1]}</p></div>`).join("")}</div>`;
-  if(t.ways) h+=t.ways.map(w=>`<h4 class="zt-h">Two ways to solve it</h4><div class="zt-wq">${w.q}</div><div class="zt-ways">${w.m.map(m=>`<div class="zt-way"><b>${m[0]}</b><ol>${m[1].map(s=>`<li>${s}</li>`).join("")}</ol></div>`).join("")}</div>${w.note?`<p class="zt-note"><b>Which is better?</b> ${w.note}</p>`:""}`).join("");
-  if(t.study) h+=`<h4 class="zt-h">Study this unit further</h4><div class="zt-res">${t.study.map(stItem).join("")}</div>`;
-  const c=(window.ZT||{})._course; if(c) h+=`<h4 class="zt-h">For the whole course</h4><div class="zt-res">${c.map(stItem).join("")}</div>`;
-  return h; }
-const ZTCSS=`.zt-h{font-size:21px;margin:18px 0 8px;padding-bottom:3px;border-bottom:1px solid #ddd}
-.zt-defs{margin:0}.zt-defs dt{font-weight:700;margin-top:10px;color:var(--c)}.zt-defs dd{margin:2px 0 0 0;padding-left:12px;border-left:3px solid #eee}
-.zt-ex{font-size:16.5px;color:#333;margin-top:3px}
-.zt-thm{border:1px solid #ddd;border-left:5px solid var(--c);border-radius:10px;padding:10px 12px;margin:10px 0;background:#fcfcfb}
-.zt-tn{font-weight:800;font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:var(--c)}.zt-tn span{text-transform:none;letter-spacing:0;font-weight:700}
-.zt-st{margin:4px 0}.zt-thm details{margin-top:6px}.zt-thm summary{cursor:pointer;font-weight:600;color:#333}
-.zt-pf,.zt-ce{padding:6px 10px;background:#fff;border-radius:8px;margin-top:4px;font-size:17px}.zt-ce{background:#fff6ea}.qed{float:right}
-.zt-ul{padding-left:20px}.zt-apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
-.zt-app{border:1px solid #e3e3e3;border-radius:10px;padding:8px 12px}.zt-app p{margin:3px 0 0;font-size:16.5px}
-.zt-wq{font-weight:600;margin-bottom:6px}.zt-ways{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
-.zt-way{border:1px solid #ddd;border-radius:10px;padding:8px 12px}.zt-way ol{margin:4px 0 0;padding-left:20px}.zt-note{font-size:17px}
-.zt-res{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
-.zt-r{border:1px solid #e3e3e3;border-radius:10px;padding:8px 12px}.zt-r a,.zt-r>b{display:block;font-weight:700;font-size:17.5px;text-decoration:none;color:#111;margin-top:2px}.zt-r a:hover{text-decoration:underline}
-.zt-r i{display:block;font-size:15px;color:#555}.zt-r p{margin:3px 0 0;font-size:16px}.zt-k{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:#555}
-.zt-lv{font-size:12px;font-weight:700;border-radius:6px;padding:1px 6px;margin-right:6px;text-transform:uppercase}.zl1{background:#e5f2e8;color:#1e6236}.zl2{background:#fff1dc;color:#8a5205}.zl3{background:#f3e6f3;color:#6b2b6b}
-@media print{.zt-thm details{display:block}.zt-thm details>*{display:block}}`;
-{ const s=document.createElement("style"); s.textContent=ZTCSS; document.head.appendChild(s); }
-
-const SECS=[["thm","Theory","definitions · theorems · proofs","#111111"],["flow","Method flowchart","which method, when","#1d4e89"],["sheet","Key formulas","rules on one page","#c2571a"],["ex","Solved examples","step by step, new each time","#2a7a46"],["prac","Practice","MCQ · deck · type","#0f7a6c"],["sets","Practice sets","fixed, printable","#1f4fd1"],["chal","Challenge Lab","hardest, new each time","#6a3d9a"],["frq","FRQs","AP-style, with scoring","#c23a52"],["rel","Released FRQs","official, by unit","#7a5a12"],["use","Uses & resources","applications · 2 ways · study more","#0b5d6b"]];
-function unitHTML(u){ const zt=(window.ZT||{})[u.id]; const secs=SECS.filter(s=>s[0]!=="thm"||(zt&&zt.defs)).filter(s=>s[0]!=="use"||(zt&&(zt.apps||zt.study))).filter(s=>s[0]!=="flow"||u.flow).filter(s=>s[0]!=="chal"||(u.chal&&u.chal.length)).filter(s=>s[0]!=="frq"||(u.frq&&u.frq.length)).filter(s=>s[0]!=="rel"||relList(u).length).filter(s=>!["ex","prac","sets"].includes(s[0])||(u.gen&&u.gen.length)).filter(s=>s[0]!=="sheet"||(u.sheet&&u.sheet.length));
+const SECS=[["flow","Method flowchart","which method, when","#1d4e89"],["sheet","Key formulas","rules on one page","#c2571a"],["ex","Solved examples","step by step, new each time","#2a7a46"],["prac","Practice","MCQ · deck · type","#0f7a6c"],["sets","Practice sets","fixed, printable","#1f4fd1"],["chal","Challenge Lab","hardest, new each time","#6a3d9a"],["frq","FRQs","AP-style, with scoring","#c23a52"],["rel","Released FRQs","official, by unit","#7a5a12"]];
+function unitHTML(u){ const secs=SECS.filter(s=>s[0]!=="flow"||u.flow).filter(s=>s[0]!=="chal"||(u.chal&&u.chal.length)).filter(s=>s[0]!=="frq"||(u.frq&&u.frq.length)).filter(s=>s[0]!=="rel"||relList(u).length).filter(s=>!["ex","prac","sets"].includes(s[0])||(u.gen&&u.gen.length)).filter(s=>s[0]!=="sheet"||(u.sheet&&u.sheet.length));
   const N=secs.length, pos=secs.map((_,i)=>{ const a=-Math.PI/2+2*Math.PI*i/N; return [50+38*Math.cos(a),50+35*Math.sin(a)]; });
-  const body=k=>k==="thm"?thmHTML(u,zt):k==="use"?useHTML(u,zt):k==="flow"?flowHTML("f-"+u.id,u.flow):k==="ex"?exBox(u.id):k==="prac"?boxHTML(u.id,"sat"):k==="frq"?frqBox(u.id):k==="rel"?relHTML(u):k==="sets"?setsBox(u):k==="sheet"?posterHTML(u):boxHTML(u.id,"chal");
+  const body=k=>k==="flow"?flowHTML("f-"+u.id,u.flow):k==="ex"?exBox(u.id):k==="prac"?boxHTML(u.id,"sat"):k==="frq"?frqBox(u.id):k==="rel"?relHTML(u):k==="sets"?setsBox(u):k==="sheet"?posterHTML(u):boxHTML(u.id,"chal");
   return `<section class="zu" id="sec-${u.id}" style="--c:${u.c}"><div class="zu-ch">${esc2(u.label||("Unit "+u.num))}</div><h2>${esc2(u.name)}</h2><p class="zu-sub">${esc2(u.sub)}</p>
    <div class="amap"><div class="am-stage"><svg class="am-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${pos.map(([x,y])=>`<line x1="50" y1="50" x2="${x}" y2="${y}"/>`).join("")}${pos.slice(0,-1).map(([x,y],i)=>`<line class="pth" x1="${x}" y1="${y}" x2="${pos[i+1][0]}" y2="${pos[i+1][1]}"/>`).join("")}</svg>
     <div class="am-hub"><b>${esc2(u.short)}</b><span>Tap a node</span></div>
@@ -437,7 +353,7 @@ main{max-width:1180px;margin:0 auto;padding:22px 16px 60px}
 footer{max-width:860px;margin:0 auto;padding:16px 16px 44px;color:#333;font-size:16px;text-align:center;border-top:3px double #111;font-style:italic}
 @media (max-width:640px){.cm{grid-template-columns:1fr}.cm-cur{font-size:15px}}`;
 const st3=document.createElement("style"); st3.textContent=SHCSS; document.head.appendChild(st3);
-window.ZB={route,init:initData,_test:{G,gen,options,parseAns,U}};
-const start=()=>{ initData(); if(!window.ZNOBOOK) route(); };
+window.ZB={route,_test:{G,gen,options,parseAns,U}};
+const start=()=>{ initData(); route(); };
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start); else setTimeout(start,0);
 })();

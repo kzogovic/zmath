@@ -235,48 +235,6 @@ U4.adv=[
    return PS("Linear transformations",`A point is first transformed by a ${T[2]}, then by a ${S[2]}. Where does (${N(x)}, ${N(y)}) go?`,pt(N(X2),N(Y2)),[pt(N(T[0][0]*x+T[0][1]*y),N(T[1][0]*x+T[1][1]*y)),pt(N(Y2),N(X2)),pt(N(-X2),N(-Y2))],[`Matrices: first ${MX(T.slice(0,2))}, then ${MX(S.slice(0,2))}.`,`Combined = second · first = ${MX(M)}.`,`${MX(M)}·[${N(x)}, ${N(y)}] = <b>${pt(N(X2),N(Y2))}</b>`]); },
  ()=>{ const [b,c,a]=pick(TRP); return P("Conics",`An ellipse has equation x${sq}/${a*a} + y${sq}/${b*b} = 1. Find the distance between its foci.`,2*c,[c,2*a,a+b],[`a${sq} = ${a*a}, b${sq} = ${b*b}: c${sq} = a${sq} − b${sq} = ${c*c}.`,`c = ${c}; foci at (±${c}, 0).`,`Distance = 2c = <b>${2*c}</b>`]); }];
 
-/* ===== added practice: even/odd, concavity from a table, composition, linear vs exponential, reciprocal trig, polar rate of change ===== */
-U1.med.push(
- ()=>{ const kind=pick(["Even","Odd","Neither"]); const d=kind==="Even"?pick([2,4,6]):kind==="Odd"?pick([3,5]):pick([3,4,5]); const co=Array(d+1).fill(0);
-   for(let p=0;p<=d;p++){ const ok=kind==="Even"?p%2===0:kind==="Odd"?p%2===1:true; if(ok&&(p===d||Math.random()<.6)) co[d-p]=nz(-5,5); }
-   const pw=co.map((k,i)=>k?d-i:-1).filter(p=>p>=0); if(pw.length<2) return null; if(kind==="Neither"&&(!pw.some(p=>p%2===0)||!pw.some(p=>p%2===1))) return null;
-   const neg=co.map((k,i)=>(d-i)%2?-k:k);
-   return PSX("Even and odd functions",`Is f(x) = ${poly(co)} even, odd, or neither?`,kind,["Even","Odd","Neither","Both even and odd"].filter(x=>x!==kind),
-    [`Replace x with −x: odd powers change sign, even powers (and constants) do not.`,`f(−x) = ${poly(neg)}`,kind==="Even"?`f(−x) = f(x): <b>even</b> (symmetric about the y-axis).`:kind==="Odd"?`f(−x) = −f(x): <b>odd</b> (symmetric about the origin).`:`f(−x) is neither f(x) nor −f(x): <b>neither</b>.`]); });
-U1.adv.push(
- ()=>{ const inc=Math.random()<.5, up=Math.random()<.5, m=R(1,6), k=R(1,3), dx=pick([1,2]), x0=R(-3,2);
-   let r=[0,1,2,3].map(i=>m+k*i); if(inc!==up) r.reverse(); if(!inc) r=r.map(v=>-v);
-   const ys=[R(-10,10)]; r.forEach(v=>ys.push(ys[ys.length-1]+v*dx)); const xs=ys.map((_,i)=>x0+i*dx);
-   const lab=(a,b)=>`${a?"Increasing":"Decreasing"} and concave ${b?"up":"down"}`;
-   return PS("Concavity from a table",`${TB(["x",...xs.map(N)],[["f(x)",...ys.map(N)]])} The table gives values of f on equally spaced inputs. Which describes f on [${N(xs[0])}, ${N(xs[4])}]?`,lab(inc,up),[lab(!inc,up),lab(inc,!up),lab(!inc,!up)],
-    [`Average rates of change on consecutive intervals: ${r.map(N).join(", ")}.`,`All ${inc?"positive":"negative"} ⇒ ${inc?"increasing":"decreasing"}.`,`The rates are ${up?"increasing":"decreasing"} ⇒ concave ${up?"up":"down"}.`,`<b>${lab(inc,up)}</b>`]); });
-U2.med.push(
- ()=>{ let a=nz(-4,4); if(a===1) a=2; const b=nz(-6,6),c=R(-5,5),k=nz(-3,3); const f=x=>a*x+b, g=x=>x*x+c, fg=f(g(k)), gf=g(f(k)), one=Math.random()<.5;
-   return P("Composition",`f(x) = ${lin(a,b)} and g(x) = ${poly([1,0,c])}. Find ${one?`f(g(${N(k)}))`:`g(f(${N(k)}))`}.`,one?fg:gf,[one?gf:fg,f(k)*g(k),f(k)+g(k)],
-    one?[`Inside first: g(${N(k)}) = ${N(g(k))}.`,`Then f(${N(g(k))}) = ${N(a)}(${N(g(k))})${sg(b)} = <b>${N(fg)}</b>`]:[`Inside first: f(${N(k)}) = ${N(f(k))}.`,`Then g(${N(f(k))}) = (${N(f(k))})${sq}${sg(c)} = <b>${N(gf)}</b>`]); });
-U2.adv.push(
- ()=>{ const isExp=Math.random()<.5; let a,ys,ans,w,why;
-   if(isExp){ const r=pick([2,3,0.5]); a=r===0.5?R(1,5)*8:R(1,9); ys=[0,1,2,3].map(i=>a*r**i); const rs=r===0.5?"(1/2)":String(r), bad=r===0.5?"2":r===2?"3":"2";
-     ans=`Exponential: f(x) = ${a}·${rs}<sup>x</sup>`; w=[`Linear: f(x) = ${lin(ys[1]-a,a)}`,`Exponential: f(x) = ${a}·${bad}<sup>x</sup>`,`Exponential: f(x) = ${ys[1]}·${rs}<sup>x</sup>`];
-     why=[`Ratios of consecutive outputs: ${ys.slice(1).map((y,i)=>F(y,ys[i])).join(", ")}, all equal.`,`Constant ratio ⇒ exponential with b = ${r===0.5?"1/2":r} and f(0) = ${a}.`]; }
-   else { const d=nz(-6,6); a=R(2,12); ys=[0,1,2,3].map(i=>a+d*i); if(ys.some(y=>y<=0)) return null;
-     ans=`Linear: f(x) = ${lin(d,a)}`; w=[`Exponential: f(x) = ${a}·${Math.abs(d)===1?2:Math.abs(d)}<sup>x</sup>`,`Linear: f(x) = ${lin(-d,a)}`,`Linear: f(x) = ${lin(d,a+d)}`];
-     why=[`Differences of consecutive outputs: ${ys.slice(1).map((y,i)=>N(y-ys[i])).join(", ")}, all equal.`,`Constant difference ⇒ linear with slope ${N(d)} and f(0) = ${a}.`]; }
-   return PSX("Linear or exponential",`${TB(["x","0","1","2","3"],[["f(x)",...ys.map(N)]])} Which model fits the table exactly?`,ans,w,[...why,`<b>${ans}</b>`]); });
-U3.med.push(
- ()=>{ const [ang,c,s]=pick(UC); const num=t=>{ const ng=t[0]==="−", v={"0":0,"1":1,"1/2":.5,"√2/2":Math.SQRT2/2,"√3/2":Math.sqrt(3)/2}[ng?t.slice(1):t]; return ng?-v:v; };
-   const cv=num(c), sv=num(s), fn=pick(["sec","csc","cot"]); const den=fn==="sec"?cv:sv; if(Math.abs(den)<1e-9) return null;
-   const E=[[0,"0"],[1,"1"],[2,"2"],[Math.SQRT2,"√2"],[2/Math.sqrt(3),"2√3/3"],[Math.sqrt(3),"√3"],[1/Math.sqrt(3),"√3/3"],[0.5,"1/2"],[Math.SQRT2/2,"√2/2"],[Math.sqrt(3)/2,"√3/2"]];
-   const ex=v=>{ if(!isFinite(v)) return "Undefined"; const e=E.find(([x])=>Math.abs(x-Math.abs(v))<1e-9); return e?(v<-1e-9?"−":"")+e[1]:null; };
-   const v=fn==="sec"?1/cv:fn==="csc"?1/sv:cv/sv, a=ex(v);
-   const w=[ex(-v),fn==="sec"?c:fn==="csc"?s:ex(sv/cv),fn==="sec"?ex(1/sv):fn==="csc"?ex(1/cv):ex(1/v)].filter(x=>x&&x!==a);
-   return PSX("Reciprocal trig functions",`Find ${fn}(${ang}).`,a,w,[`On the unit circle at ${ang}: cos = ${c}, sin = ${s}.`,fn==="sec"?`sec = 1/cos = 1/(${c})`:fn==="csc"?`csc = 1/sin = 1/(${s})`:`cot = cos/sin = (${c})/(${s})`,`<b>${a}</b>`]); });
-U3.adv.push(
- ()=>{ const a=R(2,6), b=nz(-4,4), fn=pick(["sin","cos"]), q=R(0,3); const T=fn==="sin"?[0,1,0,-1,0]:[1,0,-1,0,1], L=["0","π/2","π","3π/2","2π"];
-   const r1=a+b*T[q], r2=a+b*T[q+1], d=r2-r1; const ans=`${N(2*d)}/π`;
-   return PSX("Polar rate of change",`r(θ) = ${a} ${b<0?"−":"+"} ${Math.abs(b)===1?"":Math.abs(b)+" "}${fn} θ. Find the average rate of change of r with respect to θ on [${L[q]}, ${L[q+1]}].`,ans,[N(d),`${N(d)}/π`,`${N(-2*d)}/π`],
-    [`r(${L[q]}) = ${N(r1)} and r(${L[q+1]}) = ${N(r2)}.`,`Change in θ: π/2.`,`(${N(r2)} − ${N(r1)})/(π/2) = <b>${ans}</b>`,d>0?`Positive: on average the point moves away from the pole${r1>=0&&r2>=0?"":" (watch the sign of r)"}.`:`Negative: on average r decreases.`]); });
-
 const units=[U1,U2,U3,U4];
 const wrap=g=>()=>{ for(let i=0;i<20;i++){ const p=g(); if(p) return p; } return g(); };
 units.forEach(u=>{ ["gen","chal","frq"].forEach(k=>u[k]=(u[k]||[]).filter(Boolean).map(wrap)); });
