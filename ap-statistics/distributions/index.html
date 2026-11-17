@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Distribution Map &amp; Calculator Commands · Z-AP Statistics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'EB Garamond',Georgia,serif;color:#111;background:#fff;line-height:1.45;font-size:18px}
+code,.cmd,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.top{max-width:1180px;margin:0 auto;padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap}
+.top a{color:#111;font-weight:600;text-decoration:none;border:1.5px solid #111;border-radius:999px;padding:4px 14px;display:inline-block;font-size:16px}
+header{padding:20px 16px 10px;text-align:center}
+header .wrap{max-width:860px;margin:0 auto;border-top:3px double #111;border-bottom:3px double #111;padding:18px 8px 14px}
+.kicker{text-transform:uppercase;letter-spacing:.28em;font-size:13px;margin:0 0 8px}
+h1{font-weight:800;font-size:clamp(30px,6.4vw,54px);margin:0 0 4px;line-height:1.05}
+.calcs{font-size:clamp(17px,3.6vw,22px);font-weight:600;margin:4px 0 8px}
+header p.sub{margin:0 auto;font-style:italic;color:#333;max-width:640px}
+main{max-width:1180px;margin:0 auto;padding:6px 14px 50px}
+/* calculator picker */
+.pick{position:sticky;top:0;z-index:5;background:#fff;padding:10px 0 8px;border-bottom:1px solid #ddd;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pick b{font-size:16px;letter-spacing:.06em;text-transform:uppercase;margin-right:4px}
+.pick button{font:600 17px 'EB Garamond',Georgia,serif;border:1.5px solid #111;background:#fff;color:#111;border-radius:999px;padding:5px 14px;cursor:pointer}
+.pick button[aria-pressed="true"]{background:#111;color:#fff}
+.layout{display:grid;grid-template-columns:1fr;gap:18px;margin-top:14px}
+@media(min-width:960px){.layout{grid-template-columns:minmax(420px,520px) 1fr}.panelwrap{position:sticky;top:64px;align-self:start;max-height:calc(100vh - 76px);overflow:auto}}
+.mapbox{border:1px solid #ccc;border-radius:14px;padding:6px;background:#fbfaf7}
+svg{width:100%;height:auto;display:block}
+.node{cursor:pointer}
+.node rect{stroke:#fff;stroke-width:2}
+.node.beyond rect{stroke-dasharray:5 3;stroke:#fff}
+.node.sel rect{stroke:#111;stroke-width:3.5}
+.node text{fill:#fff;text-anchor:middle;pointer-events:none}
+.node .nm{font:700 15px 'EB Garamond',Georgia,serif}
+.node .tg{font:500 11.5px 'EB Garamond',Georgia,serif;opacity:.95}
+.node:focus{outline:none}.node:focus rect{stroke:#111;stroke-width:3.5}
+.edge{stroke:#555;stroke-width:1.6;fill:none}
+.edge.approx{stroke-dasharray:5 4}
+.elab{font:italic 12.5px 'EB Garamond',Georgia,serif;fill:#222;paint-order:stroke;stroke:#fbfaf7;stroke-width:4px;stroke-linejoin:round;text-anchor:middle}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:15px;padding:8px 6px 2px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+.ln{width:26px;border-top:2px solid #555;display:inline-block}.ln.d{border-top-style:dashed}
+.hint{font-size:15px;color:#555;font-style:italic;padding:2px 6px 6px}
+/* panel */
+#panel{scroll-margin-top:64px}
+.panel{border:1px solid #ccc;border-top:5px solid var(--c,#111);border-radius:14px;padding:16px 16px 18px}
+.panel h2{margin:0;font-size:30px;line-height:1.1}
+.panel .tags{margin:6px 0 10px;display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:14px;border:1px solid var(--c,#111);color:var(--c,#111);border-radius:999px;padding:1px 10px}
+.tag.fill{background:var(--c);color:#fff}
+.panel p{margin:6px 0}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:10px 0;font-size:17px}
+.facts dt{font-weight:600}.facts dd{margin:0}
+h3{font-size:21px;margin:18px 0 6px;border-bottom:1px solid #ddd;padding-bottom:3px}
+table.cmds{width:100%;border-collapse:collapse;font-size:16px}
+table.cmds td{border-top:1px solid #e3e3e3;padding:6px 6px;vertical-align:top}
+table.cmds td:first-child{width:38%;color:#333}
+.cmd{background:#f3f2ee;border-radius:6px;padding:2px 6px;font-size:14.5px;word-break:break-word;display:inline-block}
+.menu{font-size:15px;color:#444;margin:4px 0 8px}
+.note{font-size:15.5px;background:#f6f6f6;border-left:4px solid var(--c,#111);padding:8px 10px;margin:8px 0;border-radius:0 8px 8px 0}
+.warn{background:#fff6ea;border-left-color:#b8650f}
+/* try it */
+.try{border:1.5px solid var(--c,#111);border-radius:12px;padding:12px;margin-top:8px;background:#fff}
+.row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;margin:6px 0}
+.row label{display:flex;flex-direction:column;font-size:14.5px;font-weight:600}
+.row input,.row select{font:16px ui-monospace,Menlo,Consolas,monospace;padding:6px 8px;border:1px solid #999;border-radius:8px;width:96px;background:#fff}
+.row select{width:auto;font-family:'EB Garamond',Georgia,serif;font-size:17px}
+.out{margin-top:10px;font-size:18px}
+.out .big{font-size:24px;font-weight:700}
+.out .line{margin:6px 0}
+.ap{font-size:16px;background:#eef4ea;border-left:4px solid #2a7a46;padding:8px 10px;border-radius:0 8px 8px 0;margin-top:8px}
+/* cheat sheet */
+.sheet{margin-top:30px}
+.sheet h2{font-size:28px;margin:0 0 4px}
+.sheet .sub2{font-style:italic;color:#444;margin:0 0 10px}
+.sheet table{width:100%;border-collapse:collapse;font-size:16px}
+.sheet th{background:#111;color:#fff;text-align:left;padding:7px 8px;font-weight:600}
+.sheet td{border-bottom:1px solid #ddd;padding:7px 8px;vertical-align:top}
+.sheet td:first-child{font-weight:600;white-space:nowrap}
+.sheetwrap{overflow-x:auto}
+.examtips{margin-top:26px;border:2px solid #2a7a46;border-radius:14px;padding:14px 16px}
+.examtips h2{margin:0 0 6px;font-size:26px;color:#2a7a46}
+.examtips ul{margin:6px 0;padding-left:22px}
+footer{text-align:center;font-size:15px;color:#555;padding:20px 14px 40px;font-style:italic}
+@media print{.pick,.top,.try{display:none}.panelwrap{position:static;max-height:none}}
+</style>
+<script>(function(){ var NS="https://abacus.jasoncameron.dev/hit/kzogovic.github.io/", K="ap-statistics";
+ function hit(k){ try{ fetch(NS+k).catch(function(){}); }catch(e){} }
+ function once(flag,k){ try{ if(!sessionStorage.getItem(flag)){ sessionStorage.setItem(flag,"1"); hit(k); } }catch(e){ hit(k); } }
+ once("zmVisit","zmath-visits"); if(K!=="hub") once("zmVisit-"+K,"book-"+K+"-visits");
+ var acc=0,last=Date.now(),act=Date.now();
+ ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,function(){act=Date.now();},{passive:true}); });
+ setInterval(function(){ var n=Date.now(); if(document.visibilityState==="visible"&&n-act<120000) acc+=(n-last)/1000; last=n;
+   if(acc>=60){ acc-=60; setTimeout(function(){ hit("zmath-minutes"); if(K!=="hub") hit("book-"+K+"-minutes"); },Math.random()*8000); } },10000);
+})();</script>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="0c59c8ac-f594-41fb-ac04-392482ab3e25"></script>
+<script>/* Z-Math time counter: counts only time the page is open, visible and in use. No names, no cookies. */
+(function(){ var BOOK='Z-AP Statistics', STEP=300, acc=0, last=Date.now(), active=Date.now();
+ function used(){ active=Date.now(); } ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,used,{passive:true}); });
+ function send(n){ for(var i=0;i<n;i++){ try{ window.umami&&umami.track("5 minutes of use",{book:BOOK}); }catch(e){} } }
+ function tick(){ var now=Date.now(); if(document.visibilityState==="visible"&&now-active<120000) acc+=(now-last)/1000; last=now; if(acc>=STEP){ var n=Math.floor(acc/STEP); acc-=n*STEP; send(n); } }
+ setInterval(tick,15000);
+ document.addEventListener("visibilitychange",function(){ tick(); if(document.visibilityState==="hidden"&&acc>=STEP/2){ acc=0; send(1); } });
+})();</script>
+</head>
+<body>
+<div class="top" data-zmath-link><a href="../../">← Z-Math: all courses</a><a href="../">← Z-AP Statistics</a></div>
+<header><div class="wrap">
+  <p class="kicker">AP Statistics · Zogovic</p>
+  <h1>Distribution Map &amp; Calculator Commands</h1>
+  <p class="calcs">TI-84 · TI-Nspire · Desmos</p>
+  <p class="sub">How the distributions connect, what each one is for, and exactly what to type on your calculator. Tap a distribution on the map.</p>
+</div></header>
+
+<main>
+  <div class="pick" role="group" aria-label="Choose your calculator">
+    <b>My calculator:</b>
+    <button data-calc="ti84">TI-84</button>
+    <button data-calc="nsp">TI-Nspire</button>
+    <button data-calc="des">Desmos</button>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="mapbox">
+        <svg id="map" viewBox="0 0 420 680" role="img" aria-label="Map of probability distributions and how they connect"></svg>
+        <div class="legend">
+          <span><i class="sw" style="background:#b03a2e"></i>Discrete (Unit 4)</span>
+          <span><i class="sw" style="background:#6b3fa0"></i>Sampling (Unit 5)</span>
+          <span><i class="sw" style="background:#1f5fa8"></i>Normal family</span>
+          <span><i class="sw" style="background:#a8326e"></i>t (Units 7, 9)</span>
+          <span><i class="sw" style="background:#3d4fb5"></i>Chi-square (Unit 8)</span>
+          <span><i class="sw" style="background:#5f6670"></i>Beyond AP</span>
+          <span><i class="ln"></i>exact</span>
+          <span><i class="ln d"></i>approximately, for large samples</span>
+        </div>
+        <div class="hint">Tap any box to see what it's for, its formulas and the calculator commands.</div>
+      </div>
+    </div>
+    <div class="panelwrap"><div id="panel" class="panel"></div></div>
+  </div>
+
+  <section class="sheet">
+    <h2>Calculator Commands: <span id="sheetCalc"></span></h2>
+    <p class="sub2" id="sheetMenu"></p>
+    <div class="sheetwrap"><table id="sheet"></table></div>
+  </section>
+
+  <section class="examtips">
+    <h2>On the AP exam: write it so it earns credit</h2>
+    <ul>
+      <li><b>Name the distribution and its parameters:</b> “X ~ Binomial(n = 20, p = 0.3)” or “Normal(μ = 70, σ = 4)”.</li>
+      <li><b>Write the probability you want, with the boundary:</b> P(X ≤ 5), P(X ≥ 6), P(Z &gt; 1.8).</li>
+      <li><b>Then give the answer:</b> P(X ≤ 5) = 0.4164.</li>
+      <li>Calculator syntax by itself, such as <code>binomcdf(20,0.3,5)</code>, does <b>not</b> earn credit, even when the answer is right. It's fine to show it as well, as long as you label the parameters.</li>
+      <li><b>Discrete:</b> “at least 6” means P(X ≥ 6) = 1 − P(X ≤ 5). <b>Continuous:</b> &lt; and ≤ give the same answer.</li>
+    </ul>
+  </section>
+</main>
+<footer>Made by Zogovic for Z-AP Statistics. Commands checked against the TI-84 Plus, TI-Nspire CX and Desmos guides. Answers are rounded to 4 decimals.</footer>
+
+<script>
+/* ===================== math ===================== */
+function lgamma(x){const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+ if(x<0.5)return Math.log(Math.PI/Math.sin(Math.PI*x))-lgamma(1-x); x-=1;let a=c[0];const t=x+g+0.5;for(let i=1;i<9;i++)a+=c[i]/(x+i);
+ return 0.5*Math.log(2*Math.PI)+(x+0.5)*Math.log(t)-t+Math.log(a);}
+function betacf(a,b,x){const M=300,EPS=3e-14,FP=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FP)d=FP;d=1/d;let h=d;
+ for(let m=1;m<=M;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;h*=d*c;
+  aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FP)d=FP;c=1+aa/c;if(Math.abs(c)<FP)c=FP;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+function ibeta(x,a,b){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));
+ return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function gammp(a,x){if(x<=0)return 0;if(x<a+1){let ap=a,sum=1/a,del=sum;for(let n=0;n<500;n++){ap++;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*1e-15)break;}return sum*Math.exp(-x+a*Math.log(x)-lgamma(a));}
+ let b=x+1-a,c=1e300,d=1/b,h=d;for(let i=1;i<500;i++){const an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<1e-300)d=1e-300;c=b+an/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<1e-15)break;}
+ return 1-Math.exp(-x+a*Math.log(x)-lgamma(a))*h;}
+function Phi(z){ if(z===Infinity)return 1; if(z===-Infinity)return 0; return 0.5*(1+Math.sign(z)*gammp(0.5,z*z/2)); }
+function tcdf(t,df){ if(t===Infinity)return 1; if(t===-Infinity)return 0; const x=df/(df+t*t),p=0.5*ibeta(x,df/2,0.5); return t>0?1-p:p; }
+function chicdf(x,df){ if(x===Infinity)return 1; return x<=0?0:gammp(df/2,x/2); }
+function fcdf(x,d1,d2){ if(x===Infinity)return 1; return x<=0?0:ibeta(d1*x/(d1*x+d2),d1/2,d2/2); }
+function lchoose(n,k){return lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);}
+function binpmf(n,p,k){ if(k<0||k>n||k!==Math.floor(k))return 0; if(p===0)return k===0?1:0; if(p===1)return k===n?1:0; return Math.exp(lchoose(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p)); }
+function bincdf(n,p,k){ k=Math.floor(k); if(k<0)return 0; if(k>=n)return 1; let s=0; for(let i=0;i<=k;i++)s+=binpmf(n,p,i); return Math.min(1,s); }
+function geopmf(p,k){ return (k>=1&&k===Math.floor(k))?p*Math.pow(1-p,k-1):0; }
+function geocdf(p,k){ k=Math.floor(k); return k<1?0:1-Math.pow(1-p,k); }
+function poipmf(l,k){ return (k>=0&&k===Math.floor(k))?Math.exp(-l+k*Math.log(l)-lgamma(k+1)):0; }
+function poicdf(l,k){ k=Math.floor(k); return k<0?0:1-gammp(k+1,l); }
+function invert(cdf,area,lo,hi){ for(let i=0;i<200;i++){const m=(lo+hi)/2; if(cdf(m)<area)lo=m; else hi=m;} return (lo+hi)/2; }
+
+/* ===================== helpers ===================== */
+const m1=k=>typeof k==="number"?k-1:k+"−1";
+const r4=x=>{ if(!isFinite(x))return String(x); const v=Math.round(x*10000)/10000; return (Object.is(v,-0)?0:v).toFixed(4); };
+const fmt=x=>{ if(x===Infinity)return "∞"; if(x===-Infinity)return "−∞"; return String(+(+x).toFixed(6)); };
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const C=s=>`<span class="cmd">${esc(s)}</span>`;
+const CALCN={ti84:"TI-84",nsp:"TI-Nspire",des:"Desmos"};
+const MENU={
+ ti84:"On the TI-84: press 2nd, then VARS (DISTR) for every command below. For −∞ and ∞ type −1E99 and 1E99 (E is 2nd , ).",
+ nsp:"On the TI-Nspire: in a Calculator page press menu → 5: Probability → 5: Distributions (older OS: menu → 6: Statistics → 5: Distributions). You can also type the command. Use the ∞ key for infinity.",
+ des:"In Desmos: type the command directly, or use + → Inference/Probability distribution. Desmos has binomial, Poisson, normal and t, but no geometric, chi-square or F function (use the formula or a TI)."
+};
+/* lower/upper bound strings for continuous commands */
+function lo(calc,v){ if(v!==-Infinity)return fmt(v); return calc==="ti84"?"-1E99":"-∞"; }
+function hi(calc,v){ if(v!==Infinity)return fmt(v); return calc==="ti84"?"1E99":"∞"; }
+
+/* ===================== distributions ===================== */
+const COL={disc:"#b03a2e",samp:"#6b3fa0",norm:"#1f5fa8",t:"#a8326e",chi:"#3d4fb5",beyond:"#5f6670"};
+const D={
+ bern:{name:"Bernoulli",short:"Bernoulli",tag:"one trial",col:"disc",x:210,y:42,unit:"Unit 4",
+  what:"A single trial with two outcomes: success (X = 1) with probability p, failure (X = 0) otherwise.",
+  params:"p = probability of success",mean:"p",sd:"√(p(1 − p))",
+  uses:"Free throw made or missed, a coin flip, one survey answer of yes/no.",
+  links:"Add up n independent Bernoulli trials → Binomial. Repeat trials until the first success → Geometric.",
+  cmds:{ti84:[["P(X = 1)","binompdf(1,p,1), which is just p"]],nsp:[["P(X = 1)","binomPdf(1,p,1), which is just p"]],des:[["P(X = 1)","binomialdist(1,p).pdf(1)"]]}},
+ binom:{name:"Binomial",short:"Binomial",tag:"B(n, p)",col:"disc",x:62,y:135,unit:"Unit 4",kind:"disc",
+  what:"X = the number of successes in n trials.",
+  params:"n = number of trials, p = probability of success",mean:"μ = np",sd:"σ = √(np(1 − p))",
+  check:"BINS: Binary outcomes, Independent trials (10% condition when sampling without replacement), fixed Number of trials, same probability of Success.",
+  uses:"Number of heads in 20 flips, number of defective items in a sample of 50.",
+  links:"Large counts (np ≥ 10 and n(1 − p) ≥ 10) → approximately Normal. Divide X by n → the sample proportion p̂. Very large n and small p → approximately Poisson with λ = np.",
+  inputs:[["n","n",20],["p","p",0.3]],
+  pm:(v,k)=>binpmf(v.n,v.p,k),cd:(v,k)=>bincdf(v.n,v.p,k),label:v=>`Binomial(n = ${fmt(v.n)}, p = ${fmt(v.p)})`,
+  gen:{ti84:{eq:(v,k)=>`binompdf(${v.n},${v.p},${k})`,le:(v,k)=>`binomcdf(${v.n},${v.p},${k})`,ge:(v,k)=>`1-binomcdf(${v.n},${v.p},${m1(k)})`,bt:(v,a,b)=>`binomcdf(${v.n},${v.p},${b})-binomcdf(${v.n},${v.p},${m1(a)})`},
+       nsp:{eq:(v,k)=>`binomPdf(${v.n},${v.p},${k})`,le:(v,k)=>`binomCdf(${v.n},${v.p},${k})`,ge:(v,k)=>`binomCdf(${v.n},${v.p},${k},${v.n})`,bt:(v,a,b)=>`binomCdf(${v.n},${v.p},${a},${b})`},
+       des:{eq:(v,k)=>`binomialdist(${v.n},${v.p}).pdf(${k})`,le:(v,k)=>`binomialdist(${v.n},${v.p}).cdf(${k})`,ge:(v,k)=>`1-binomialdist(${v.n},${v.p}).cdf(${m1(k)})`,bt:(v,a,b)=>`binomialdist(${v.n},${v.p}).cdf(${a},${b})`}}},
+ geom:{name:"Geometric",short:"Geometric",tag:"Geo(p)",col:"disc",x:358,y:135,unit:"Unit 4",kind:"disc",
+  what:"X = the number of the trial on which the first success happens (X = 1, 2, 3, …).",
+  params:"p = probability of success",mean:"μ = 1/p",sd:"σ = √(1 − p) / p",
+  check:"Binary outcomes, independent trials, same p, and you keep going until the first success (no fixed n).",
+  uses:"Number of shots until the first basket, number of calls until someone answers.",
+  links:"Comes from repeating Bernoulli trials until the first success.",
+  inputs:[["p","p",0.2]],
+  pm:(v,k)=>geopmf(v.p,k),cd:(v,k)=>geocdf(v.p,k),label:v=>`Geometric(p = ${fmt(v.p)})`,
+  gen:{ti84:{eq:(v,k)=>`geometpdf(${v.p},${k})`,le:(v,k)=>`geometcdf(${v.p},${k})`,ge:(v,k)=>`1-geometcdf(${v.p},${m1(k)})`,bt:(v,a,b)=>`geometcdf(${v.p},${b})-geometcdf(${v.p},${m1(a)})`},
+       nsp:{eq:(v,k)=>`geomPdf(${v.p},${k})`,le:(v,k)=>`geomCdf(${v.p},${k})`,ge:(v,k)=>`1-geomCdf(${v.p},${m1(k)})`,bt:(v,a,b)=>`geomCdf(${v.p},${a},${b})`},
+       des:{eq:(v,k)=>`${v.p}(1-${v.p})^(${k}-1)`,le:(v,k)=>`1-(1-${v.p})^${k}`,ge:(v,k)=>`(1-${v.p})^(${k}-1)`,bt:(v,a,b)=>`(1-${v.p})^(${a}-1)-(1-${v.p})^${b}`}}},
+ phat:{name:"Sampling distribution of p̂",short:"p̂",tag:"sample proportion",col:"samp",x:62,y:250,unit:"Unit 5",kind:"cont",
+  what:"The distribution of the sample proportion p̂ over all random samples of size n.",
+  params:"p = population proportion, n = sample size",mean:"μ = p",sd:"σ = √(p(1 − p)/n)",
+  check:"Random sample; 10% condition (n ≤ 10% of population); Large counts np ≥ 10 and n(1 − p) ≥ 10 for the Normal shape.",
+  uses:"Probability that a sample of 100 voters shows more than 55% support.",
+  links:"It is a Binomial count divided by n. With large counts it is approximately Normal, so you use normalcdf with μ = p and σ = √(p(1 − p)/n).",
+  inputs:[["p","p",0.5],["n","n",100]],
+  musd:v=>[v.p,Math.sqrt(v.p*(1-v.p)/v.n)],
+  label:v=>`p̂ ≈ Normal(μ = ${fmt(v.p)}, σ = ${r4(Math.sqrt(v.p*(1-v.p)/v.n))})`,norm:true},
+ pois:{name:"Poisson",short:"Poisson",tag:"Beyond AP",col:"beyond",beyond:true,x:358,y:250,unit:"Beyond AP",kind:"disc",
+  what:"X = the number of events in a fixed time or space, when events happen independently at an average rate λ.",
+  params:"λ = average number of events",mean:"μ = λ",sd:"σ = √λ",
+  uses:"Number of emails per hour, number of typos per page, customers arriving per minute.",
+  links:"Binomial with very large n and very small p is approximately Poisson with λ = np. The waiting time between Poisson events is Exponential.",
+  inputs:[["λ","l",4]],
+  pm:(v,k)=>poipmf(v.l,k),cd:(v,k)=>poicdf(v.l,k),label:v=>`Poisson(λ = ${fmt(v.l)})`,
+  gen:{ti84:{eq:(v,k)=>`poissonpdf(${v.l},${k})`,le:(v,k)=>`poissoncdf(${v.l},${k})`,ge:(v,k)=>`1-poissoncdf(${v.l},${m1(k)})`,bt:(v,a,b)=>`poissoncdf(${v.l},${b})-poissoncdf(${v.l},${m1(a)})`},
+       nsp:{eq:(v,k)=>`poissPdf(${v.l},${k})`,le:(v,k)=>`poissCdf(${v.l},${k})`,ge:(v,k)=>`1-poissCdf(${v.l},${m1(k)})`,bt:(v,a,b)=>`poissCdf(${v.l},${a},${b})`},
+       des:{eq:(v,k)=>`poissondist(${v.l}).pdf(${k})`,le:(v,k)=>`poissondist(${v.l}).cdf(${k})`,ge:(v,k)=>`1-poissondist(${v.l}).cdf(${m1(k)})`,bt:(v,a,b)=>`poissondist(${v.l}).cdf(${a},${b})`}}},
+ xbar:{name:"Sampling distribution of x̄",short:"x̄",tag:"sample mean",col:"samp",x:62,y:410,unit:"Unit 5",kind:"cont",
+  what:"The distribution of the sample mean x̄ over all random samples of size n.",
+  params:"μ = population mean, σ = population SD, n = sample size",mean:"μ_x̄ = μ",sd:"σ_x̄ = σ / √n",
+  check:"Random sample; 10% condition; Normal shape if the population is Normal OR n ≥ 30 (Central Limit Theorem).",
+  uses:"Probability that the mean weight of 40 bags is under 15.9 oz.",
+  links:"By the Central Limit Theorem, x̄ is approximately Normal for large n. When σ is unknown and you use s, you switch to t.",
+  inputs:[["μ","mu",16],["σ","s",0.5],["n","n",40]],
+  musd:v=>[v.mu,v.s/Math.sqrt(v.n)],
+  label:v=>`x̄ ≈ Normal(μ = ${fmt(v.mu)}, σ = ${r4(v.s/Math.sqrt(v.n))})`,norm:true},
+ normal:{name:"Normal",short:"Normal",tag:"N(μ, σ)",col:"norm",x:210,y:330,unit:"Units 1, 5",kind:"cont",
+  what:"The bell-shaped, symmetric density curve. Many measurements and most sampling distributions are approximately Normal.",
+  params:"μ = mean, σ = standard deviation",mean:"μ",sd:"σ",
+  check:"Use it only when the problem says the variable is Normal, or the sampling distribution conditions say so.",
+  uses:"Heights, test scores, measurement error. Empirical rule: 68%, 95%, 99.7% within 1, 2, 3 SDs.",
+  links:"Standardize with z = (x − μ)/σ → Standard Normal. Binomial, p̂ and x̄ are approximately Normal for large samples.",
+  inputs:[["μ","mu",70],["σ","s",4]],musd:v=>[v.mu,v.s],label:v=>`Normal(μ = ${fmt(v.mu)}, σ = ${fmt(v.s)})`,norm:true},
+ expo:{name:"Exponential",short:"Exponential",tag:"Beyond AP",col:"beyond",beyond:true,x:358,y:350,unit:"Beyond AP",kind:"cont",
+  what:"X = the waiting time until the next event, when events happen at rate λ (a Poisson process).",
+  params:"λ = rate (events per unit of time)",mean:"μ = 1/λ",sd:"σ = 1/λ",
+  uses:"Time until the next customer arrives, lifetime of a part that doesn't wear out.",
+  links:"The time between Poisson events. It is “memoryless”: having waited already doesn't change the future wait.",
+  inputs:[["λ","l",0.5]],
+  cdf:(v,x)=>x<=0?0:1-Math.exp(-v.l*x),label:v=>`Exponential(λ = ${fmt(v.l)})`},
+ z:{name:"Standard Normal",short:"Std. Normal",tag:"z ~ N(0, 1)",col:"norm",x:210,y:450,unit:"Units 1, 6",kind:"cont",
+  what:"The Normal distribution with mean 0 and SD 1. A z-score says how many SDs a value is from the mean.",
+  params:"none (μ = 0, σ = 1)",mean:"0",sd:"1",
+  uses:"z-scores, z* critical values for confidence intervals, z test statistics for proportions (Unit 6).",
+  links:"Any Normal becomes Standard Normal with z = (x − μ)/σ. Replace σ with s → t. Square z and add df of them → chi-square.",
+  inputs:[],musd:v=>[0,1],label:()=>`Standard Normal (μ = 0, σ = 1)`,norm:true,std:true},
+ t:{name:"t distribution",short:"t",tag:"t(df)",col:"t",x:62,y:560,unit:"Units 7, 9",kind:"cont",
+  what:"Like the Standard Normal but with heavier tails. Used for means when σ is unknown and you use the sample SD s.",
+  params:"df = degrees of freedom (n − 1 for one sample)",mean:"0",sd:"a little more than 1",
+  uses:"t* for confidence intervals for μ, p-values for t-tests (one-sample, paired, two-sample) and for slopes (df = n − 2).",
+  links:"As df grows, t gets closer and closer to the Standard Normal.",
+  inputs:[["df","df",14]],cdf:(v,x)=>tcdf(x,v.df),label:v=>`t(df = ${fmt(v.df)})`,inv:true},
+ chi:{name:"Chi-square",short:"Chi-square χ²",tag:"χ²(df)",col:"chi",x:358,y:560,unit:"Unit 8",kind:"cont",
+  what:"A right-skewed distribution of non-negative values. The χ² test statistic follows it when the null hypothesis is true.",
+  params:"df = degrees of freedom",mean:"μ = df",sd:"√(2·df)",
+  check:"Goodness of fit: df = categories − 1. Homogeneity/independence: df = (rows − 1)(columns − 1). All expected counts ≥ 5.",
+  uses:"p-values for goodness of fit, homogeneity and independence tests. The p-value is always the right tail: P(χ² ≥ statistic).",
+  links:"The sum of df squared Standard Normal values. A ratio of two chi-squares (each divided by its df) gives F.",
+  inputs:[["df","df",3]],cdf:(v,x)=>chicdf(x,v.df),label:v=>`χ²(df = ${fmt(v.df)})`,inv:true,pos:true},
+ F:{name:"F distribution",short:"F",tag:"Beyond AP",col:"beyond",beyond:true,x:358,y:650,unit:"Beyond AP",kind:"cont",
+  what:"A right-skewed distribution used to compare variances and in ANOVA (comparing several means).",
+  params:"df₁ (numerator), df₂ (denominator)",mean:"df₂/(df₂ − 2) for df₂ > 2",sd:"—",
+  uses:"ANOVA, comparing two variances, testing a whole regression model.",
+  links:"F = (χ²₁/df₁) / (χ²₂/df₂). Also F(1, df) = t(df)².",
+  inputs:[["df₁","d1",3],["df₂","d2",20]],cdf:(v,x)=>fcdf(x,v.d1,v.d2),label:v=>`F(${fmt(v.d1)}, ${fmt(v.d2)})`,pos:true}
+};
+const EDGES=[
+ ["bern","binom","add n trials"],["bern","geom","until 1st success"],
+ ["binom","phat","÷ n",0,[12,0]],["binom","pois","n big, p small",1],
+ ["phat","normal","large counts",1,[-4,-10]],["pois","expo","wait time",0,[30,0]],
+ ["xbar","normal","CLT",1,[-6,12]],["normal","z","z = (x − μ)/σ",0,[46,0]],
+ ["z","t","σ → s"],["z","chi","add z²"],["chi","F","ratio",0,[22,0]]
+];
+
+/* continuous commands */
+function contGen(id,calc,mode,v,a,b){
+ const d=D[id];
+ if(d.norm){
+  const [mu,sd]=d.musd(v); const m=fmt(mu), s=d.std?null:(d.id==="normal"?fmt(sd):r4(sd));
+  const P=(L,H)=> calc==="ti84"?`normalcdf(${lo(calc,L)},${hi(calc,H)}${s?`,${m},${s}`:""})`
+     : calc==="nsp"?`normCdf(${lo(calc,L)},${hi(calc,H)}${s?`,${m},${s}`:""})`
+     : (L===-Infinity?`normaldist(${s?`${m},${s}`:""}).cdf(${fmt(H)})`: H===Infinity?`1-normaldist(${s?`${m},${s}`:""}).cdf(${fmt(L)})`:`normaldist(${s?`${m},${s}`:""}).cdf(${fmt(L)},${fmt(H)})`);
+  if(mode==="inv") return calc==="des"?`normaldist(${s?`${m},${s}`:""}).inversecdf(${fmt(a)})`:`invNorm(${fmt(a)}${s?`,${m},${s}`:""})`;
+  return mode==="lt"?P(-Infinity,a):mode==="gt"?P(a,Infinity):P(a,b);
+ }
+ if(id==="t"){
+  const df=fmt(v.df);
+  if(mode==="inv") return calc==="ti84"?`invT(${fmt(a)},${df})`:calc==="nsp"?`invt(${fmt(a)},${df})`:`tdist(${df}).inversecdf(${fmt(a)})`;
+  const P=(L,H)=>calc==="ti84"?`tcdf(${lo(calc,L)},${hi(calc,H)},${df})`:calc==="nsp"?`tCdf(${lo(calc,L)},${hi(calc,H)},${df})`
+     :(L===-Infinity?`tdist(${df}).cdf(${fmt(H)})`:H===Infinity?`1-tdist(${df}).cdf(${fmt(L)})`:`tdist(${df}).cdf(${fmt(L)},${fmt(H)})`);
+  return mode==="lt"?P(-Infinity,a):mode==="gt"?P(a,Infinity):P(a,b);
+ }
+ if(id==="chi"){
+  const df=fmt(v.df);
+  if(mode==="inv") return calc==="nsp"?`invχ²(${fmt(a)},${df})`:null;
+  if(calc==="des") return null;
+  const f=calc==="ti84"?"χ²cdf":"χ²Cdf";
+  const P=(L,H)=>`${f}(${L===0?0:lo(calc,L)},${hi(calc,H)},${df})`;
+  return mode==="lt"?P(0,a):mode==="gt"?P(a,Infinity):P(a,b);
+ }
+ if(id==="F"){
+  if(calc==="des"||mode==="inv") return null;
+  const f=calc==="ti84"?"Fcdf":"FCdf", t=`,${fmt(v.d1)},${fmt(v.d2)}`;
+  return mode==="lt"?`${f}(0,${fmt(a)}${t})`:mode==="gt"?`${f}(${fmt(a)},${hi(calc,Infinity)}${t})`:`${f}(${fmt(a)},${fmt(b)}${t})`;
+ }
+ if(id==="expo"){
+  const l=fmt(v.l);
+  return mode==="lt"?`1-e^(-${l}*${fmt(a)})`:mode==="gt"?`e^(-${l}*${fmt(a)})`:`e^(-${l}*${fmt(a)})-e^(-${l}*${fmt(b)})`;
+ }
+}
+Object.keys(D).forEach(k=>D[k].id=k);
+
+/* static command lists for each distribution (used in panel + cheat sheet) */
+function cmdList(id,calc){
+ const d=D[id];
+ if(d.cmds) return d.cmds[calc];
+ if(d.kind==="disc"){
+  const ex=d.inputs.reduce((o,[l,k])=>(o[k]=l==="λ"?"λ":l,o),{});
+  const g=d.gen[calc];
+  if(calc==="des"&&id==="geom") return [["P(X = k)","p(1-p)^(k-1)"],["P(X ≤ k)","1-(1-p)^k"],["P(X ≥ k)","(1-p)^(k-1)"],["Note","Desmos has no geometric function: type the formula."]];
+  return [["P(X = k)",g.eq(ex,"k")],["P(X ≤ k)",g.le(ex,"k")],["P(X ≥ k)",g.ge(ex,"k")],["P(a ≤ X ≤ b)",g.bt(ex,"a","b")]];
+ }
+ const T={
+  normal:{ti84:[["P(a < X < b)","normalcdf(a,b,μ,σ)"],["P(X < x)","normalcdf(-1E99,x,μ,σ)"],["P(X > x)","normalcdf(x,1E99,μ,σ)"],["x with area A to its left","invNorm(A,μ,σ)"]],
+          nsp:[["P(a < X < b)","normCdf(a,b,μ,σ)"],["P(X < x)","normCdf(-∞,x,μ,σ)"],["P(X > x)","normCdf(x,∞,μ,σ)"],["x with area A to its left","invNorm(A,μ,σ)"]],
+          des:[["P(a < X < b)","normaldist(μ,σ).cdf(a,b)"],["P(X < x)","normaldist(μ,σ).cdf(x)"],["P(X > x)","1-normaldist(μ,σ).cdf(x)"],["x with area A to its left","normaldist(μ,σ).inversecdf(A)"]]},
+  z:{ti84:[["P(a < Z < b)","normalcdf(a,b)"],["P(Z < z)","normalcdf(-1E99,z)"],["z* for 95% confidence","invNorm(0.975)"]],
+     nsp:[["P(a < Z < b)","normCdf(a,b)"],["P(Z < z)","normCdf(-∞,z)"],["z* for 95% confidence","invNorm(0.975)"]],
+     des:[["P(a < Z < b)","normaldist().cdf(a,b)"],["P(Z < z)","normaldist().cdf(z)"],["z* for 95% confidence","normaldist().inversecdf(0.975)"]]},
+  phat:{ti84:[["P(p̂ > x)","normalcdf(x,1E99,p,√(p(1-p)/n))"],["Test or interval","STAT → TESTS → 1-PropZTest / 1-PropZInt"]],
+        nsp:[["P(p̂ > x)","normCdf(x,∞,p,√(p(1-p)/n))"],["Test or interval","menu → Statistics → Stat Tests → 1-Prop z Test"]],
+        des:[["P(p̂ > x)","1-normaldist(p,√(p(1-p)/n)).cdf(x)"],["Test or interval","+ → Inference → 1-proportion z"]]},
+  xbar:{ti84:[["P(x̄ < x)","normalcdf(-1E99,x,μ,σ/√(n))"]],nsp:[["P(x̄ < x)","normCdf(-∞,x,μ,σ/√(n))"]],des:[["P(x̄ < x)","normaldist(μ,σ/√(n)).cdf(x)"]]},
+  t:{ti84:[["P(T > t) (right tail)","tcdf(t,1E99,df)"],["Two-sided p-value","2*tcdf(|t|,1E99,df)"],["t* for 95% confidence","invT(0.975,df)"],["Test or interval","STAT → TESTS → T-Test / TInterval"]],
+     nsp:[["P(T > t) (right tail)","tCdf(t,∞,df)"],["Two-sided p-value","2*tCdf(|t|,∞,df)"],["t* for 95% confidence","invt(0.975,df)"],["Test or interval","menu → Statistics → Stat Tests → t Test"]],
+     des:[["P(T > t) (right tail)","1-tdist(df).cdf(t)"],["Two-sided p-value","2(1-tdist(df).cdf(|t|))"],["t* for 95% confidence","tdist(df).inversecdf(0.975)"],["Test or interval","+ → Inference → 1-sample t"]]},
+  chi:{ti84:[["p-value P(χ² ≥ x)","χ²cdf(x,1E99,df)"],["Goodness of fit","STAT → TESTS → χ²GOF-Test"],["Two-way table","STAT → TESTS → χ²-Test (matrix [A])"],["Critical value","not built in: use a table"]],
+       nsp:[["p-value P(χ² ≥ x)","χ²Cdf(x,∞,df)"],["Critical value (area A to left)","invχ²(A,df)"],["Tests","menu → Statistics → Stat Tests → χ² GOF / χ² 2-way Test"]],
+       des:[["p-value","No χ² function: use + → Inference → χ² test, or a TI"]]},
+  expo:{ti84:[["P(X ≤ x)","1-e^(-λx)"],["P(X > x)","e^(-λx)"]],nsp:[["P(X ≤ x)","1-e^(-λx)"],["P(X > x)","e^(-λx)"]],des:[["P(X ≤ x)","1-e^(-λx)"],["P(X > x)","e^(-λx)"]]},
+  F:{ti84:[["P(F > x)","Fcdf(x,1E99,df₁,df₂)"],["ANOVA","STAT → TESTS → ANOVA(L1,L2,…)"]],nsp:[["P(F > x)","FCdf(x,∞,df₁,df₂)"],["ANOVA","menu → Statistics → Stat Tests → ANOVA"]],des:[["P(F > x)","No F function: use a TI"]]}
+ };
+ return T[id][calc];
+}
+
+/* ===================== state ===================== */
+let calc="ti84", cur="binom";
+try{ calc=localStorage.getItem("zmCalc")||"ti84"; }catch(e){}
+try{ const h=location.hash.slice(1); if(D[h])cur=h; }catch(e){}
+
+/* ===================== map ===================== */
+const NW=112,NH=50;
+function clip(x1,y1,x2,y2){ const dx=x2-x1,dy=y2-y1; const sx=dx?(NW/2+3)/Math.abs(dx):Infinity, sy=dy?(NH/2+3)/Math.abs(dy):Infinity; const s=Math.min(sx,sy); return [x1+dx*s,y1+dy*s]; }
+function drawMap(){
+ const svg=document.getElementById("map"); let h=`<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="#555"/></marker></defs>`;
+ for(const [a,b,lab,ap,off] of EDGES){ const A=D[a],B=D[b]; const [x1,y1]=clip(A.x,A.y,B.x,B.y),[x2,y2]=clip(B.x,B.y,A.x,A.y);
+  h+=`<line class="edge${ap?" approx":""}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" marker-end="url(#ar)"/>`;
+  const mx=(x1+x2)/2+(off?off[0]:0),my=(y1+y2)/2+(off?off[1]:0); h+=`<text class="elab" x="${mx}" y="${my+4}">${esc(lab)}</text>`; }
+ for(const id in D){ const d=D[id];
+  h+=`<g class="node${d.beyond?" beyond":""}${id===cur?" sel":""}" data-id="${id}" tabindex="0" role="button" aria-label="${esc(d.name)}"><rect x="${d.x-NW/2}" y="${d.y-NH/2}" width="${NW}" height="${NH}" rx="11" fill="${COL[d.col]}"/><text class="nm" x="${d.x}" y="${d.y-2}">${esc(d.short)}</text><text class="tg" x="${d.x}" y="${d.y+15}">${esc(d.tag)}</text></g>`; }
+ svg.innerHTML=h;
+ svg.querySelectorAll(".node").forEach(g=>{ const go=()=>select(g.dataset.id,true); g.addEventListener("click",go); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();go();} }); });
+}
+
+/* ===================== panel ===================== */
+function select(id,scroll){ cur=id; try{ history.replaceState(null,"","#"+id); }catch(e){} drawMap(); drawPanel();
+ if(scroll&&window.innerWidth<960) document.getElementById("panel").scrollIntoView({behavior:"smooth",block:"start"}); }
+function drawPanel(){
+ const d=D[cur], p=document.getElementById("panel"); p.style.setProperty("--c",COL[d.col]);
+ let h=`<h2>${esc(d.name)}</h2><div class="tags"><span class="tag fill">${esc(d.unit)}</span><span class="tag">${d.kind==="disc"?"discrete":d.kind==="cont"?"continuous":"discrete"}</span></div>`;
+ h+=`<p>${esc(d.what)}</p><dl class="facts"><dt>Parameters</dt><dd>${esc(d.params)}</dd><dt>Mean</dt><dd>${esc(d.mean)}</dd><dt>SD</dt><dd>${esc(d.sd)}</dd><dt>Used for</dt><dd>${esc(d.uses)}</dd></dl>`;
+ if(d.check) h+=`<div class="note"><b>Check first:</b> ${esc(d.check)}</div>`;
+ h+=`<div class="note"><b>Connections:</b> ${esc(d.links)}</div>`;
+ h+=`<h3>Calculator commands · ${CALCN[calc]}</h3><table class="cmds">${cmdList(cur,calc).map(([a,b])=>`<tr><td>${esc(a)}</td><td>${/^(No |not |Desmos has|STAT|menu|\+ )/.test(b)?esc(b):C(b)}</td></tr>`).join("")}</table>`;
+ if(d.inputs) h+=tryBox(d);
+ p.innerHTML=h;
+ if(d.inputs) wireTry(d);
+}
+function tryBox(d){
+ const modes=d.kind==="disc"?[["eq","P(X = k)"],["le","P(X ≤ k)"],["ge","P(X ≥ k)"],["bt","P(a ≤ X ≤ b)"]]
+   :[["lt","P(X < x)"],["gt","P(X > x)"],["bt","P(a < X < b)"]].concat((d.norm||d.inv)?[["inv","Value with area A to the left"]]:[]);
+ const defMode=d.id==="chi"||d.id==="F"?"gt":d.kind==="disc"?"le":"lt";
+ return `<h3>Try it: get the answer and the exact keystrokes</h3><div class="try">
+ <div class="row">${d.inputs.map(([l,k,v])=>`<label>${esc(l)}<input data-k="${k}" type="number" step="any" value="${v}" inputmode="decimal"></label>`).join("")}</div>
+ <div class="row"><label>Find<select id="tmode">${modes.map(([m,l])=>`<option value="${m}"${m===defMode?" selected":""}>${esc(l)}</option>`).join("")}</select></label>
+ <label id="la"><span id="laT">k</span><input id="ta" type="number" step="any"></label><label id="lb">b<input id="tb" type="number" step="any"></label></div>
+ <div class="out" id="tout"></div></div>`;
+}
+const DEF={binom:[5,3,8],geom:[3,2,5],pois:[3,2,6],phat:[0.55,0.45,0.55],xbar:[15.9,15.9,16.1],normal:[75,65,75],z:[1.96,-1,1],t:[2.1,-2,2],chi:[7.81,1,5],F:[3.1,1,3],expo:[2,1,3]};
+function wireTry(d){
+ const box=document.querySelector(".try"), sel=document.getElementById("tmode"), ta=document.getElementById("ta"), tb=document.getElementById("tb");
+ const df=DEF[d.id]||[1,0,1];
+ function setDefaults(){ const m=sel.value; if(m==="inv"){ ta.value=d.id==="chi"?0.95:0.975; } else if(m==="bt"){ ta.value=df[1]; tb.value=df[2]; } else ta.value=df[0]; }
+ function labels(){ const m=sel.value; document.getElementById("lb").style.display=m==="bt"?"":"none";
+  document.getElementById("laT").textContent=m==="inv"?"area A":m==="bt"?"a":d.kind==="disc"?"k":"x"; }
+ sel.addEventListener("change",()=>{ setDefaults(); labels(); run(); });
+ box.querySelectorAll("input").forEach(i=>i.addEventListener("input",run));
+ setDefaults(); labels(); run();
+ function run(){
+  const v={}; let bad=false; box.querySelectorAll("input[data-k]").forEach(i=>{ v[i.dataset.k]=parseFloat(i.value); if(!isFinite(v[i.dataset.k]))bad=true; });
+  const m=sel.value, a=parseFloat(ta.value), b=parseFloat(tb.value), out=document.getElementById("tout");
+  if(bad||!isFinite(a)||(m==="bt"&&!isFinite(b))){ out.innerHTML=`<i>Fill in every box.</i>`; return; }
+  const err=validate(d,v,m,a,b); if(err){ out.innerHTML=`<div class="note warn">${esc(err)}</div>`; return; }
+  let val, ptxt, cmd;
+  const X=d.id==="phat"?"p̂":d.id==="xbar"?"x̄":d.id==="z"?"Z":d.id==="t"?"T":d.id==="chi"?"χ²":d.id==="F"?"F":"X";
+  if(d.kind==="disc"){
+   val=m==="eq"?d.pm(v,a):m==="le"?d.cd(v,a):m==="ge"?1-d.cd(v,a-1):d.cd(v,b)-d.cd(v,a-1);
+   ptxt=m==="eq"?`P(X = ${fmt(a)})`:m==="le"?`P(X ≤ ${fmt(a)})`:m==="ge"?`P(X ≥ ${fmt(a)})`:`P(${fmt(a)} ≤ X ≤ ${fmt(b)})`;
+   cmd=d.gen[calc][m](v,a,b);
+  } else {
+   const F=d.norm?(x=>{const [mu,s]=d.musd(v);return Phi((x-mu)/s);}):(x=>d.cdf(v,x));
+   if(m==="inv"){ const [L,H]=d.norm?(()=>{const[mu,s]=d.musd(v);return[mu-50*s,mu+50*s];})():d.pos?[0,1e4]:[-1e3,1e3]; val=invert(F,a,L,H); ptxt=`Value with area ${fmt(a)} to the left`; }
+   else { val=m==="lt"?F(a):m==="gt"?1-F(a):F(b)-F(a); ptxt=m==="lt"?`P(${X} < ${fmt(a)})`:m==="gt"?`P(${X} > ${fmt(a)})`:`P(${fmt(a)} < ${X} < ${fmt(b)})`; }
+   cmd=contGen(d.id,calc,m,v,a,b);
+  }
+  let h=`<div class="line">${esc(ptxt)} = <span class="big">${r4(val)}</span></div>`;
+  h+=`<div class="line">${CALCN[calc]}: ${cmd?C(cmd):`<i>${esc(noCmd(d,calc,m))}</i>`}</div>`;
+  if(d.id==="phat"||d.id==="xbar") h+=`<div class="line" style="font-size:16px">σ = ${d.id==="phat"?`√(p(1 − p)/n) = √(${fmt(v.p)}·${fmt(1-v.p)}/${fmt(v.n)})`:`σ/√n = ${fmt(v.s)}/√${fmt(v.n)}`} = ${r4(d.musd(v)[1])}</div>`;
+  h+=`<div class="ap"><b>Write on the AP exam:</b> ${esc(d.label(v))}; ${esc(m==="inv"?`the value with area ${fmt(a)} to its left is ${r4(val)}`:`${ptxt} = ${r4(val)}`)}.</div>`;
+  out.innerHTML=h;
+ }
+}
+function noCmd(d,calc,m){
+ if(d.id==="chi"&&m==="inv") return calc==="ti84"?"The TI-84 has no inverse χ² command: use a χ² table (the TI-Nspire has invχ²).":"Desmos has no χ² function.";
+ if(calc==="des") return `Desmos has no ${d.id==="chi"?"χ²":"F"} function: use a TI or the Inference menu.`;
+ return "Not available on this calculator.";
+}
+function validate(d,v,m,a,b){
+ if("p" in v&&(v.p<0||v.p>1)) return "p must be between 0 and 1.";
+ if("n" in v&&(v.n<1||(d.id==="binom"&&v.n!==Math.floor(v.n)))) return "n must be a whole number of at least 1.";
+ if(("s" in v&&v.s<=0)||("l" in v&&v.l<=0)) return d.id==="pois"||d.id==="expo"?"λ must be greater than 0.":"σ must be greater than 0.";
+ if(("df" in v&&v.df<=0)||("d1" in v&&(v.d1<=0||v.d2<=0))) return "Degrees of freedom must be greater than 0.";
+ if(d.kind==="disc"&&(a!==Math.floor(a)||(m==="bt"&&b!==Math.floor(b)))) return "For a discrete distribution, k (and a, b) must be whole numbers.";
+ if(m==="bt"&&b<a) return "b must be at least a.";
+ if(m==="inv"&&(a<=0||a>=1)) return "The area A must be between 0 and 1.";
+ if(d.id==="phat"&&(v.n*v.p<10||v.n*(1-v.p)<10)) return `Large counts fails: np = ${fmt(v.n*v.p)} and n(1 − p) = ${fmt(v.n*(1-v.p))}. Both must be at least 10 to use the Normal model.`;
+ return "";
+}
+
+/* ===================== cheat sheet ===================== */
+function drawSheet(){
+ document.getElementById("sheetCalc").textContent=CALCN[calc];
+ document.getElementById("sheetMenu").textContent=MENU[calc];
+ const order=["binom","geom","normal","z","phat","xbar","t","chi","pois","expo","F"];
+ let h=`<tr><th>Distribution</th><th>What you want</th><th>Type this</th></tr>`;
+ for(const id of order){ const L=cmdList(id,calc); L.forEach(([a,b],i)=>{ h+=`<tr>${i===0?`<td rowspan="${L.length}" style="border-left:5px solid ${COL[D[id].col]}">${esc(D[id].name)}${D[id].beyond?"<br><small style='font-weight:400'>Beyond AP</small>":""}</td>`:""}<td>${esc(a)}</td><td>${/^(No |not |Desmos has|STAT|menu|\+ )/.test(b)?esc(b):C(b)}</td></tr>`; }); }
+ document.getElementById("sheet").innerHTML=h;
+}
+function setCalc(c){ calc=c; try{localStorage.setItem("zmCalc",c);}catch(e){} document.querySelectorAll(".pick button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.calc===c)); drawPanel(); drawSheet(); }
+document.querySelectorAll(".pick button").forEach(b=>b.addEventListener("click",()=>setCalc(b.dataset.calc)));
+drawMap(); setCalc(calc);
+</script>
+</body>
+</html>

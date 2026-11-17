@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Z-Frontiers: Where Math Leads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:'EB Garamond',Georgia,serif;color:#111;background:#fff;line-height:1.45;font-size:18px}
+a{color:inherit}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.85em}
+.top{max-width:1100px;margin:0 auto;padding:12px 16px 0;display:flex;gap:8px;flex-wrap:wrap}
+.top a,.pill{color:#111;font-weight:600;text-decoration:none;border:1.5px solid #111;border-radius:999px;padding:4px 14px;display:inline-block;font-size:16px;background:#fff;cursor:pointer;font-family:inherit}
+header{padding:20px 16px 8px;text-align:center}
+header .wrap{max-width:860px;margin:0 auto;border-top:3px double #111;border-bottom:3px double #111;padding:18px 8px 14px}
+.kicker{text-transform:uppercase;letter-spacing:.28em;font-size:13px;margin:0 0 8px}
+h1{font-weight:800;font-size:clamp(34px,7vw,60px);margin:0 0 6px;line-height:1.05}
+header p{margin:0 auto;font-style:italic;color:#333;max-width:660px}
+main{max-width:1100px;margin:0 auto;padding:8px 16px 50px}
+h2{font-size:30px;margin:30px 0 4px;line-height:1.1}
+.sub{color:#444;font-style:italic;margin:0 0 12px}
+/* course chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 16px 'EB Garamond',Georgia,serif;border:1.5px solid #111;background:#fff;border-radius:999px;padding:5px 13px;cursor:pointer;text-decoration:none;color:#111}
+.chip:hover,.chip[aria-current="true"]{background:#111;color:#fff}
+/* topic cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{display:block;text-decoration:none;border:1px solid #ddd;border-top:6px solid var(--c);border-radius:14px;padding:14px 16px 16px;background:#fff;transition:transform .15s,box-shadow .15s}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.card .ic{font-size:30px;line-height:1}
+.card b{display:block;font-size:22px;margin:6px 0 4px;color:var(--c)}
+.card p{margin:0;font-size:17px;color:#333}
+.card .from{margin-top:8px;font-size:14px;color:#666}
+/* map table */
+.mapwrap{overflow-x:auto;border:1px solid #ddd;border-radius:12px}
+table.map{border-collapse:collapse;font-size:15px;min-width:820px;width:100%}
+table.map th,table.map td{border-bottom:1px solid #eee;padding:6px 6px;text-align:center}
+table.map th{position:sticky;top:0;background:#fafafa;font-weight:600;vertical-align:bottom}
+table.map th a{text-decoration:none;color:var(--c)}
+table.map td:first-child,table.map th:first-child{text-align:left;white-space:nowrap;position:sticky;left:0;background:#fff;z-index:1}
+table.map th:first-child{background:#fafafa}
+table.map td a.dot{display:inline-block;min-width:26px;border-radius:999px;color:#fff;text-decoration:none;font-weight:700;font-size:13px;padding:1px 6px;background:var(--c)}
+table.map td a.course{font-weight:600;text-decoration:none}
+/* topic page */
+.thead{border-left:8px solid var(--c);padding:6px 0 6px 16px;margin:18px 0 10px}
+.thead .ic{font-size:40px}
+.thead h2{margin:4px 0 4px;font-size:clamp(30px,6vw,44px);color:var(--c)}
+.thead p{margin:0;font-size:20px;font-style:italic}
+.two{display:grid;grid-template-columns:1fr;gap:18px}
+@media(min-width:880px){.two{grid-template-columns:1.25fr 1fr}}
+.box{border:1px solid #ddd;border-radius:14px;padding:14px 16px}
+.box h3{margin:0 0 8px;font-size:22px}
+.box ul{margin:0;padding-left:20px}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0 2px}
+.chain span{border:1.5px solid var(--c);border-radius:999px;padding:3px 11px;font-size:16px;font-weight:600}
+.chain span:last-child{background:var(--c);color:#fff}
+.chain i{font-style:normal;color:var(--c);font-weight:700}
+.path{width:100%;border-collapse:collapse;font-size:17px}
+.path td{border-top:1px solid #eee;padding:8px 6px;vertical-align:top}
+.path td:first-child{width:30%}
+.path .cn{display:inline-block;font-size:13.5px;font-weight:700;color:#fff;background:var(--c);border-radius:6px;padding:1px 8px;text-decoration:none;margin-bottom:3px}
+.path .cc{font-weight:600}
+.lvl{display:inline-block;font-size:12.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:6px;padding:1px 7px;margin-right:6px;vertical-align:2px}
+.l1{background:#e5f2e8;color:#1e6236}.l2{background:#fff1dc;color:#8a5205}.l3{background:#f3e6f3;color:#6b2b6b}
+.res{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.r{border:1px solid #e3e3e3;border-radius:12px;padding:10px 12px;background:#fff}
+.r .k{font-size:13px;color:#555;text-transform:uppercase;letter-spacing:.06em}
+.r a.t,.r span.t{display:block;font-weight:700;font-size:18px;margin:2px 0;text-decoration:none;color:#111}
+.r a.t:hover{text-decoration:underline}
+.r .by{font-size:15px;color:#555;font-style:italic}
+.r p{margin:4px 0 0;font-size:16px}
+.filters{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.filters button{font:600 15px 'EB Garamond',Georgia,serif;border:1px solid #999;background:#fff;border-radius:999px;padding:3px 11px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:#111;color:#fff;border-color:#111}
+.careers{display:flex;flex-wrap:wrap;gap:6px}
+.careers span{background:#f3f2ee;border-radius:8px;padding:2px 9px;font-size:16px}
+.nav2{display:flex;justify-content:space-between;gap:10px;margin-top:26px;flex-wrap:wrap}
+/* demos */
+.demo{border:2px solid var(--c);border-radius:14px;padding:14px 16px;margin-top:18px;background:#fcfcfb}
+.demo h3{margin:0 0 4px;font-size:22px;color:var(--c)}
+.demo .row{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:flex-end;margin:8px 0}
+.demo label{display:flex;flex-direction:column;font-size:14.5px;font-weight:600}
+.demo input[type=number],.demo select{font:16px ui-monospace,Menlo,Consolas,monospace;padding:5px 8px;border:1px solid #999;border-radius:8px;width:100px;background:#fff}
+.demo select{width:auto;font-family:'EB Garamond',Georgia,serif;font-size:17px}
+.demo input[type=range]{width:200px}
+.demo button.go{font:600 16px 'EB Garamond',Georgia,serif;border:1.5px solid var(--c);background:var(--c);color:#fff;border-radius:999px;padding:5px 14px;cursor:pointer}
+.demo button.alt{background:#fff;color:var(--c)}
+.demo .out{font-size:18px;margin-top:6px}
+.demo .big{font-size:24px;font-weight:700}
+.demo svg{width:100%;max-width:520px;height:auto;display:block;background:#fff;border:1px solid #eee;border-radius:10px;margin-top:6px}
+.hist{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;line-height:1.6;word-break:break-all}
+.note{font-size:16px;background:#f6f6f6;border-left:4px solid var(--c,#111);padding:8px 10px;margin:8px 0;border-radius:0 8px 8px 0}
+.free{display:inline-block;font-size:12.5px;font-weight:800;letter-spacing:.06em;background:#1e6236;color:#fff;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+.lib{display:inline-block;font-size:12.5px;font-weight:700;background:#eee;color:#555;border-radius:6px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+.top12{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.tp{border:2px solid #1e6236;border-radius:12px;padding:10px 12px;background:#f6fbf7;text-decoration:none;display:block}
+.tp b{font-size:18px;display:block}.tp .by{font-size:14.5px;color:#555;font-style:italic}.tp p{margin:4px 0 0;font-size:16px}
+.tp .f{font-size:13.5px;margin-top:6px;color:#333}
+.langs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.lang{border:1px solid #ddd;border-top:6px solid var(--c);border-radius:14px;padding:12px 14px;scroll-margin-top:12px}
+.lang h3{margin:0;font-size:24px;color:var(--c)}
+.lang .lv{font-size:14px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.05em}
+.lang ul{margin:4px 0;padding-left:20px}.lang .sec{font-size:16px;color:#333}
+.lang .lr a{display:block;font-weight:600;margin:3px 0;text-decoration:none}.lang .lr a:hover{text-decoration:underline}
+.lang .lr span{font-weight:400;font-style:italic;color:#555;font-size:15px}
+.lang .ff{font-size:15px;margin-top:6px}
+.lang.hl{box-shadow:0 0 0 3px var(--c)}
+table.goals{width:100%;border-collapse:collapse;font-size:17px}
+table.goals td{border-top:1px solid #eee;padding:8px 6px;vertical-align:top}
+table.goals td:first-child{font-weight:600;width:34%}
+.lchip{display:inline-block;border:1.5px solid var(--c);color:var(--c);border-radius:999px;padding:2px 11px;font-weight:700;text-decoration:none;font-size:15.5px;margin:2px 4px 2px 0}
+footer{text-align:center;font-size:15px;color:#555;padding:20px 14px 40px;font-style:italic}
+.pc{margin:6px 0;border:1px solid #e5e7eb;border-radius:8px;padding:4px 8px;background:#fafafa}.pc summary{cursor:pointer;font-weight:700}.pc ul{margin:4px 0 6px}.cmpt td,.cmpt th{border:1px solid #e5e7eb;padding:6px 8px;vertical-align:top;font-size:15px}.cmpt th{background:#f3f4f6}
+</style>
+<script>(function(){ var NS="https://abacus.jasoncameron.dev/hit/kzogovic.github.io/", K="frontiers";
+ function hit(k){ try{ fetch(NS+k).catch(function(){}); }catch(e){} }
+ function once(flag,k){ try{ if(!sessionStorage.getItem(flag)){ sessionStorage.setItem(flag,"1"); hit(k); } }catch(e){ hit(k); } }
+ once("zmVisit","zmath-visits"); if(K!=="hub") once("zmVisit-"+K,"book-"+K+"-visits");
+ var acc=0,last=Date.now(),act=Date.now();
+ ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,function(){act=Date.now();},{passive:true}); });
+ setInterval(function(){ var n=Date.now(); if(document.visibilityState==="visible"&&n-act<120000) acc+=(n-last)/1000; last=n;
+   if(acc>=60){ acc-=60; setTimeout(function(){ hit("zmath-minutes"); if(K!=="hub") hit("book-"+K+"-minutes"); },Math.random()*8000); } },10000);
+})();</script>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="0c59c8ac-f594-41fb-ac04-392482ab3e25"></script>
+<script>/* Z-Math time counter: counts only time the page is open, visible and in use. No names, no cookies. */
+(function(){ var BOOK='Z-Frontiers', STEP=300, acc=0, last=Date.now(), active=Date.now();
+ function used(){ active=Date.now(); } ["pointerdown","keydown","scroll","touchstart","mousemove"].forEach(function(e){ addEventListener(e,used,{passive:true}); });
+ function send(n){ for(var i=0;i<n;i++){ try{ window.umami&&umami.track("5 minutes of use",{book:BOOK}); }catch(e){} } }
+ function tick(){ var now=Date.now(); if(document.visibilityState==="visible"&&now-active<120000) acc+=(now-last)/1000; last=now; if(acc>=STEP){ var n=Math.floor(acc/STEP); acc-=n*STEP; send(n); } }
+ setInterval(tick,15000);
+ document.addEventListener("visibilitychange",function(){ tick(); if(document.visibilityState==="hidden"&&acc>=STEP/2){ acc=0; send(1); } });
+})();</script>
+<script src="data.js"></script>
+</head>
+<body>
+<div class="top" data-zmath-link><a href="../">← Z-Math: all courses</a><a href="#" id="homeLink" style="display:none">← Z-Frontiers home</a></div>
+<header><div class="wrap">
+  <p class="kicker">Z-Math · Zogovic</p>
+  <h1>Z-Frontiers: Where Math Leads</h1>
+  <p>Machine learning, AI, game theory, cryptography and more. See which math from your classes leads to which field, how it is used, and where to dig deeper.</p>
+</div></header>
+<main id="app"></main>
+<footer>Made by Zogovic for Z-Math. Links go to free resources wherever possible; books without a link are available in libraries and bookstores. Levels: <b>Start here</b> = anyone, <b>Next step</b> = after Algebra 2 or AP courses, <b>Deep dive</b> = university level.</footer>
+
+<script>
+const C=window.ZF_COURSES, T=window.ZF_TOPICS, G=window.ZF_GENERAL, TOP=window.ZF_TOP, L=window.ZF_LANGS, GOALS=window.ZF_GOALS;
+const LB=Object.fromEntries(L.map(l=>[l.id,l]));
+const isFree=r=>r.k!=="book"&&!r.paid;
+const byId=Object.fromEntries(T.map(t=>[t.id,t]));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KIND={play:"Try it / interactive",watch:"Watch",free:"Free course or textbook",book:"Book",read:"Article, blog or magazine",journal:"Research & journals",join:"Compete & join"};
+const LVL={1:["l1","Start here"],2:["l2","Next step"],3:["l3","Deep dive"]};
+const app=document.getElementById("app");
+function coursesOf(t){ return [...new Set(t.path.map(p=>p[0]))]; }
+
+/* ---------------- HOME ---------------- */
+function home(){
+ document.getElementById("homeLink").style.display="none";
+ let h=`<h2>Start from your class</h2><p class="sub">Pick the course you're taking to see where its math is used.</p><div class="chips">`;
+ for(const id in C) h+=`<a class="chip" href="#from-${id}">${esc(C[id].n)}</a>`;
+ h+=`</div><h2>Best free places to start</h2><p class="sub">All free. Pick one tonight.</p><div class="top12">${TOP.map(x=>`<a class="tp" href="${esc(x.u)}" target="_blank" rel="noopener"><b>${esc(x.t)} ↗ <span class="free">FREE</span></b><div class="by">${esc(x.by)}</div><p>${esc(x.d)}</p><div class="f">Field: ${byId[x.f].icon} ${esc(byId[x.f].name)}</div></a>`).join("")}</div>
+ <h2>Which programming language should I learn?</h2><p class="sub">Python, Java, JavaScript, SQL, R, C++ and more: what each one is for, which careers use it, and free places to learn.</p><a class="pill" href="#coding" style="background:#111;color:#fff">Open the coding-language guide →</a>`;
+ h+=`<p class="sub">Twelve fields where your math is used today.</p><div class="grid">`;
+ for(const t of T) h+=`<a class="card" href="#${t.id}" style="--c:${t.color}"><span class="ic">${t.icon}</span><b>${esc(t.name)}</b><p>${esc(t.hook)}</p><div class="from">Built on: ${coursesOf(t).map(c=>esc(C[c].n)).join(" · ")}</div></a>`;
+ h+=`</div><h2>The map: which class leads to which field</h2><p class="sub">Each number counts the concepts from that class that the field uses. Tap a number to jump there.</p><div class="mapwrap"><table class="map"><tr><th>Your class ↓ &nbsp; Field →</th>`;
+ for(const t of T) h+=`<th style="--c:${t.color}"><a href="#${t.id}">${t.icon}<br>${esc(t.name.replace(/ \(.*\)/,""))}</a></th>`;
+ h+=`</tr>`;
+ for(const id in C){ h+=`<tr><td><a class="course" href="#from-${id}">${esc(C[id].n)}</a></td>`;
+  for(const t of T){ const n=t.path.filter(p=>p[0]===id).length; h+=`<td>${n?`<a class="dot" style="--c:${t.color}" href="#${t.id}" title="${esc(C[id].n)} → ${esc(t.name)}">${n}</a>`:""}</td>`; }
+  h+=`</tr>`; }
+ h+=`</table></div>`;
+ h+=`<h2>Explore any topic</h2><p class="sub">Magazines, video channels, free courses and competitions for curious students.</p>${resGrid(G,false)}`;
+ app.innerHTML=h;
+}
+
+/* ---------------- FROM A COURSE ---------------- */
+function fromCourse(id){
+ const c=C[id]; if(!c) return home();
+ document.getElementById("homeLink").style.display="";
+ let h=`<div class="thead" style="--c:#111"><h2>Where ${esc(c.n)} leads</h2><p>Every concept from ${esc(c.n)} that these fields use, and what it does there.</p></div>`;
+ h+=`<p><a class="pill" href="${c.href}">Open ${esc(c.n)} →</a> <a class="pill" href="#coding">Which programming language? →</a></p>`;
+ let any=false;
+ for(const t of T){ const rows=t.path.filter(p=>p[0]===id); if(!rows.length) continue; any=true;
+  h+=`<div class="box" style="--c:${t.color};border-left:6px solid ${t.color};margin-top:12px"><h3><a href="#${t.id}" style="color:${t.color};text-decoration:none">${t.icon} ${esc(t.name)} →</a></h3><table class="path">${rows.map(r=>`<tr><td class="cc">${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join("")}</table></div>`; }
+ if(!any) h+=`<p>No links yet.</p>`;
+ h+=`<h2>Other classes</h2><div class="chips">${Object.keys(C).map(k=>`<a class="chip" href="#from-${k}"${k===id?' aria-current="true"':""}>${esc(C[k].n)}</a>`).join("")}</div>`;
+ app.innerHTML=h; scrollTo(0,0);
+}
+
+/* ---------------- TOPIC ---------------- */
+function resGrid(list,withFilters,tid){
+ const kinds=[...new Set(list.map(r=>r.k))];
+ let h="";
+ if(withFilters){ h+=`<div class="filters" data-for="${tid}"><button aria-pressed="true" data-k="all">All</button><button aria-pressed="false" data-k="free">FREE only</button>${kinds.map(k=>`<button aria-pressed="false" data-k="${k}">${esc(KIND[k])}</button>`).join("")}</div>`; }
+ const sorted=[...list].sort((a,b)=>(a.l||0)-(b.l||0));
+ h+=`<div class="res">${sorted.map(r=>`<div class="r" data-k="${r.k}" data-free="${isFree(r)?1:0}"><div class="k">${r.l?`<span class="lvl ${LVL[r.l][0]}">${LVL[r.l][1]}</span>`:""}${esc(KIND[r.k])}${isFree(r)?'<span class="free">FREE</span>':r.k==="book"?'<span class="lib">library or bookstore</span>':'<span class="lib">library access</span>'}</div>${r.u?`<a class="t" href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)} ↗</a>`:`<span class="t">${esc(r.t)}</span>`}${r.by?`<div class="by">${esc(r.by)}</div>`:""}<p>${esc(r.d)}</p></div>`).join("")}</div>`;
+ return h;
+}
+function topic(id){
+ const t=byId[id]; if(!t) return home();
+ document.getElementById("homeLink").style.display="";
+ const i=T.indexOf(t), prev=T[(i+T.length-1)%T.length], next=T[(i+1)%T.length];
+ let h=`<div style="--c:${t.color}"><div class="thead"><span class="ic">${t.icon}</span><h2>${esc(t.name)}</h2><p>${esc(t.hook)}</p></div>
+ <div class="two"><div class="box"><h3>What it is</h3><p style="margin:0">${esc(t.what)}</p></div>
+ <div class="box"><h3>Where you see it</h3><ul>${t.see.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div></div>
+ <h2 style="color:${t.color}">Which math leads here</h2><p class="sub">Follow the path from left to right to dig deeper.</p>
+ <div class="chain">${t.chain.map(c=>`<span>${esc(c)}</span>`).join("<i>→</i>")}</div>
+ <h2 style="color:${t.color}">Which concept is used where</h2><p class="sub">Tap a class to open its Z-book.</p>
+ <table class="path">${t.path.map(p=>`<tr><td><a class="cn" href="${C[p[0]].href}">${esc(C[p[0]].n)}</a><br><span class="cc">${esc(p[1])}</span></td><td>${esc(p[2])}</td></tr>`).join("")}</table>
+ ${(window.ZF_CODE||{})[t.id]?`<div class="note" style="--c:${t.color};margin-top:12px"><b>How it's coded in practice:</b> ${window.ZF_CODE[t.id].langs.map(x=>`<a class="lchip" style="--c:${LB[x].c}" href="#coding-${x}">${esc(LB[x].n)}</a>`).join(" ")}<p style="margin:6px 0 0">${esc(window.ZF_CODE[t.id].why)}</p><p style="margin:6px 0 0;font-size:15px;color:#555">The AP CS A rows above are about the <i>ideas</i> (loops, arrays, classes). The class teaches them in Java; in this field you would write them in the languages listed here.</p></div>`:""}
+ ${t.demo?`<div class="demo" id="demo"></div>`:""}
+ <h2 style="color:${t.color}">Dig deeper</h2><p class="sub">Start with green, then move to orange and purple.</p>
+ ${resGrid(t.res,true,t.id)}
+ ${t.langs?`<h2 style="color:${t.color}">Programming languages used here</h2><p class="sub">Start with the first one. Tap for free places to learn it.</p><div>${t.langs.map(x=>`<a class="lchip" style="--c:${LB[x].c}" href="#coding-${x}">${esc(LB[x].n)}</a>`).join("")}</div>`:""}
+ <h2 style="color:${t.color}">Careers that use it</h2><div class="careers">${t.careers.map(c=>`<span>${esc(c)}</span>`).join("")}</div>
+ <div class="nav2"><a class="pill" href="#${prev.id}">← ${prev.icon} ${esc(prev.name)}</a><a class="pill" href="#${next.id}">${next.icon} ${esc(next.name)} →</a></div></div>`;
+ app.innerHTML=h; scrollTo(0,0);
+ app.querySelectorAll(".filters button").forEach(b=>b.onclick=()=>{ const k=b.dataset.k;
+  app.querySelectorAll(".filters button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  app.querySelectorAll(".res .r").forEach(r=>r.style.display=(k==="all"||r.dataset.k===k||(k==="free"&&r.dataset.free==="1"))?"":"none"); });
+ if(t.demo) DEMOS[t.demo](document.getElementById("demo"));
+}
+
+/* ---------------- CODING ---------------- */
+function coding(sel){
+ document.getElementById("homeLink").style.display="";
+ const usedIn=id=>T.filter(t=>(t.langs||[]).includes(id));
+ let h=`<div class="thead" style="--c:#111"><h2>Which programming language for what?</h2><p>Every field on this site needs some coding. Here is which language to pick for which problems and careers, and where to learn it free.</p></div>
+ <div class="note" style="--c:#2a7a46"><b>Short answer:</b> if you're in AP CS A, master <b>Java</b> for the exam, then learn <b>Python</b>: it's the main language of AI, data science and research, and the one most fields on this site use. Add <b>SQL</b> for any data job, <b>R</b> for statistics, <b>C++</b> where speed matters, and <b>JavaScript</b> for the web. Once you know one language well, the next one takes weeks, not years: loops, conditions, arrays and functions are the same ideas everywhere.</div>
+ <h2>The big five, side by side</h2><p class="sub">The languages you'll meet most in math, data and AI careers.</p><div class="mapwrap"><table class="goals cmpt"><tr><th></th><th>Python</th><th>SQL</th><th>R</th><th>C++</th><th>Java</th></tr>
+ <tr><td><b>Main job</b></td><td>AI, data, science, automation</td><td>Getting data out of databases</td><td>Statistics and research</td><td>Speed: engines, robots, AI cores</td><td>Big business systems, Android, AP CS A</td></tr>
+ <tr><td><b>How hard to start</b></td><td>Easiest</td><td>Easy</td><td>Medium</td><td>Hardest</td><td>Medium</td></tr>
+ <tr><td><b>Speed</b></td><td>Slow alone, fast with libraries</td><td>Depends on the database</td><td>Slow alone, fast with libraries</td><td>Fastest</td><td>Fast</td></tr>
+ <tr><td><b>Used with</b></td><td>SQL, C++ underneath</td><td>Python, R, Excel</td><td>SQL</td><td>Python on top</td><td>SQL</td></tr>
+ <tr><td><b>Biggest limit</b></td><td>Not for speed-critical code or phone apps</td><td>Not a full programming language</td><td>Little use outside statistics</td><td>Slow to write, easy to make bugs</td><td>Wordy; few data/AI tools</td></tr>
+ <tr><td><b>Typical jobs</b></td><td>Data scientist, ML engineer, researcher</td><td>Data analyst, every data job</td><td>Biostatistician, research analyst</td><td>Game, robotics, trading engineer</td><td>Back-end and Android developer</td></tr></table></div>
+ <p class="sub">A common path: <b>Java</b> in AP CS A → <b>Python</b> → <b>SQL</b>. Add <b>R</b> for statistics, or <b>C++</b> for games, robotics and competitive programming.</p>
+ <h2>Pick by goal</h2><table class="goals">${GOALS.map(([g,l,a])=>`<tr><td>${esc(g)}</td><td><a class="lchip" style="--c:${LB[l].c}" href="#coding-${l}">${esc(LB[l].n)}</a> ${esc(a)}</td></tr>`).join("")}</table>
+ <h2>The languages</h2><p class="sub">All the learning links below are free.</p><div class="langs">`;
+ for(const l of L){ const u=usedIn(l.id);
+  h+=`<div class="lang${l.id===sel?" hl":""}" id="lang-${l.id}" style="--c:${l.c}"><h3>${esc(l.n)}</h3><div class="lv">${esc(l.lvl)}</div><p style="margin:6px 0">${esc(l.why)}</p>
+  <b>Best for</b><ul>${l.best.map(b=>`<li>${esc(b)}</li>`).join("")}</ul>${(window.ZF_LANGX||{})[l.id]?(()=>{ const x=window.ZF_LANGX[l.id]; return `<details class="pc"><summary>Pros, cons and limits</summary><b style="color:#166534">Pros</b><ul>${x.pros.map(b=>`<li>${esc(b)}</li>`).join("")}</ul><b style="color:#991b1b">Cons</b><ul>${x.cons.map(b=>`<li>${esc(b)}</li>`).join("")}</ul><p style="margin:4px 0"><b>When to use it:</b> ${esc(x.limits)}</p></details>`; })():""}<div class="sec"><b>Sectors:</b> ${esc(l.sectors)}</div>
+  ${u.length?`<div class="ff"><b>Fields on this site:</b> ${u.map(t=>`<a href="#${t.id}" style="color:${t.color};text-decoration:none;font-weight:600">${t.icon} ${esc(t.name)}</a>`).join(" · ")}</div>`:""}
+  <div class="lr" style="margin-top:8px"><b>Learn it free</b>${l.res.map(r=>`<a href="${esc(r.u)}"${r.u.startsWith("http")?' target="_blank" rel="noopener"':""}>${esc(r.t)}${r.u.startsWith("http")?" ↗":" →"}${r.by?` <span>${esc(r.by)}</span>`:""}</a>`).join("")}</div></div>`; }
+ h+=`</div><h2>Practice in any language</h2>${resGrid([
+  {k:"play",t:"Exercism",u:"https://exercism.org",d:"Free coding exercises in 70+ languages, with mentors."},
+  {k:"play",t:"Project Euler",u:"https://projecteuler.net",d:"Math problems you solve by writing programs."},
+  {k:"join",t:"USA Computing Olympiad (USACO)",u:"https://usaco.org",d:"Free online contests; the USACO Guide teaches the algorithms."},
+  {k:"free",t:"CS50x",by:"Harvard",u:"https://cs50.harvard.edu/x/",d:"The famous free intro to computer science: C, Python, SQL, web."}],false)}`;
+ app.innerHTML=h;
+ if(sel){ const el=document.getElementById("lang-"+sel); if(el) setTimeout(()=>el.scrollIntoView({block:"start"}),30); } else scrollTo(0,0);
+}
+
+/* ---------------- DEMOS ---------------- */
+const f4=x=>(Math.round(x*10000)/10000).toString();
+const DEMOS={
+ gd(el){
+  el.innerHTML=`<h3>Try it: gradient descent</h3><p style="margin:0">A model's error is f(x) = (x − 3)² + 1. The computer doesn't know the bottom is at x = 3. It only knows the slope f′(x) = 2(x − 3), and keeps stepping downhill: <b>x<sub>new</sub> = x − (learning rate) · f′(x)</b>.</p>
+  <div class="row"><label>Start x<input type="number" id="g0" value="-4" step="any"></label><label>Learning rate: <span id="glr">0.20</span><input type="range" id="gr" min="0.02" max="1.1" step="0.02" value="0.2"></label>
+  <button class="go" id="gs">Take a step</button><button class="go alt" id="gx">Reset</button></div>
+  <svg id="gsv" viewBox="0 0 520 260"></svg><div class="out" id="go"></div>
+  <div class="note">Try a learning rate of 0.9, then 1.05. Too small is slow; too big jumps back and forth or runs away. Choosing it well is a real problem in AI.</div>`;
+  let pts=[]; const F=x=>(x-3)**2+1, sx=x=>40+(x+6)*(440/18), sy=y=>240-y*(220/100);
+  function draw(){ let p=""; for(let x=-6;x<=12.01;x+=0.1){ const y=F(x); if(y<=100) p+=(p?"L":"M")+sx(x).toFixed(1)+","+sy(y).toFixed(1); }
+   let s=`<line x1="40" y1="240" x2="480" y2="240" stroke="#999"/><path d="${p}" fill="none" stroke="#1f5fa8" stroke-width="2.5"/>`;
+   for(let i=1;i<pts.length;i++){ const a=pts[i-1],b=pts[i]; if(F(a)<=100&&F(b)<=100) s+=`<line x1="${sx(a)}" y1="${sy(F(a))}" x2="${sx(b)}" y2="${sy(F(b))}" stroke="#b03a2e" stroke-dasharray="4 3"/>`; }
+   pts.forEach((x,i)=>{ if(F(x)<=100&&x>=-6&&x<=12) s+=`<circle cx="${sx(x)}" cy="${sy(F(x))}" r="${i===pts.length-1?6:4}" fill="${i===pts.length-1?"#b03a2e":"#e9a59c"}"/>`; });
+   s+=`<text x="${sx(3)}" y="255" text-anchor="middle" font-size="12">x = 3</text>`;
+   el.querySelector("#gsv").innerHTML=s; const x=pts[pts.length-1];
+   el.querySelector("#go").innerHTML=`Step ${pts.length-1}: x = <span class="big">${f4(x)}</span>, error f(x) = ${f4(F(x))}, slope f′(x) = ${f4(2*(x-3))}${Math.abs(x)>1e6?" — it ran away!":Math.abs(x-3)<0.001?" — found the bottom!":""}`; }
+  function reset(){ pts=[parseFloat(el.querySelector("#g0").value)||0]; draw(); }
+  el.querySelector("#gr").oninput=e=>el.querySelector("#glr").textContent=(+e.target.value).toFixed(2);
+  el.querySelector("#gs").onclick=()=>{ const x=pts[pts.length-1], lr=+el.querySelector("#gr").value; pts.push(x-lr*2*(x-3)); draw(); };
+  el.querySelector("#gx").onclick=reset; el.querySelector("#g0").oninput=reset; reset();
+ },
+ neuron(el){
+  el.innerHTML=`<h3>Try it: one artificial neuron</h3><p style="margin:0">A neuron computes <b>z = w₁x₁ + w₂x₂ + b</b>, then squashes it with the sigmoid <b>σ(z) = 1/(1 + e<sup>−z</sup>)</b> to get a number between 0 and 1. Example: should I go outside? x₁ = how sunny (0–10), x₂ = how much homework (0–10).</p>
+  <div class="row">${[["x1","x₁ sunny",8],["x2","x₂ homework",3],["w1","weight w₁",0.6],["w2","weight w₂",-0.9],["b","bias b",0]].map(([k,l,v])=>`<label>${l}<input type="number" step="any" id="n${k}" value="${v}"></label>`).join("")}</div>
+  <div class="out" id="no"></div><div class="note">A positive weight pushes toward “yes”, a negative weight toward “no”. Training means the computer adjusts w₁, w₂ and b by itself. A chatbot has billions of these weights.</div>`;
+  const run=()=>{ const g=k=>parseFloat(el.querySelector("#n"+k).value)||0; const z=g("w1")*g("x1")+g("w2")*g("x2")+g("b"), s=1/(1+Math.exp(-z));
+   el.querySelector("#no").innerHTML=`z = ${f4(g("w1"))}·${f4(g("x1"))} + (${f4(g("w2"))})·${f4(g("x2"))} + ${f4(g("b"))} = <b>${f4(z)}</b><br>σ(z) = <span class="big">${f4(s)}</span> → ${s>=0.5?"“Yes, go outside!”":"“No, stay in.”"}`; };
+  el.querySelectorAll("input").forEach(i=>i.oninput=run); run();
+ },
+ pd(el){
+  el.innerHTML=`<h3>Try it: the repeated prisoner's dilemma</h3><p style="margin:0">Each round you <b>cooperate</b> or <b>cheat</b>. Both cooperate: 3 points each. Both cheat: 1 each. If one cheats and the other cooperates: cheater 5, cooperator 0. Cheating is always better for one round. So why does cooperation win in the long run?</p>
+  <div class="row"><label>Opponent<select id="po"><option value="copy">Copycat (does what you did last round)</option><option value="cheat">Always cheats</option><option value="coop">Always cooperates</option><option value="grudge">Grudger (cooperates until you cheat once)</option><option value="rand">Random</option></select></label></div>
+  <div class="row"><button class="go" id="pc">🤝 Cooperate</button><button class="go alt" id="pd">😈 Cheat</button><button class="go alt" id="pr">Restart</button></div>
+  <div class="out" id="pout"></div><div class="hist" id="ph"></div>
+  <div class="note">Play 10 rounds against Copycat by always cheating, then by always cooperating. Compare your scores. This is the idea from Axelrod's tournaments and “The Evolution of Trust”.</div>`;
+  let me=[],op=[],ms=0,os=0; const P={CC:[3,3],CD:[0,5],DC:[5,0],DD:[1,1]};
+  function opp(){ const s=el.querySelector("#po").value, n=me.length;
+   if(s==="copy") return n?me[n-1]:"C"; if(s==="cheat") return "D"; if(s==="coop") return "C"; if(s==="grudge") return me.includes("D")?"D":"C"; return Math.random()<.5?"C":"D"; }
+  function play(m){ const o=opp(); me.push(m); op.push(o); const [a,b]=P[m+o]; ms+=a; os+=b; show(); }
+  function show(){ const sym=x=>x==="C"?"🤝":"😈";
+   el.querySelector("#pout").innerHTML=me.length?`Round ${me.length}: you ${sym(me.at(-1))}, opponent ${sym(op.at(-1))}. Score: <span class="big">you ${ms} · them ${os}</span>`:"Make your first move.";
+   el.querySelector("#ph").innerHTML=me.length?`You:&nbsp;&nbsp;${me.map(sym).join(" ")}<br>Them: ${op.map(sym).join(" ")}`:""; }
+  el.querySelector("#pc").onclick=()=>play("C"); el.querySelector("#pd").onclick=()=>play("D");
+  const reset=()=>{me=[];op=[];ms=0;os=0;show();}; el.querySelector("#pr").onclick=reset; el.querySelector("#po").onchange=reset; show();
+ },
+ bayes(el){
+  el.innerHTML=`<h3>Try it: what does a positive test really mean?</h3><p style="margin:0">A disease affects some people. A test catches most sick people, but sometimes says “positive” for healthy people too. If you test positive, what's the chance you're actually sick?</p>
+  <div class="row"><label>Have the disease (%)<input type="number" id="bp" value="1" step="any"></label><label>Test catches sick people (%)<input type="number" id="bs" value="99" step="any"></label><label>False positives in healthy people (%)<input type="number" id="bf" value="5" step="any"></label></div>
+  <div class="out" id="bo"></div><div class="note">This is Bayes' theorem: P(sick | positive) = P(positive | sick)·P(sick) / P(positive). Doctors, judges and data scientists all need it.</div>`;
+  const run=()=>{ const g=k=>Math.min(100,Math.max(0,parseFloat(el.querySelector("#b"+k).value)||0))/100; const p=g("p"),s=g("s"),f=g("f"), N=10000;
+   const sick=N*p, tp=sick*s, fp=(N-sick)*f, post=(tp+fp)?tp/(tp+fp):0;
+   el.querySelector("#bo").innerHTML=`Out of <b>10,000</b> people: <b>${Math.round(sick)}</b> are sick, and <b>${Math.round(tp)}</b> of them test positive. Of the <b>${Math.round(N-sick)}</b> healthy people, <b>${Math.round(fp)}</b> also test positive.<br>So of ${Math.round(tp+fp)} positive tests, only ${Math.round(tp)} are really sick: <span class="big">P(sick | positive) = ${(post*100).toFixed(1)}%</span>`; };
+  el.querySelectorAll("input").forEach(i=>i.oninput=run); run();
+ },
+ rsa(el){
+  el.innerHTML=`<h3>Try it: mini RSA encryption</h3><p style="margin:0">Pick two primes p and q. The public key is (n = pq, e); the private key d undoes it. Real RSA uses primes with hundreds of digits.</p>
+  <div class="row"><label>prime p<input type="number" id="rp" value="61"></label><label>prime q<input type="number" id="rq" value="53"></label><label>message m (a number less than n)<input type="number" id="rm" value="65"></label></div>
+  <div class="out" id="ro"></div><div class="note">Anyone can encrypt with the public (n, e). To find d you need φ = (p − 1)(q − 1), and for that you need to factor n into p and q. For a 600-digit n, nobody knows how to do that in a reasonable time.</div>`;
+  const isP=n=>{ if(n<2||n!==Math.floor(n))return false; for(let i=2;i*i<=n;i++) if(n%i===0) return false; return true; };
+  const gcd=(a,b)=>b?gcd(b,a%b):a;
+  const inv=(a,m)=>{ let [o,r]=[a,m],[s,ns]=[1,0]; while(r){ const q=Math.floor(o/r); [o,r]=[r,o-q*r]; [s,ns]=[ns,s-q*ns]; } return ((s%m)+m)%m; };
+  const pw=(b,e,m)=>{ let r=1n,B=BigInt(b)%BigInt(m),E=BigInt(e),M=BigInt(m); while(E>0n){ if(E&1n) r=r*B%M; B=B*B%M; E>>=1n; } return r; };
+  const run=()=>{ const p=+el.querySelector("#rp").value,q=+el.querySelector("#rq").value,m=+el.querySelector("#rm").value, o=el.querySelector("#ro");
+   if(!isP(p)||!isP(q)||p===q||p>100000||q>100000){ o.innerHTML="Please choose two different prime numbers (under 100,000)."; return; }
+   const n=p*q, ph=(p-1)*(q-1); let e=3; while(gcd(e,ph)!==1) e+=2; const d=inv(e,ph);
+   if(!(m>=0&&m<n&&m===Math.floor(m))){ o.innerHTML=`m must be a whole number from 0 to ${n-1}.`; return; }
+   const c=pw(m,e,n), back=pw(c,d,n);
+   o.innerHTML=`n = ${p}·${q} = <b>${n}</b>, φ = ${p-1}·${q-1} = ${ph}<br>Public key: e = <b>${e}</b> (shares no factor with φ) · Private key: d = <b>${d}</b> (because e·d mod φ = 1)<br>Encrypt: c = m<sup>e</sup> mod n = ${m}<sup>${e}</sup> mod ${n} = <span class="big">${c}</span><br>Decrypt: c<sup>d</sup> mod n = ${c}<sup>${d}</sup> mod ${n} = <span class="big">${back}</span> ✓ the original message`; };
+  el.querySelectorAll("input").forEach(i=>i.oninput=run); run();
+ },
+ logistic(el){
+  el.innerHTML=`<h3>Try it: when simple rules become chaos</h3><p style="margin:0">The logistic map <b>x<sub>next</sub> = r · x · (1 − x)</b> models a population (as a fraction of the maximum). Slide r and watch what happens.</p>
+  <div class="row"><label>growth rate r: <span id="lr">2.80</span><input type="range" id="lrr" min="2.5" max="4" step="0.01" value="2.8"></label><label>start x₀<input type="number" id="lx" value="0.2" step="0.01"></label><label>second start (tiny change)<input type="number" id="lx2" value="0.2001" step="0.0001"></label></div>
+  <svg id="lsv" viewBox="0 0 520 240"></svg><div class="out" id="lo"></div>
+  <div class="note">Try r = 2.8 (settles down), 3.2 (bounces between 2 values), 3.5 (4 values), 3.9 (chaos). With chaos, the two lines start almost equal and soon look nothing alike: the “butterfly effect”, and the reason weather forecasts can't go out more than a couple of weeks.</div>`;
+  const run=()=>{ const r=+el.querySelector("#lrr").value; el.querySelector("#lr").textContent=r.toFixed(2);
+   const seq=x=>{ const a=[x]; for(let i=0;i<50;i++){ x=r*x*(1-x); a.push(x);} return a; };
+   const A=seq(+el.querySelector("#lx").value||0), B=seq(+el.querySelector("#lx2").value||0);
+   const sx=i=>30+i*(470/50), sy=y=>220-Math.max(0,Math.min(1,y))*200;
+   const line=(a,c)=>`<polyline fill="none" stroke="${c}" stroke-width="2" points="${a.map((y,i)=>sx(i).toFixed(1)+","+sy(y).toFixed(1)).join(" ")}"/>`;
+   el.querySelector("#lsv").innerHTML=`<line x1="30" y1="220" x2="500" y2="220" stroke="#999"/><line x1="30" y1="20" x2="30" y2="220" stroke="#999"/><text x="34" y="16" font-size="12">1</text><text x="34" y="234" font-size="12">0</text><text x="440" y="234" font-size="12">step 50</text>${line(B,"#e9a2c8")}${line(A,"#a8326e")}`;
+   el.querySelector("#lo").innerHTML=`Last 4 values: ${A.slice(-4).map(f4).join(", ")}`; };
+  el.querySelectorAll("input").forEach(i=>i.oninput=run); run();
+ },
+ compound(el){
+  el.innerHTML=`<h3>Try it: the power of compound interest</h3><p style="margin:0"><b>A = P(1 + r/n)<sup>nt</sup></b>, an exponential function from Algebra 2.</p>
+  <div class="row"><label>Start amount P ($)<input type="number" id="cp" value="1000" step="any"></label><label>Yearly rate r (%)<input type="number" id="cr" value="7" step="any"></label><label>Years t<input type="number" id="ct" value="40" step="1"></label><label>Times per year n<input type="number" id="cn" value="12" step="1"></label></div>
+  <div class="out" id="co"></div><div class="note">Doubling time = ln 2 / (n·ln(1 + r/n)). With r = 7% that is about 10 years (rule of 72: 72 ÷ 7 ≈ 10). Starting at 15 instead of 25 gives your money one more doubling.</div>`;
+  const run=()=>{ const g=k=>parseFloat(el.querySelector("#c"+k).value)||0; const P=g("p"),r=g("r")/100,t=g("t"),n=Math.max(1,g("n"));
+   const A=P*Math.pow(1+r/n,n*t), S=P*(1+r*t), dbl=r>0?Math.log(2)/(n*Math.log(1+r/n)):Infinity, money=x=>"$"+x.toLocaleString(undefined,{maximumFractionDigits:0});
+   el.querySelector("#co").innerHTML=`Compound interest: <span class="big">${money(A)}</span><br>Simple interest (no compounding): ${money(S)}<br>Doubling time: ${isFinite(dbl)?dbl.toFixed(1)+" years":"never"}`; };
+  el.querySelectorAll("input").forEach(i=>i.oninput=run); run();
+ }
+};
+
+/* ---------------- ROUTER ---------------- */
+function route(){ const h=decodeURIComponent(location.hash.slice(1));
+ if(h==="coding") coding(); else if(h.startsWith("coding-")) coding(h.slice(7)); else if(h.startsWith("from-")) fromCourse(h.slice(5)); else if(byId[h]) topic(h); else home(); }
+document.getElementById("homeLink").onclick=e=>{ e.preventDefault(); location.hash=""; home(); scrollTo(0,0); };
+addEventListener("hashchange",route); route();
+</script>
+</body>
+</html>
