@@ -58,18 +58,20 @@ function bindPanel(box,levels){ PANELS.set(box,{levels,lv:0,mode:"prob"}); const
   box.querySelectorAll("[data-mcm]").forEach(b=>b.onclick=()=>{ S.mode=b.dataset.mcm; box.querySelectorAll("[data-mcm]").forEach(x=>x.classList.toggle("on",x===b)); render(box); });
   box.querySelector("[data-mcn]").onclick=()=>render(box); render(box); }
 /* interactive step-by-step labs for Algebra 1 Systems (Algebra 2 adds its own in methods.js) */
-const LAB1={s1:"graph",s2:"sub",s3:"elim",s4:"cramer"};
+const LAB1={s1:"graph",s2:"sub",s3:"elim",s4:"cramer",graph:"graph",sub:"sub",elim:"elim",cr2:"cramer",inv:"inverse",el3:"elim3"}, S31={gauss:"gauss",cr3:"sar",sar:"sar",form:"aug",cls:"cls",p3:"cls"};
 function addCard(d){ const mf=d.previousElementSibling; if(!mf||!mf.classList.contains("mf")) return; const k=d.dataset.k, card=d.querySelector(".mf-dc"); if(!k||!card||card.querySelector(".mc-wrap")) return;
   const flow=mf.dataset.flow||"", name=(card.querySelector("h4")||{}).textContent||"this method";
   const F0=window.__ZFLOWS&&window.__ZFLOWS[flow]; const m={name,key:k,hint:(mf.querySelector(`[data-fm="${k}"] span`)||{}).textContent||""};
   let levels=[], lab="";
-  if(window.ZC){ const uid=flow.replace(/^f-/,""); levels=levelsAlg1(uid,m); if(uid==="sys"&&LAB1[k]&&window.ZSYS) lab=ZSYS.html({methods:[LAB1[k]],lead:`Solve a new system with ${name}, one step at a time. Each box turns <span class="zs-ok">green</span> when it's right and <span class="zs-no">red</span> when it's not.`}); }
+  const zu=mf.closest(".zu"), uidOf=()=>flow.startsWith("f-")?flow.slice(2):((zu&&zu.id||"").replace(/^sec-/,"")||flow);
+  if(window.ZC){ const uid=uidOf(); levels=levelsAlg1(uid,m); if(uid==="sys"&&LAB1[k]&&window.ZSYS) lab=ZSYS.html({methods:[LAB1[k]],lead:`Solve a new system with ${name}, one step at a time. Each box turns <span class="zs-ok">green</span> when it's right and <span class="zs-no">red</span> when it's not.`}); else if(uid==="sys"&&S31[k]&&window.A2S3) lab=A2S3.html(); }
   else { const sec=(mf.closest("section.unit")||{}).id||""; levels=levelsAlg2(sec.replace(/^sec-/,""),m); }
-  let whole=false; if(!levels.length){ m.all=true; whole=true; levels=window.ZC?levelsAlg1(flow.replace(/^f-/,""),m):levelsAlg2(((mf.closest("section.unit")||{}).id||"").replace(/^sec-/,""),m); }
+  let whole=false; if(!levels.length){ m.all=true; whole=true; levels=window.ZC?levelsAlg1(uidOf(),m):levelsAlg2(((mf.closest("section.unit")||{}).id||"").replace(/^sec-/,""),m); }
   if(!levels.length&&!lab) return;
   const w=document.createElement("div"); w.className="mc-wrap"; w.innerHTML=`<h5>📚 Practice: ${whole?"this whole unit (mixed)":name}</h5>${build(levels,lab)}`;
   const before=card.querySelector(".mf-tip,.fx-go:not(.mf-gen)"); before?card.insertBefore(w,before):card.appendChild(w);
-  bindPanel(w.querySelector(".mc"),levels); }
+  bindPanel(w.querySelector(".mc"),levels);
+  const s3=w.querySelector(".mc-lab .s3lab"); if(s3&&window.A2S3){ A2S3.bind(w); const b=s3.querySelector(`.s3mode [data-m="${S31[k]}"]`); if(b) b.click(); } }
 const mo=new MutationObserver(()=>{ document.querySelectorAll(".mf + .mf-d,.mf-d").forEach(d=>{ if(d.dataset.k) addCard(d); }); });
 const go=()=>{ mo.observe(document.body,{childList:true,subtree:true}); document.querySelectorAll(".mf-d").forEach(d=>d.dataset.k&&addCard(d)); };
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",go); else go();
@@ -93,7 +95,8 @@ const css=`.mc-wrap{margin:14px 0 6px;border-top:2px solid var(--c,#1d4e89);padd
 .mc-fb .yes{color:#137333;font-weight:700}.mc-fb .no{color:#b3261e;font-weight:700}
 .mc-card{border:1.5px solid #111;background:#fff;padding:10px 12px}.mc-k{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:#555}.mc-cq{font-size:18px}
 .mc-db{display:flex;gap:8px;margin-top:8px}.mc-db .ok{border-color:#1a7f37;color:#1a7f37}.mc-db .bad{border-color:#c5221f;color:#c5221f}
-.mc-note{font-style:italic;color:#555}`;
+.mc-note{font-style:italic;color:#555}
+.mc-lab .s3lab>.lead2{display:none}`;
 const st=document.createElement("style"); st.textContent=css; document.head.appendChild(st);
 window.MCARD={addCard,_t:{levelsAlg1,levelsAlg2,matchGens,tok}};
 })();
