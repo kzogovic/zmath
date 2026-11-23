@@ -147,7 +147,7 @@ function drawPlot(box,S,O){
 /* ---------- solved example view ---------- */
 const KINDS={one:"Exactly one solution",none:"No solution",inf:"Infinitely many solutions"};
 function exampleHTML(S){ const O=solveAll(S);
-  const M=[["gauss","Gauss (augmented matrix)",gaussHTML],["gj","Gauss–Jordan (RREF)",gjHTML],["elim","Elimination with equations",elimHTML],["cramer","Cramer's rule",cramerHTML],["inv","Inverse matrix",inverseHTML]];
+  const M=[["gauss","Gauss (augmented matrix)",gaussHTML],["gj","Gauss–Jordan (RREF)",gjHTML],["elim","Elimination with equations",elimHTML],["cramer","Cramer's rule",cramerHTML],["sar","Sarrus' rule",sarrusHTML],["inv","Inverse matrix",inverseHTML]];
   return {O,html:`<div class="s3ex"><div class="s3q"><span class="s3tag ${O.G.kind}">${KINDS[O.G.kind]}</span><div class="s3qs">Solve:${sysHTML(S.M)}</div></div>
    <div class="s3tabs">${M.map(([k,t],i)=>`<button type="button" data-t="${k}"${i?"":' class="on"'}>${t}</button>`).join("")}<button type="button" data-t="graph">3D graph</button></div>
    ${M.map(([k,,f],i)=>`<div class="s3pane" data-p="${k}"${i?" hidden":""}>${f(S,O)}</div>`).join("")}<div class="s3pane" data-p="graph" hidden>${plotHTML()}</div></div>`}; }
@@ -196,14 +196,49 @@ function practiceClass(box){ const kind=pick(["one","none","inf"]), T=genSystem(
     box.querySelector(".s3fb").innerHTML=`<p class="${ok?"yes":"no"}">${ok?"Correct!":"Not quite."} det A = ${O.D.h()}. ${O.D.z()?"det = 0, so not exactly one solution; Gauss decides:":"det ≠ 0, so exactly one solution."}</p>`;
     const ex=exampleHTML(T); box.querySelector(".s3sol").innerHTML=ex.html.replace(/<div class="s3q">[\s\S]*?<\/div><\/div>/,""); bindExample(box.querySelector(".s3sol"),T,ex.O); });
   box.querySelector('[data-a="new"]').onclick=()=>practiceClass(box); }
+/* ---------- Sarrus' rule (3 × 3 determinant): copy columns 1–2 to the right, ↘ products minus ↗ products ---------- */
+const SW=48, SH=34;
+const sarP=A=>{ A=A.map(r=>r.map(q)); const E=A.map(r=>[...r,r[0],r[1]]); const dn=[0,1,2].map(c=>E[0][c].mul(E[1][c+1]).mul(E[2][c+2])), up=[0,1,2].map(c=>E[2][c].mul(E[1][c+1]).mul(E[0][c+2])); const sd=dn.reduce((s,v)=>s.add(v),q(0)), su=up.reduce((s,v)=>s.add(v),q(0)); return {E,dn,up,sd,su,det:sd.sub(su)}; };
+function sarDiagram(A,inputs,show){ const S=sarP(A), cx=j=>SW*j+SW/2+8, cy=i=>SH*i+SH/2+4;
+  const cells=[]; for(let i=0;i<3;i++) for(let j=0;j<5;j++){ const v=S.E[i][j]; cells.push(`<div class="s3sc${j>2?" cp":""}" style="left:${SW*j+8}px;top:${SH*i+4}px">${j>2&&inputs?P_inp(`sc${i}${j}`,`row ${i+1}, copied column ${j-2}`,42):v.h()}</div>`); }
+  const L=[0,1,2].map(c=>`<line x1="${cx(c)}" y1="${cy(0)}" x2="${cx(c+2)}" y2="${cy(2)}" class="dn"/>`).join("")+[0,1,2].map(c=>`<line x1="${cx(c)}" y1="${cy(2)}" x2="${cx(c+2)}" y2="${cy(0)}" class="up"/>`).join("");
+  const W=SW*5+16, H=SH*3+8;
+  return `<div class="s3sar${show?" on":""}" style="width:${W}px;height:${H}px"><svg width="${W}" height="${H}" aria-hidden="true">${L}<path d="M8 2 h-6 v${H-4} h6" class="br"/><path d="M${SW*3+4} 2 h6 v${H-4} h-6" class="br"/><line x1="${SW*3+12}" y1="4" x2="${SW*3+12}" y2="${H-4}" class="sep"/></svg>${cells.join("")}</div>`; }
+function sarText(A){ const S=sarP(A), P=v=>v.n<0?`(${v.h()})`:v.h(), J=L=>L.map((v,i)=>i?P(v):v.h()).join(" + "); return `<p class="s3p"><span class="s3dn">↘</span> ${J(S.dn)} = ${S.sd.h()}<br><span class="s3up">↗</span> ${J(S.up)} = ${S.su.h()}</p><p class="s3p">det = ${S.sd.h()} − ${P(S.su)} = <b>${S.det.h()}</b></p>`; }
+function sarrusHTML(S,O){ const A=O.A, B=O.B, D=O.D, rep=j=>A.map((r,i)=>r.map((v,c)=>c===j?B[i]:v));
+  let h=`<p class="s3p">Rule of Sarrus (only for 3 × 3): copy the first two columns to the right. Multiply along the three <span class="s3dn">↘ blue</span> diagonals and add; multiply along the three <span class="s3up">↗ red</span> diagonals and add. det = (↘ sum) − (↗ sum).</p><p class="s3p"><b>D</b> = det A:</p>${sarDiagram(A,false,true)}${sarText(A)}`;
+  if(D.z()) return h+`<p>D = 0, so Cramer's rule can't be used: there is no unique solution. Use Gauss to decide between none and infinitely many.</p>`;
+  [0,1,2].map(j=>{ const M=rep(j), d=det3(M); h+=`<p class="s3p"><b>D<sub>${V[j]}</sub></b>: replace the ${V[j]}-column with the constants.</p>${sarDiagram(M,false,true)}${sarText(M)}<p class="s3ans">${V[j]} = D<sub>${V[j]}</sub> ÷ D = ${d.h()} / ${D.h()} = ${d.div(D).h()}</p>`; });
+  return h; }
+function practiceSarrus(box){ let T, O; for(let k=0;k<60;k++){ T=genSystem("one"); O=solveAll(T); if(Math.abs(O.D.val())<=60) break; }
+  const A=O.A, B=O.B, S=sarP(A), rep=j=>A.map((r,i)=>r.map((v,c)=>c===j?B[i]:v)), Ds=[0,1,2].map(j=>det3(rep(j)));
+  box.innerHTML=`<p class="s3p">Solve with Cramer's rule. Find each determinant with the rule of Sarrus. Whole numbers or fractions like −3/2.</p>${sysHTML(T.M)}
+   <p class="s3p"><b>Step 1.</b> Copy the first two columns of A to the right.</p><div data-o="dg">${sarDiagram(A,true,false)}</div>
+   <p class="s3p"><b>Step 2.</b> Multiply along each diagonal (any order).</p>
+   <div class="s3row"><span class="s3dn">↘ down</span> ${[0,1,2].map(k=>P_inp("d"+k,"down product "+(k+1),54)).join(" + ")}</div>
+   <div class="s3row"><span class="s3up">↗ up</span> ${[0,1,2].map(k=>P_inp("u"+k,"up product "+(k+1),54)).join(" + ")}</div>
+   <div class="s3row">D = (↘ sum) − (↗ sum) = ${P_inp("D","D",64)}</div>
+   <p class="s3p"><b>Step 3.</b> Replace one column with the constants and use Sarrus again.</p>
+   <div class="s3row">D<sub>x</sub> = ${P_inp("Dx","D x",64)} D<sub>y</sub> = ${P_inp("Dy","D y",64)} D<sub>z</sub> = ${P_inp("Dz","D z",64)}</div>
+   <p class="s3p"><b>Step 4.</b> Divide by D.</p>
+   <div class="s3row">x = ${P_inp("x","x")} y = ${P_inp("y","y")} z = ${P_inp("z","z")} <button type="button" class="s3b" data-a="chk">Check</button><button type="button" class="s3b o" data-a="sol">Show solution</button><button type="button" class="s3b o" data-a="new">↻ New system</button></div><div class="s3fb"></div><div class="s3sol"></div>`;
+  const fb=box.querySelector(".s3fb"), el=k=>box.querySelector(`[data-k="${k}"]`);
+  const mark=(k,want)=>{ const e=el(k), v=parse(e.value), ok=same(v,want); e.classList.toggle("ok",ok); e.classList.toggle("bad",!ok&&v!==null); return ok; };
+  const anyOrder=(keys,wants)=>{ const left=wants.slice(); let all=true; keys.forEach(k=>{ const e=el(k), v=parse(e.value); const i=left.findIndex(w=>same(v,w)); const ok=i>=0; if(ok) left.splice(i,1); e.classList.toggle("ok",ok); e.classList.toggle("bad",!ok&&v!==null); if(!ok) all=false; }); return all; };
+  box.querySelector('[data-a="chk"]').onclick=()=>{ let cp=true; for(let i=0;i<3;i++) for(let j=3;j<5;j++) if(!mark(`sc${i}${j}`,S.E[i][j])) cp=false;
+    box.querySelector(".s3sar").classList.toggle("on",cp);
+    const d=anyOrder(["d0","d1","d2"],S.dn), u=anyOrder(["u0","u1","u2"],S.up), Dk=mark("D",S.det), dx=["Dx","Dy","Dz"].map((k,j)=>mark(k,Ds[j])).every(Boolean), xs=["x","y","z"].map((k,i)=>mark(k,O.X[i])).every(Boolean);
+    fb.innerHTML=cp&&d&&u&&Dk&&dx&&xs?`<p class="yes">Solved! (${O.X.map(v=>v.h()).join(", ")})</p>`:`<p class="no">${!cp?"Step 1: copy column 1, then column 2, next to the matrix.":!(d&&u)?"Step 2: follow each line through three numbers and multiply them.":!Dk?"D = (sum of ↘ products) − (sum of ↗ products).":!dx?"Step 3: put the constants in the x-column for Dx, the y-column for Dy, the z-column for Dz.":"Step 4: x = Dx ÷ D, y = Dy ÷ D, z = Dz ÷ D."} The wrong boxes are red.</p>`; };
+  box.querySelector('[data-a="sol"]').onclick=()=>{ box.querySelector(".s3sol").innerHTML=sarrusHTML(T,O); };
+  box.querySelector('[data-a="new"]').onclick=()=>practiceSarrus(box); }
 /* ---------- lab shell ---------- */
-function html(){ return `<div class="s3lab"><p class="lead2">Every system here is new each time. Solved examples show five methods and a 3D graph of the three planes; practice checks each answer as you go.</p>
-  <div class="s3mode">${[["ex","Solved examples"],["solve","Practice: solve"],["gauss","Practice: Gauss step by step"],["aug","Practice: augmented matrix"],["cls","Practice: how many solutions?"]].map(([k,t],i)=>`<button type="button" data-m="${k}"${i?"":' class="on"'}>${t}</button>`).join("")}</div>
+function html(){ return `<div class="s3lab"><p class="lead2">Every system here is new each time. Solved examples show six methods and a 3D graph of the three planes; practice checks each answer as you go.</p>
+  <div class="s3mode">${[["ex","Solved examples"],["solve","Practice: solve"],["gauss","Practice: Gauss step by step"],["sar","Practice: Sarrus & Cramer"],["aug","Practice: augmented matrix"],["cls","Practice: how many solutions?"]].map(([k,t],i)=>`<button type="button" data-m="${k}"${i?"":' class="on"'}>${t}</button>`).join("")}</div>
   <div class="s3exctl"><span>Type:</span>${[["one","One solution"],["none","No solution"],["inf","Infinitely many"]].map(([k,t],i)=>`<button type="button" data-k="${k}"${i?"":' class="on"'}>${t}</button>`).join("")}<button type="button" class="s3b" data-new>↻ New example</button></div>
   <div class="s3out"></div></div>`; }
 function bind(root){ root.querySelectorAll(".s3lab").forEach(lab=>{ if(lab.dataset.bound) return; lab.dataset.bound=1; const out=lab.querySelector(".s3out"), ctl=lab.querySelector(".s3exctl"); let mode="ex", kind="one";
   const render=()=>{ ctl.hidden=mode!=="ex"; if(mode==="ex"){ const S=genSystem(kind), ex=exampleHTML(S); out.innerHTML=ex.html; bindExample(out,S,ex.O); }
-    else if(mode==="solve") practiceSolve(out); else if(mode==="gauss") practiceGauss(out); else if(mode==="aug") practiceAug(out); else practiceClass(out); };
+    else if(mode==="solve") practiceSolve(out); else if(mode==="gauss") practiceGauss(out); else if(mode==="sar") practiceSarrus(out); else if(mode==="aug") practiceAug(out); else practiceClass(out); };
   lab.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{ mode=b.dataset.m; lab.querySelectorAll("[data-m]").forEach(x=>x.classList.toggle("on",x===b)); render(); });
   ctl.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{ kind=b.dataset.k; ctl.querySelectorAll("[data-k]").forEach(x=>x.classList.toggle("on",x===b)); render(); });
   ctl.querySelector("[data-new]").onclick=render; render(); }); }
@@ -248,6 +283,15 @@ const css=`.s3mode,.s3exctl,.s3tabs{display:flex;flex-wrap:wrap;gap:6px;align-it
 .s3leg{display:flex;flex-direction:column;gap:3px;font-size:15.5px;padding:4px 6px}
 .s3leg i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-1px;border-radius:3px}
 .s3leg .no{color:#b3261e;font-style:italic}
+.s3sar{position:relative;margin:6px 0 4px;max-width:100%}
+.s3sar svg{position:absolute;left:0;top:0;pointer-events:none;z-index:0}
+.s3sar svg line.dn,.s3sar svg line.up{opacity:0;transition:opacity .3s;stroke-width:2.2}
+.s3sar.on svg line.dn,.s3sar.on svg line.up{opacity:.45}
+.s3sar svg .dn{stroke:#1f4fd1}.s3sar svg .up{stroke:#c23a52;stroke-dasharray:5 4}
+.s3sar svg .br{fill:none;stroke:#111;stroke-width:1.6}.s3sar svg .sep{stroke:#999;stroke-dasharray:3 3}
+.s3sc{position:absolute;width:48px;height:34px;display:flex;align-items:center;justify-content:center;font-size:17px;z-index:1;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 5px #fff,0 0 6px #fff}
+.s3sc.cp{color:#555}.s3sc .s3in{width:42px;height:28px;font-size:15.5px;background:rgba(255,255,255,.85)}
+.s3dn{color:#1f4fd1;font-weight:700}.s3up{color:#c23a52;font-weight:700}
 @media (max-width:640px){.s3in{width:48px}.s3qs{flex-direction:column;align-items:flex-start}.s3steps{padding-left:18px}}`;
 const st=document.createElement("style"); st.textContent=css; document.head.appendChild(st);
 window.A2S3={html,bind,_test:{genSystem,gauss,solveAll,backSub,paramSol,gaussJordan,det3,adj,Q,exampleHTML}};

@@ -293,6 +293,9 @@ const QFLOW=()=>flowHTML("quad",{M:QM,label:"Solving quadratics flowchart",lead:
 /* ---------- more method flowcharts: systems, units 4, 5, 6, 7, 10 ---------- */
 const BLU="#1f4fd1", T=(...r)=>r;  // T(q, steps) helper
 const mat=rows=>`<span class="mx" style="--n:${(rows[0]||[]).length}">${rows.flat().map(v=>`<i>${v}</i>`).join("")}</span>`;
+const dmat=rows=>`<span class="mx mxd" style="--n:${rows[0].length}">${rows.flat().map(v=>`<i>${v}</i>`).join("")}</span>`;   // determinant |…|
+const amat=rows=>`<span class="mx mxa" style="--n:${rows[0].length}">${rows.flat().map((v,j)=>`<i${j%rows[0].length===rows[0].length-1?' class="ab"':""}>${v}</i>`).join("")}</span>`;   // augmented [A | B]
+const SYS3=L=>`<span class="mf-sys">${L.map(e=>`<span>${e}</span>`).join("")}</span>`;
 const SM={
  form:{grp:"Always first",c:NAVY,name:"Line Up the Variables",hint:"ax + by (+ cz) = d",
   when:"Before choosing any method.",
@@ -333,12 +336,12 @@ const SM={
   when:"Any 3 × 3 system, and the best way to classify one with no or infinitely many solutions.",
   rule:"Write the augmented matrix [A | B]. Use row operations to get zeros below the diagonal, then back-substitute. A row 0 0 0 | k with k ≠ 0 means no solution. A row of all zeros means infinitely many.",
   why:"It's systematic and always works, and the last row tells you the type of system.",
-  ex:[T("x + y + z = 6, 2x − y + z = 3, x + 2y − z = 2",["R₂ − 2R₁ → [0 −3 −1 | −9], R₃ − R₁ → [0 1 −2 | −4]. Swap them.","R₃ + 3R₂ → [0 0 −7 | −21], so z = 3, y = 2, x = 1. <b>(1, 2, 3)</b>"]),T("x + y + z = 3, 2x + y − z = 2, 3x + 2y = 5",["Eq 3 = Eq 1 + Eq 2, so one row becomes 0 0 0 | 0.","Infinitely many: <b>(−1 + 2t, 4 − 3t, t)</b>"])]},
+  ex:[T(SYS3(["x + y + z = 6","2x − y + z = 3","x + 2y − z = 2"]),[`Augmented matrix: ${amat([[1,1,1,6],[2,"−1",1,3],[1,2,"−1",2]])}`,`R₂ − 2R₁ and R₃ − R₁, then swap R₂ and R₃: ${amat([[1,1,1,6],[0,1,"−2","−4"],[0,"−3","−1","−9"]])}`,`R₃ + 3R₂: ${amat([[1,1,1,6],[0,1,"−2","−4"],[0,0,"−7","−21"]])}`,"Back-substitute: z = 3, y = 2, x = 1. <b>(1, 2, 3)</b>"]),T(SYS3(["x + y + z = 3","2x + y − z = 2","3x + 2y = 5"]),[`Augmented matrix: ${amat([[1,1,1,3],[2,1,"−1",2],[3,2,0,5]])}`,`R₃ − R₁ − R₂ (Eq 3 = Eq 1 + Eq 2): ${amat([[1,1,1,3],[2,1,"−1",2],[0,0,0,0]])}`,"A row of zeros: infinitely many solutions <b>(−1 + 2t, 4 − 3t, t)</b>"])]},
  cr3:{grp:"3 × 3 linear",c:RED,name:"Cramer's Rule (3 × 3)",hint:"z = D<sub>z</sub> / D",
   when:"You need only one variable, or the system has a parameter.",
   rule:"Find D, the determinant of the coefficients. Replace a column with the constants to get Dₓ, D<sub>y</sub> or D<sub>z</sub>. If D ≠ 0, each variable is its determinant ÷ D.",
   why:"To find just z, you need only two determinants instead of solving the whole system.",
-  ex:[T("x + y + z = 6, 2x − y + z = 3, x + 2y − z = 2. Find z.",["D = 1(1 − 2) − 1(−2 − 1) + 1(4 + 1) = 7.","D<sub>z</sub> = 21, so <b>z = 3</b>."]),T("x + y + z = 3, 2x + y − z = 2, 3x + 2y = 5",["D = 2 − 3 + 1 = 0.","D = 0: no unique solution. Use Gauss to decide between none and infinitely many."])]},
+  ex:[T(SYS3(["x + y + z = 6","2x − y + z = 3","x + 2y − z = 2"])+" Find z.",[`D = ${dmat([[1,1,1],[2,"−1",1],[1,2,"−1"]])} = 1(1 − 2) − 1(−2 − 1) + 1(4 + 1) = <b>7</b>`,`D<sub>z</sub> = ${dmat([[1,1,6],[2,"−1",3],[1,2,2]])} = 1(−2 − 6) − 1(4 − 3) + 6(4 + 1) = <b>21</b>`,"z = D<sub>z</sub> ÷ D = 21 ÷ 7 = <b>3</b>"]),T(SYS3(["x + y + z = 3","2x + y − z = 2","3x + 2y = 5"]),[`D = ${dmat([[1,1,1],[2,1,"−1"],[3,2,0]])} = 1(0 + 2) − 1(0 + 3) + 1(4 − 3) = <b>0</b>`,"D = 0: no unique solution. Use Gauss to decide between none and infinitely many."])]},
  p2:{grp:"With a parameter",c:PURP,name:"Parameter Discussion (2 × 2)",hint:"D ≠ 0? D = 0?",
   when:"The coefficients contain a letter such as k or m, and you must say how the solutions depend on it.",
   rule:"<b>D ≠ 0</b> → exactly one solution x = Dₓ/D, y = D<sub>y</sub>/D. <b>D = 0</b> and Dₓ = D<sub>y</sub> = 0 → infinitely many. <b>D = 0</b> and Dₓ or D<sub>y</sub> ≠ 0 → no solution.",
@@ -1096,6 +1099,9 @@ const st=document.createElement("style"); st.textContent=CSS+`
 .mf-exs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;margin:8px 0}
 .mf-ex{border:1px solid #ccc;padding:8px 12px}
 .mf-eq{margin:0 0 2px;font-size:19px;font-weight:600}
+.mf-sys{display:inline-flex;flex-direction:column;border-left:2px solid currentColor;padding:1px 0 1px 10px;margin:2px 6px 2px 0;line-height:1.45;vertical-align:middle}
+.mx.mxd{background:none!important}.mx.mxd::before,.mx.mxd::after{width:0!important;border-top:0!important;border-bottom:0!important}
+.mx.mxa>i.ab{border-left:1.5px solid #888;padding-left:.55em}
 .mf-ex ol{margin:0;padding-left:20px;font-size:16px;line-height:1.55}
 @media (max-width:700px){.mf{padding:14px 4px}.mf-br{--g:4px}.mf-n{padding:5px 3px;border-radius:9px}.mf-n b{font-size:12.5px}.mf-col .mf-n span{display:none}.mf-l{padding:2px 4px}.mf-l b{font-size:12.5px}.mf-l span{display:none}.mf-s,.mf-q{font-size:15px}.mf-br[style*="--n:5"] .mf-n b,.mf-br[style*="--n:5"] .mf-l b{font-size:10.5px;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:normal}.mf-n b{overflow-wrap:normal;-webkit-hyphens:auto;hyphens:auto}}
 `; document.head.appendChild(st);
