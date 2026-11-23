@@ -1,5 +1,7 @@
 // Algebra 2 Honors: interactive cheat sheets (rules + worked example + common mistake + "another example")
 (function(){
+const MXc=(rows,cls)=>`<span class="mx ${cls}" style="--n:${rows[0].length}">${rows.flat().map(v=>`<i>${v}</i>`).join("")}</span>`;
+const DMX=r=>MXc(r,"mxd"), BMX=r=>MXc(r,"mxb2"), SYSX=L=>`<span class="mf-sys">${L.map(e=>`<span>${e}</span>`).join("")}</span>`;   // determinant |…|, matrix […], stacked system
 const C=(t,rules,ex,tip,gen,g)=>({t,rules,ex,tip,gen,g});
 const CS={
 "toolkit":[
@@ -35,10 +37,10 @@ const CS={
   ["Solve 2x + y = 7 and x - y = 2.","Add the equations: 3x = 9 → x = 3. Then 3 - y = 2 → y = 1.<br><b>(3, 1)</b>"],"Multiply a WHOLE equation (both sides) when lining up coefficients.","unit-1:Systems",{f:[x=>7-2*x,{f:x=>x-2,light:true}],p:[[3,1]]}),
  C("Special cases",["Same slope, different intercept → parallel → no solution","Same line → infinitely many solutions","Different slopes → exactly one solution"],
   ["How many solutions: 2x - 4y = 8 and x - 2y = 3?","Both have slope 1/2; intercepts -2 and -3/2 differ → parallel → <b>no solution</b>."],"0 = 0 means infinitely many, not “x = 0”."),
- C("Cramer's rule (2 × 2)",["D = |a b; c d| = ad - bc","x = {{D<sub>x</sub>|D}}, y = {{D<sub>y</sub>|D}} (replace a column with the constants)","D = 0 → no unique solution"],
-  ["Solve 2x + y = 7, x - y = 2 with Cramer's rule.","D = 2(-1) - 1(1) = -3. &nbsp; D<sub>x</sub> = 7(-1) - 1(2) = -9 → x = 3. &nbsp; D<sub>y</sub> = 2(2) - 7(1) = -3 → y = 1."],"Order matters: ad - bc, not bc - ad."),
- C("Inverse matrices",["A = [a b; c d] → A⁻¹ = {{1|ad - bc}}[d -b; -c a]","AX = B → X = A⁻¹B","No inverse if ad - bc = 0"],
-  ["Find the inverse of [2 1; 5 3].","det = 6 - 5 = 1 → A⁻¹ = [3 -1; -5 2]. Check: [2 1; 5 3][3 -1; -5 2] = [1 0; 0 1] ✓"],"Swap a and d; change the signs of b and c."),
+ C("Cramer's rule (2 × 2)",[`D = ${DMX([["a","b"],["c","d"]])} = ad - bc`,`D<sub>x</sub> = ${DMX([["e","b"],["f","d"]])}, D<sub>y</sub> = ${DMX([["a","e"],["c","f"]])} (replace a column with the constants e, f)`,"x = {{D<sub>x</sub>|D}}, y = {{D<sub>y</sub>|D}}","D = 0 → no unique solution"],
+  [`Solve ${SYSX(["2x + y = 7","x - y = 2"])} with Cramer's rule.`,`D = ${DMX([[2,1],[1,-1]])} = 2(-1) - 1(1) = <b>-3</b><br>D<sub>x</sub> = ${DMX([[7,1],[2,-1]])} = 7(-1) - 1(2) = -9 → x = {{-9|-3}} = <b>3</b><br>D<sub>y</sub> = ${DMX([[2,7],[1,2]])} = 2(2) - 7(1) = -3 → y = {{-3|-3}} = <b>1</b>`],"Order matters: ad - bc, not bc - ad."),
+ C("Inverse matrices",[`A = ${BMX([["a","b"],["c","d"]])} → A⁻¹ = {{1|ad - bc}}${BMX([["d","-b"],["-c","a"]])}`,"AX = B → X = A⁻¹B","No inverse if ad - bc = 0"],
+  [`Find the inverse of ${BMX([[2,1],[5,3]])}.`,`det = 2·3 - 1·5 = 1 → A⁻¹ = ${BMX([[3,-1],[-5,2]])}<br>Check: ${BMX([[2,1],[5,3]])}${BMX([[3,-1],[-5,2]])} = ${BMX([[1,0],[0,1]])} ✓`],"Swap a and d; change the signs of b and c."),
  C("Nonlinear systems",["Substitute the line into the curve.","The number of real solutions = number of intersection points","Discriminant 0 → tangent (one point)"],
   ["Solve y = x^2 - 1 and y = x + 1.","x^2 - 1 = x + 1 → x^2 - x - 2 = 0 → x = 2 or -1 → <b>(2, 3) and (-1, 0)</b>"],"Find y for EACH x value.","unit-3:Systems & tangents",{f:[x=>x*x-1,{f:x=>x+1,light:true}],p:[[2,3],[-1,0]]})
 ],
