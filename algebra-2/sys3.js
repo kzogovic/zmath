@@ -64,9 +64,9 @@ function gauss(M0){
 function backSub(M,piv){ // unique, M upper-triangular integers
   const X=[null,null,null], lines=[];
   for(let i=2;i>=0;i--){ const c=piv[i]; let rhs=q(M[i][3]); const parts=[];
-    for(let j=c+1;j<3;j++){ if(M[i][j]!==0){ rhs=rhs.sub(q(M[i][j]).mul(X[j])); parts.push(`${neg(M[i][j])}(${X[j].h()})`); } }
+    for(let j=c+1;j<3;j++){ if(M[i][j]!==0){ rhs=rhs.sub(q(M[i][j]).mul(X[j])); parts.push(`${parts.length?(M[i][j]<0?" − "+neg(-M[i][j]):" + "+neg(M[i][j])):neg(M[i][j])}(${X[j].h()})`); } }
     X[c]=rhs.div(q(M[i][c]));
-    lines.push(`Row ${i+1}: ${eqn(M[i])}${parts.length?` → ${neg(M[i][c])}${V[c]} = ${q(M[i][3]).h()} − (${parts.join(" + ")})`:""} → <b>${V[c]} = ${X[c].h()}</b>`); }
+    lines.push(`Row ${i+1}: ${eqn(M[i])}${parts.length?` → ${neg(M[i][c])}${V[c]} = ${q(M[i][3]).h()} − (${parts.join("")})`:""} → <b>${V[c]} = ${X[c].h()}</b>`); }
   return {X,lines}; }
 function paramSol(M,piv){ // rank 2: one free variable t
   const free=[0,1,2].find(c=>!piv.includes(c)); const E=[null,null,null]; E[free]=[q(0),q(1)];

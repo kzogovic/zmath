@@ -180,22 +180,22 @@ details.fold>.grid,details.fold>.cs,details.fold>.quiz,details.fold>.sat,details
 </div>
 
 <script src="plot.js?v=1794835224"></script>
-<script src="practice.js?v=1794835224"></script>
-<script src="gen.js?v=1794835224"></script>
+<script src="practice.js?v=1795445000"></script>
+<script src="gen.js?v=1795445000"></script>
 <script src="sat.js?v=1794835224"></script>
 <script src="res.js?v=1794835224"></script>
 <script src="cheat.js?v=1794835224"></script>
 <script src="explog.js?v=1794835224"></script>
-<script src="moregen.js?v=1794835224"></script>
+<script src="moregen.js?v=1795445000"></script>
 <script src="formulas.js?v=1794835224"></script>
 <script src="ws.js?v=1794835224"></script>
 <script src="poly.js?v=1794835224"></script>
-<script src="unitplus.js?v=1794835224"></script>
+<script src="unitplus.js?v=1795445000"></script>
 <script src="frac.js?v=1794835224"></script>
-<script src="factor.js?v=1795442000"></script>
+<script src="factor.js?v=1795445000"></script>
 <script src="division.js?v=1794835224"></script>
 <script src="pro.js?v=1794835224"></script>
-<script src="sys3.js?v=1795442000"></script>
+<script src="sys3.js?v=1795445000"></script>
 <script src="mathfix.js?v=1794835224"></script>
 <script>
 const UNITS = [
@@ -440,7 +440,7 @@ function subsections(id,items){
   const grid=a=>`<div class="grid">${a.map(card).join("")}</div>`;
   if(window.A2FACT&&A2FACT.flowHas(id)) out.push(["flow",A2FACT.flowTitle(id),A2FACT.flowCount(id),A2FACT.flowHtml(id)]);
   if(window.A2PRO&&A2PRO.sheet(id)) out.push(["cheatx","Key Formulas & Rules","one page",A2PRO.sheet(id)]);
-  if(window.A2S3&&(id==="systems"||id==="unit-13"||id==="unit-1")) out.push(["lab3","3 × 3 Lab: Gauss, Matrices & 3D Graphs","solve · graph · practice",A2S3.html()]);
+  if(window.A2S3&&(id==="systems"||id==="unit-13"||id==="unit-1")) out.push(["lab3","3 × 3 Lab: Gauss, Matrices, Sarrus & 3D Graphs","solve · graph · Sarrus · practice",A2S3.html()]);
   if(A2CHEAT.has(id)) out.push(["cheat","Cheat Sheet",A2CHEAT.count(id)+" topics",A2CHEAT.html(id)]);
   if(window.A2EXPLOG&&A2EXPLOG.has(id)) out.push(["graphs","Graphs & Worked Examples",A2EXPLOG.count(id)+" examples",A2EXPLOG.html(id)]);
   if(sum.length) out.push(["summary","Unit Summary",sum.length+" pages",grid(sum)]);

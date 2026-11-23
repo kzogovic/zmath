@@ -10,7 +10,7 @@ const has=id=>topics(id).length>0;
 /* convert a generated problem {q, a: steps<br>…<b>Answer: X</b>} to {q, a, s, g} */
 function conv(p){ const parts=String(p.a).split(/<br\s*\/?>/i).map(x=>x.trim()).filter(Boolean); let ans=null, s=[];
   parts.forEach(x=>{ const m=x.match(/^<b>\s*Answer:\s*([\s\S]*?)<\/b>\s*$/i); if(m) ans=m[1].trim(); else s.push(x); });
-  if(ans===null){ const last=s.pop()||""; ans=last.replace(/^<b>|<\/b>$/g,""); s.push(last); }
+  if(ans===null){ const last=s.pop()||""; ans=last.replace(/<\/?b>/g,""); s.push(last); }
   return {q:p.q,a:ans,s,g:p.g,topic:p.topic}; }
 const mk=([name,fn])=>()=>{ for(let i=0;i<20;i++){ try{ const r=fn(); if(r&&r.q){ r.topic=r.topic||name; return conv(r); } }catch(e){} } return {q:"(Press New.)",a:"",s:[]}; };
 function gen(id,grp){ return entries(id,grp).map(mk); }

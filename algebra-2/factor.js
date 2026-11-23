@@ -342,6 +342,11 @@ const SM={
   rule:"Find D, the determinant of the coefficients. Replace a column with the constants to get Dₓ, D<sub>y</sub> or D<sub>z</sub>. If D ≠ 0, each variable is its determinant ÷ D.",
   why:"To find just z, you need only two determinants instead of solving the whole system.",
   ex:[T(SYS3(["x + y + z = 6","2x − y + z = 3","x + 2y − z = 2"])+" Find z.",[`D = ${dmat([[1,1,1],[2,"−1",1],[1,2,"−1"]])} = 1(1 − 2) − 1(−2 − 1) + 1(4 + 1) = <b>7</b>`,`D<sub>z</sub> = ${dmat([[1,1,6],[2,"−1",3],[1,2,2]])} = 1(−2 − 6) − 1(4 − 3) + 6(4 + 1) = <b>21</b>`,"z = D<sub>z</sub> ÷ D = 21 ÷ 7 = <b>3</b>"]),T(SYS3(["x + y + z = 3","2x + y − z = 2","3x + 2y = 5"]),[`D = ${dmat([[1,1,1],[2,1,"−1"],[3,2,0]])} = 1(0 + 2) − 1(0 + 3) + 1(4 − 3) = <b>0</b>`,"D = 0: no unique solution. Use Gauss to decide between none and infinitely many."])]},
+ sar:{grp:"3 × 3 linear",c:RED,name:"Sarrus' Rule (3 × 3 determinant)",hint:"copy 2 columns, ↘ − ↗",
+  when:"You need a 3 × 3 determinant: D, D<sub>x</sub>, D<sub>y</sub>, D<sub>z</sub> for Cramer's rule, or to check if det A = 0.",
+  rule:"Copy the first two columns to the right of the matrix. Multiply along the three ↘ diagonals and add. Multiply along the three ↗ diagonals and add. det = (↘ sum) − (↗ sum). It works only for 3 × 3.",
+  why:"No minors or cofactors to keep track of: six products and one subtraction. Practice it in the 3 × 3 Lab: “Sarrus' rule” tab and “Practice: Sarrus & Cramer”.",
+  ex:[T(`det ${dmat([[1,1,1],[2,"−1",1],[1,2,"−1"]])}`,[`Copy columns 1 and 2: ${mat([[1,1,1,"│ 1",1],[2,"−1",1,"│ 2","−1"],[1,2,"−1","│ 1",2]])}`,"↘: (1)(−1)(−1) + (1)(1)(1) + (1)(2)(2) = 1 + 1 + 4 = 6","↗: (1)(−1)(1) + (2)(1)(1) + (−1)(2)(1) = −1 + 2 − 2 = −1","det = 6 − (−1) = <b>7</b>"]),T(`det ${dmat([[2,1,3],[0,"−1",4],[1,2,1]])}`,["↘: (2)(−1)(1) + (1)(4)(1) + (3)(0)(2) = −2 + 4 + 0 = 2","↗: (1)(−1)(3) + (2)(4)(2) + (1)(0)(1) = −3 + 16 + 0 = 13","det = 2 − 13 = <b>−11</b>"])]},
  p2:{grp:"With a parameter",c:PURP,name:"Parameter Discussion (2 × 2)",hint:"D ≠ 0? D = 0?",
   when:"The coefficients contain a letter such as k or m, and you must say how the solutions depend on it.",
   rule:"<b>D ≠ 0</b> → exactly one solution x = Dₓ/D, y = D<sub>y</sub>/D. <b>D = 0</b> and Dₓ = D<sub>y</sub> = 0 → infinitely many. <b>D = 0</b> and Dₓ or D<sub>y</sub> ≠ 0 → no solution.",
@@ -371,7 +376,7 @@ const SM={
   ex:[T("x + y = 2 and x + y = 5",["Subtract: 0 = 3.","<b>No solution</b> (parallel lines)."]),T("2x + 4y = 6 and x + 2y = 3",["Eq 1 − 2·Eq 2: 0 = 0.","<b>Infinitely many</b>: (3 − 2t, t)."])]}
 };
 const SYS=()=>flowHTML("sys",{M:SM,label:"Systems method flowchart",lead:"Which method to use for a system, and why. Follow the arrows from the top and tap any method: each card explains when to use it and why it's the best choice there.",start:"Solve the system",top:["form"],q:"What kind of system?",
-  cols:[["2 × 2 linear","two lines",ORG,["graph","sub","elim","cr2","inv"]],["3 × 3 linear","three planes",RED,["el3","gauss","cr3"]],["With a parameter","k, m, a…",PURP,["p2","p3"]],["Nonlinear","curves",TEAL,["nls","nle"]]],end:"cls"});
+  cols:[["2 × 2 linear","two lines",ORG,["graph","sub","elim","cr2","inv"]],["3 × 3 linear","three planes",RED,["el3","gauss","cr3","sar"]],["With a parameter","k, m, a…",PURP,["p2","p3"]],["Nonlinear","curves",TEAL,["nls","nle"]]],end:"cls"});
 
 const ZM={
  cnt:{grp:"Always first",c:NAVY,name:"Count the Zeros",hint:"degree n → n zeros",

@@ -651,7 +651,7 @@ function asymptotes(){
   return {adv:true,g:RG(f,[q],{slant:x=>x+b+q,p:[],cap:`Vertical asymptote x = ${q}; slant asymptote y = ${poly([1,b+q])} (dashed).`}),
     q:`Find the vertical and slant (oblique) asymptotes of f(x) = {{${poly([1,b,c])}|${poly([1,-q])}}}.`,
     a:J([`Degree of top is exactly one more than the bottom → <b>slant asymptote</b>. Divide (synthetic division with ${q}):`,synthTable([q,1],[1,b,c]).html,
-      `f(x) = ${poly([1,b+q])} + {{${rem}|${poly([1,-q])}}}. As x → ±∞, the fraction → 0.`,`<b>Vertical asymptote:</b> x = ${q} (remainder ${rem} ≠ 0, so no hole)`,ans(`VA x = ${q}; slant asymptote y = ${poly([1,b+q])}`)])};
+      `f(x) = ${poly([1,b+q])} ${rem<0?"-":"+"} {{${Math.abs(rem)}|${poly([1,-q])}}}. As x → ±∞, the fraction → 0.`,`<b>Vertical asymptote:</b> x = ${q} (remainder ${rem} ≠ 0, so no hole)`,ans(`VA x = ${q}; slant asymptote y = ${poly([1,b+q])}`)])};
 }
 function solveRat(){
   if(Math.random()<0.5){ // p/x + q/(x-a) = 1
@@ -1073,7 +1073,7 @@ function binCube(){
   const T=[[p**3,3,0],[3*p*p*q,2,bi],[3*p*q*q,1,2*bi],[q**3,0,3*bi]];
   const ansS=tl(T.map(([c,i,j])=>[c,mono(i,j)]));
   const base=tl([[p,"x"],[q,wy?"y":""]]);
-  return {g:wy?null:FG([p**3,3*p*p*q,3*p*q*q,q**3],[-q/p],"Graph check: (px + q)^3 has a single zero with multiplicity 3 (it flattens as it crosses)."),
+  return {g:wy?null:FG([p**3,3*p*p*q,3*p*q*q,q**3],[-q/p],"Graph check: (px + q)<sup>3</sup> has a single zero with multiplicity 3 (it flattens as it crosses)."),
     q:`Expand (${base})^3.`,
     a:J([`Use (a + b)^3 = a^3 + 3a^2b + 3ab^2 + b^3 with a = ${aS}, b = ${bS}.`,
       `a^3 = (${aS})^3 = ${termS(p**3,3,0)}`,`3a^2b = 3(${aS})^2(${bS}) = ${termS(3*p*p*q,2,bi)}`,`3ab^2 = 3(${aS})(${bS})^2 = ${termS(3*p*q*q,1,2*bi)}`,`b^3 = (${bS})^3 = ${termS(q**3,0,3*bi)}`,ans(ansS)]),

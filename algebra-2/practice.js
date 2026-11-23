@@ -198,13 +198,13 @@ const SETS = [
   ["Factor x^2 + 9x + 20.",
    "Need: multiply to 20, add to 9. Pairs of 20: 1·20, 2·10, <b>4·5</b> → 4 + 5 = 9 ✓<br><b>Answer: (x + 4)(x + 5)</b>"],
   ["Factor x^2 - 11x + 28.",
-   "c = +28 and b = -11, so both numbers are negative. -4 · -7 = 28 and -4 + -7 = -11 ✓<br><b>Answer: (x - 4)(x - 7)</b>"],
+   "c = +28 and b = -11, so both numbers are negative. (-4)(-7) = 28 and -4 + (-7) = -11 ✓<br><b>Answer: (x - 4)(x - 7)</b>"],
   ["Factor x^2 + 3x - 40.",
    "c is negative → opposite signs; the larger is positive (b = +3). 8 · (-5) = -40, 8 - 5 = 3 ✓<br><b>Answer: (x + 8)(x - 5)</b>"],
   ["Factor x^2 - 4x - 21.",
    "Opposite signs; the larger is negative. -7 · 3 = -21, -7 + 3 = -4 ✓<br><b>Answer: (x - 7)(x + 3)</b>"],
   ["Factor x^2 - 16x + 64.",
-   "-8 · -8 = 64 and -8 + -8 = -16 ✓<br><b>Answer: (x - 8)^2</b>, a perfect square trinomial."],
+   "(-8)(-8) = 64 and -8 + (-8) = -16 ✓<br><b>Answer: (x - 8)^2</b>, a perfect square trinomial."],
   ["Factor x^2 + x - 56.",
    "Opposite signs; they must differ by 1. 8 · (-7) = -56, 8 - 7 = 1 ✓<br><b>Answer: (x + 8)(x - 7)</b>"],
   ["Factor x^2 - 13x + 36.",
@@ -401,7 +401,7 @@ const SETS = [
   ["Simplify (1 + i)^4.",
    "Square first: (1 + i)^2 = 1 + 2i + i^2 = 2i<br>Square again: (2i)^2 = 4i^2<br><b>Answer: -4</b>"],
   ["Simplify √(-50) · √(-2).",
-   "Write in i form first: (5i√2)(i√2) = 5i^2 · 2 = 5(-1)(2)<br><b>Answer: -10</b><br><i>Common mistake:</i> √(-50 · -2) = √100 = 10. That's wrong."],
+   "Write in i form first: (5i√2)(i√2) = 5i^2 · 2 = 5(-1)(2)<br><b>Answer: -10</b><br><i>Common mistake:</i> √((-50)(-2)) = √100 = 10. That's wrong."],
   ["Solve 2x^2 + 32 = 0.",
    "2x^2 = -32 → x^2 = -16 → x = ±√(-16)<br><b>Answer: x = ±4i</b>"],
   ["Simplify (2 - 3i)^2.",
@@ -955,7 +955,7 @@ function m(s){
      .replace(/\^(-?\d+|[a-z])/g,"<sup>$1</sup>");
   s=piecewise(s);
   s=s.replace(/\((-?\d+)\/(\d+)\)(?=[a-zA-Z(√])/g,"{{$1|$2}}");
-  s=s.replace(/\{\{([^{}|]*)\|([^{}]*)\}\}/g,(_,a,b)=>F(a,b));
+  for(let k=0;k<4&&/\{\{/.test(s);k++) s=s.replace(/\{\{([^{}|]*)\|([^{}]*)\}\}/g,(_,a,b)=>F(a,b)); // nested fractions: inner first, then outer
   s=autoFrac(s);
   s=radicals(s);
   return s.replace(/(^|[\s(=,\[{;>±/·|⌊]|&nbsp;)-(?=[\dA-Za-z(√∞⌊<])/g,"$1−").replace(/ - /g," − ");
