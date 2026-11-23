@@ -195,6 +195,8 @@ details.fold>.grid,details.fold>.cs,details.fold>.quiz,details.fold>.sat,details
 <script src="factor.js?v=1795445000"></script>
 <script src="division.js?v=1794835224"></script>
 <script src="pro.js?v=1794835224"></script>
+<script src="syslab.js?v=1795447000"></script>
+<script src="methods.js?v=1795447000"></script>
 <script src="sys3.js?v=1795445000"></script>
 <script src="mathfix.js?v=1794835224"></script>
 <script>
@@ -439,6 +441,7 @@ function subsections(id,items){
   const out=[], sum=items.filter(p=>p.summary), sat=items.filter(p=>p.units.includes("sat")), rest=items.filter(p=>!p.summary&&!p.units.includes("sat"));
   const grid=a=>`<div class="grid">${a.map(card).join("")}</div>`;
   if(window.A2FACT&&A2FACT.flowHas(id)) out.push(["flow",A2FACT.flowTitle(id),A2FACT.flowCount(id),A2FACT.flowHtml(id)]);
+  if(window.A2METH&&A2METH.has(id)) out.push(["methods","Step-by-Step Methods: Graphing, Substitution, Elimination & more","type each step · practice",A2METH.lab()]);
   if(window.A2PRO&&A2PRO.sheet(id)) out.push(["cheatx","Key Formulas & Rules","one page",A2PRO.sheet(id)]);
   if(window.A2S3&&(id==="systems"||id==="unit-13"||id==="unit-1")) out.push(["lab3","3 × 3 Lab: Gauss, Matrices, Sarrus & 3D Graphs","solve · graph · Sarrus · practice",A2S3.html()]);
   if(A2CHEAT.has(id)) out.push(["cheat","Cheat Sheet",A2CHEAT.count(id)+" topics",A2CHEAT.html(id)]);
@@ -457,7 +460,7 @@ function subsections(id,items){
 }
 function unitBody(id,items){
   const subs=subsections(id,items);
-  let h=`<div class="secnav sticky" role="navigation" aria-label="Sections"><span>Jump to:</span><div class="jb">${subs.map(([k,t,c],i)=>`<button type="button" data-jump="sub-${id}-${k}"><b>${i+1}</b> ${t}<small>${c}</small></button>`).join("")}</div></div>`;
+  let h=(window.A2METH&&A2METH.has(id)?A2METH.finder(id):"")+`<div class="secnav sticky" role="navigation" aria-label="Sections"><span>Jump to:</span><div class="jb">${subs.map(([k,t,c],i)=>`<button type="button" data-jump="sub-${id}-${k}"><b>${i+1}</b> ${t}<small>${c}</small></button>`).join("")}</div></div>`;
   subs.forEach(([k,t,c,body],i)=>{ h+=`<div class="subsec" id="sub-${id}-${k}"><h3 class="subh"><span class="num">${i+1}</span>${t}<small>${c}</small><button type="button" class="totop" data-jump="sec-${id}">↑ Sections</button></h3>${body}</div>`; });
   const seq=UNITS.filter(x=>UNITLIKE(x.id)), ix=seq.findIndex(x=>x.id===id), pv=seq[ix-1], nx=seq[ix+1];
   h+=`<div class="pnav">${pv?`<button type="button" data-open="${pv.id}">← ${esc(pv.name)}</button>`:"<span></span>"}${nx?`<button type="button" data-open="${nx.id}">${esc(nx.name)} →</button>`:""}</div>`;
