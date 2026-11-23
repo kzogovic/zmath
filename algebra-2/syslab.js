@@ -201,7 +201,7 @@ const LABS=new Map(); let uid=0;
 function html(opts={}){ const ms=(opts.methods||ORDER).filter(k=>M[k]); const id="zs"+(++uid);
   LABS.set(id,{ms,cur:ms[0],P:null,solved:0,tried:0});
   return `<div class="zs" data-zs="${id}"><p class="zs-lead">${opts.lead||"Pick a method. Type numbers in the boxes: a box turns <span class=\"zs-ok\">green</span> when it's right and <span class=\"zs-no\">red</span> when it's not. Type negatives with a minus sign and fractions like 3/4."}</p>
-   <div class="zs-tabs">${ms.map((k,i)=>`<button type="button" data-zm="${k}"${i?"":' class="on"'}>${M[k].name}</button>`).join("")}</div>
+   <div class="zs-tabs"${ms.length<2?" hidden":""}>${ms.map((k,i)=>`<button type="button" data-zm="${k}"${i?"":' class="on"'}>${M[k].name}</button>`).join("")}</div>
    <div class="zs-ctl"><span class="zs-score">Solved <b>0</b></span><button type="button" data-za="new">↻ New system</button><button type="button" data-za="hint">💡 How to</button><button type="button" data-za="show">Show answer</button><button type="button" data-za="clear">Clear</button></div>
    <div class="zs-card"></div></div>`; }
 function render(root){ const S=LABS.get(root.dataset.zs); if(!S) return; let P=null; for(let i=0;i<20&&!P;i++){ try{ P=M[S.cur].gen(); }catch(e){} } S.P=P; S.done=false; S.shown=false;
